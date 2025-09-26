@@ -47,6 +47,11 @@ export default {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        uber: {
+          green: "hsl(var(--uber-green))",
+          "green-hover": "hsl(var(--uber-green-hover))",
+          "green-light": "hsl(var(--uber-green-light))",
+        },
         sidebar: {
           DEFAULT: "hsl(var(--sidebar-background))",
           foreground: "hsl(var(--sidebar-foreground))",
