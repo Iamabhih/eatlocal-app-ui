@@ -1,32 +1,32 @@
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { useAdminData } from '@/hooks/useAdminData';
 import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 import { AdminSidebar } from '@/components/admin/AdminSidebar';
-import { useOutletContext } from 'react-router-dom';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { useAdminData } from '@/hooks/useAdminData';
 
 export default function AdminOrders() {
-  const { isSuperadmin } = useOutletContext<{ isSuperadmin: boolean }>();
   const { orders, ordersLoading, updateOrder } = useAdminData();
 
-  const handleStatusChange = (orderId: string, newStatus: string) => {
+  const handleStatusChange = (
+    orderId: string, 
+    newStatus: 'pending' | 'confirmed' | 'preparing' | 'ready_for_pickup' | 'picked_up' | 'delivered' | 'cancelled'
+  ) => {
     updateOrder({ orderId, status: newStatus });
   };
 
   return (
     <SidebarProvider>
       <div className="min-h-screen flex w-full">
-        <AdminSidebar isSuperadmin={isSuperadmin} />
-        
-        <div className="flex-1">
-          <header className="h-16 border-b flex items-center px-6">
+        <AdminSidebar />
+        <div className="flex-1 flex flex-col">
+          <header className="h-12 flex items-center border-b px-4">
             <SidebarTrigger />
-            <h1 className="text-2xl font-bold ml-4">Order Management</h1>
           </header>
+          <main className="flex-1 p-6 bg-muted/30">
+            <h1 className="text-3xl font-bold mb-6">Order Management</h1>
 
-          <main className="p-6">
             <Card>
               <CardHeader>
                 <CardTitle>All Orders</CardTitle>
@@ -63,7 +63,7 @@ export default function AdminOrders() {
                           <TableCell>
                             <Select
                               value={order.status}
-                              onValueChange={(value) => handleStatusChange(order.id, value)}
+                              onValueChange={(value: any) => handleStatusChange(order.id, value)}
                             >
                               <SelectTrigger className="w-32">
                                 <SelectValue />

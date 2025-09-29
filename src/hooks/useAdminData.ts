@@ -93,7 +93,10 @@ export function useAdminData() {
 
   // Update order status
   const updateOrderMutation = useMutation({
-    mutationFn: async ({ orderId, status }: { orderId: string; status: any }) => {
+    mutationFn: async ({ orderId, status }: { 
+      orderId: string; 
+      status: 'pending' | 'confirmed' | 'preparing' | 'ready_for_pickup' | 'picked_up' | 'delivered' | 'cancelled'
+    }) => {
       const { error } = await supabase
         .from('orders')
         .update({ status })

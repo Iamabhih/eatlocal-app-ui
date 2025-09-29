@@ -116,7 +116,7 @@ const CustomerHome = () => {
           <h2 className="text-3xl font-bold text-center mb-12">Join UberEats</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
             <Card className="group cursor-pointer hover:shadow-hover transition-all duration-300">
-              <Link to="/restaurant-portal">
+              <Link to="/restaurant/dashboard">
                 <CardContent className="p-8 text-center">
                   <div className="text-6xl mb-4">🏪</div>
                   <h3 className="text-2xl font-bold mb-4 group-hover:uber-green transition-smooth">
@@ -133,7 +133,7 @@ const CustomerHome = () => {
             </Card>
 
             <Card className="group cursor-pointer hover:shadow-hover transition-all duration-300">
-              <Link to="/delivery-portal">
+              <Link to="/delivery/dashboard">
                 <CardContent className="p-8 text-center">
                   <div className="text-6xl mb-4">🏍️</div>
                   <h3 className="text-2xl font-bold mb-4 group-hover:uber-green transition-smooth">

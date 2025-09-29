@@ -15,14 +15,14 @@ const Navbar = ({ type = "customer" }: NavbarProps) => {
       <nav className="border-b bg-card shadow-card">
         <div className="container mx-auto px-4">
           <div className="flex h-16 items-center justify-between">
-            <Link to="/restaurant-portal" className="text-2xl font-bold uber-green">
+            <Link to="/restaurant/dashboard" className="text-2xl font-bold uber-green">
               UberEats Restaurant
             </Link>
             <div className="flex items-center gap-4">
               <Link 
-                to="/restaurant-portal" 
+                to="/restaurant/dashboard" 
                 className={`px-4 py-2 rounded-lg transition-smooth ${
-                  location.pathname === "/restaurant-portal" 
+                  location.pathname === "/restaurant/dashboard" 
                     ? "bg-uber-green text-white" 
                     : "hover:bg-muted"
                 }`}
@@ -30,9 +30,9 @@ const Navbar = ({ type = "customer" }: NavbarProps) => {
                 Dashboard
               </Link>
               <Link 
-                to="/restaurant-portal/orders" 
+                to="/restaurant/orders" 
                 className={`px-4 py-2 rounded-lg transition-smooth ${
-                  location.pathname === "/restaurant-portal/orders" 
+                  location.pathname === "/restaurant/orders" 
                     ? "bg-uber-green text-white" 
                     : "hover:bg-muted"
                 }`}
@@ -40,9 +40,9 @@ const Navbar = ({ type = "customer" }: NavbarProps) => {
                 Orders
               </Link>
               <Link 
-                to="/restaurant-portal/menu" 
+                to="/restaurant/menu" 
                 className={`px-4 py-2 rounded-lg transition-smooth ${
-                  location.pathname === "/restaurant-portal/menu" 
+                  location.pathname === "/restaurant/menu" 
                     ? "bg-uber-green text-white" 
                     : "hover:bg-muted"
                 }`}
@@ -64,14 +64,14 @@ const Navbar = ({ type = "customer" }: NavbarProps) => {
       <nav className="border-b bg-card shadow-card">
         <div className="container mx-auto px-4">
           <div className="flex h-16 items-center justify-between">
-            <Link to="/delivery-portal" className="text-2xl font-bold uber-green">
+            <Link to="/delivery/dashboard" className="text-2xl font-bold uber-green">
               UberEats Delivery
             </Link>
             <div className="flex items-center gap-4">
               <Link 
-                to="/delivery-portal" 
+                to="/delivery/dashboard" 
                 className={`px-4 py-2 rounded-lg transition-smooth ${
-                  location.pathname === "/delivery-portal" 
+                  location.pathname === "/delivery/dashboard" 
                     ? "bg-uber-green text-white" 
                     : "hover:bg-muted"
                 }`}
@@ -79,9 +79,9 @@ const Navbar = ({ type = "customer" }: NavbarProps) => {
                 Dashboard
               </Link>
               <Link 
-                to="/delivery-portal/orders" 
+                to="/delivery/orders" 
                 className={`px-4 py-2 rounded-lg transition-smooth ${
-                  location.pathname === "/delivery-portal/orders" 
+                  location.pathname === "/delivery/orders" 
                     ? "bg-uber-green text-white" 
                     : "hover:bg-muted"
                 }`}
@@ -89,9 +89,9 @@ const Navbar = ({ type = "customer" }: NavbarProps) => {
                 Deliveries
               </Link>
               <Link 
-                to="/delivery-portal/earnings" 
+                to="/delivery/earnings" 
                 className={`px-4 py-2 rounded-lg transition-smooth ${
-                  location.pathname === "/delivery-portal/earnings" 
+                  location.pathname === "/delivery/earnings" 
                     ? "bg-uber-green text-white" 
                     : "hover:bg-muted"
                 }`}

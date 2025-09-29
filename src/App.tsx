@@ -31,6 +31,10 @@ import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminUsers from "./pages/admin/AdminUsers";
 import AdminRestaurants from "./pages/admin/AdminRestaurants";
 import AdminOrders from "./pages/admin/AdminOrders";
+import AdminDeliveryPartners from "./pages/admin/AdminDeliveryPartners";
+import AdminRevenue from "./pages/admin/AdminRevenue";
+import AdminAnalytics from "./pages/admin/AdminAnalytics";
+import AdminMarketing from "./pages/admin/AdminMarketing";
 import { AdminLayout } from "./components/admin/AdminLayout";
 
 import NotFound from "./pages/NotFound";
@@ -76,14 +80,10 @@ const App = () => (
               <Route path="/admin/users" element={<AdminUsers />} />
               <Route path="/admin/restaurants" element={<AdminRestaurants />} />
               <Route path="/admin/orders" element={<AdminOrders />} />
-            </Route>
-
-            {/* Superadmin shares the same routes as admin for now */}
-            <Route element={<AdminLayout />}>
-              <Route path="/superadmin/dashboard" element={<AdminDashboard />} />
-              <Route path="/superadmin/users" element={<AdminUsers />} />
-              <Route path="/superadmin/restaurants" element={<AdminRestaurants />} />
-              <Route path="/superadmin/orders" element={<AdminOrders />} />
+              <Route path="/admin/delivery-partners" element={<AdminDeliveryPartners />} />
+              <Route path="/admin/revenue" element={<AdminRevenue />} />
+              <Route path="/admin/analytics" element={<AdminAnalytics />} />
+              <Route path="/admin/marketing" element={<AdminMarketing />} />
             </Route>
 
             {/* Catch-all route */}

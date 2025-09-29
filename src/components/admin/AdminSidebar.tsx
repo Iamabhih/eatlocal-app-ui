@@ -6,8 +6,8 @@ import {
   Package,
   Truck,
   BarChart3,
-  Settings,
-  Shield
+  Megaphone,
+  DollarSign
 } from 'lucide-react';
 import {
   Sidebar,
@@ -27,19 +27,12 @@ const adminItems = [
   { title: 'Restaurants', url: '/admin/restaurants', icon: Store },
   { title: 'Orders', url: '/admin/orders', icon: Package },
   { title: 'Delivery Partners', url: '/admin/delivery-partners', icon: Truck },
+  { title: 'Revenue', url: '/admin/revenue', icon: DollarSign },
   { title: 'Analytics', url: '/admin/analytics', icon: BarChart3 },
+  { title: 'Marketing', url: '/admin/marketing', icon: Megaphone },
 ];
 
-const superadminItems = [
-  { title: 'System Settings', url: '/superadmin/settings', icon: Settings },
-  { title: 'Role Management', url: '/superadmin/roles', icon: Shield },
-];
-
-interface AdminSidebarProps {
-  isSuperadmin?: boolean;
-}
-
-export function AdminSidebar({ isSuperadmin }: AdminSidebarProps) {
+export function AdminSidebar() {
   const { state } = useSidebar();
 
   const getNavCls = ({ isActive }: { isActive: boolean }) =>
@@ -65,26 +58,6 @@ export function AdminSidebar({ isSuperadmin }: AdminSidebarProps) {
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
-
-        {isSuperadmin && (
-          <SidebarGroup>
-            <SidebarGroupLabel>Superadmin</SidebarGroupLabel>
-            <SidebarGroupContent>
-              <SidebarMenu>
-                {superadminItems.map((item) => (
-                  <SidebarMenuItem key={item.title}>
-                    <SidebarMenuButton asChild>
-                      <NavLink to={item.url} end className={getNavCls}>
-                        <item.icon className="mr-2 h-4 w-4" />
-                        {state !== 'collapsed' && <span>{item.title}</span>}
-                      </NavLink>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                ))}
-              </SidebarMenu>
-            </SidebarGroupContent>
-          </SidebarGroup>
-        )}
       </SidebarContent>
     </Sidebar>
   );

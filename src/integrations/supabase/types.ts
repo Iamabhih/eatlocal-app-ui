@@ -97,9 +97,12 @@ export type Database = {
           delivery_partner_id: string
           distance_fee: number | null
           id: string
+          net_payout: number
           order_id: string
           paid_out: boolean | null
           paid_out_at: string | null
+          platform_fee_amount: number
+          platform_fee_rate: number
           tip: number | null
           total_earnings: number
         }
@@ -110,9 +113,12 @@ export type Database = {
           delivery_partner_id: string
           distance_fee?: number | null
           id?: string
+          net_payout?: number
           order_id: string
           paid_out?: boolean | null
           paid_out_at?: string | null
+          platform_fee_amount?: number
+          platform_fee_rate?: number
           tip?: number | null
           total_earnings: number
         }
@@ -123,9 +129,12 @@ export type Database = {
           delivery_partner_id?: string
           distance_fee?: number | null
           id?: string
+          net_payout?: number
           order_id?: string
           paid_out?: boolean | null
           paid_out_at?: string | null
+          platform_fee_amount?: number
+          platform_fee_rate?: number
           tip?: number | null
           total_earnings?: number
         }
@@ -135,6 +144,68 @@ export type Database = {
             columns: ["order_id"]
             isOneToOne: false
             referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      marketing_campaigns: {
+        Row: {
+          campaign_type: string
+          clicks: number | null
+          conversions: number | null
+          created_at: string | null
+          created_by: string | null
+          description: string | null
+          end_date: string
+          id: string
+          impressions: number | null
+          name: string
+          promo_code_id: string | null
+          start_date: string
+          status: string | null
+          target_audience: string
+          updated_at: string | null
+        }
+        Insert: {
+          campaign_type: string
+          clicks?: number | null
+          conversions?: number | null
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          end_date: string
+          id?: string
+          impressions?: number | null
+          name: string
+          promo_code_id?: string | null
+          start_date: string
+          status?: string | null
+          target_audience: string
+          updated_at?: string | null
+        }
+        Update: {
+          campaign_type?: string
+          clicks?: number | null
+          conversions?: number | null
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          end_date?: string
+          id?: string
+          impressions?: number | null
+          name?: string
+          promo_code_id?: string | null
+          start_date?: string
+          status?: string | null
+          target_audience?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "marketing_campaigns_promo_code_id_fkey"
+            columns: ["promo_code_id"]
+            isOneToOne: false
+            referencedRelation: "promo_codes"
             referencedColumns: ["id"]
           },
         ]
@@ -347,6 +418,7 @@ export type Database = {
           id: string
           order_number: string
           picked_up_at: string | null
+          platform_commission: number
           ready_at: string | null
           restaurant_id: string
           special_instructions: string | null
@@ -371,6 +443,7 @@ export type Database = {
           id?: string
           order_number: string
           picked_up_at?: string | null
+          platform_commission?: number
           ready_at?: string | null
           restaurant_id: string
           special_instructions?: string | null
@@ -395,6 +468,7 @@ export type Database = {
           id?: string
           order_number?: string
           picked_up_at?: string | null
+          platform_commission?: number
           ready_at?: string | null
           restaurant_id?: string
           special_instructions?: string | null
@@ -496,11 +570,175 @@ export type Database = {
         }
         Relationships: []
       }
+      promo_code_usage: {
+        Row: {
+          discount_applied: number
+          id: string
+          order_id: string | null
+          promo_code_id: string | null
+          used_at: string | null
+          user_id: string
+        }
+        Insert: {
+          discount_applied: number
+          id?: string
+          order_id?: string | null
+          promo_code_id?: string | null
+          used_at?: string | null
+          user_id: string
+        }
+        Update: {
+          discount_applied?: number
+          id?: string
+          order_id?: string | null
+          promo_code_id?: string | null
+          used_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "promo_code_usage_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "promo_code_usage_promo_code_id_fkey"
+            columns: ["promo_code_id"]
+            isOneToOne: false
+            referencedRelation: "promo_codes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      promo_codes: {
+        Row: {
+          applicable_to: string | null
+          code: string
+          created_at: string | null
+          created_by: string | null
+          description: string | null
+          discount_type: string
+          discount_value: number
+          end_date: string
+          id: string
+          is_active: boolean | null
+          max_discount_amount: number | null
+          min_order_amount: number | null
+          per_user_limit: number | null
+          restaurant_ids: string[] | null
+          start_date: string
+          updated_at: string | null
+          usage_count: number | null
+          usage_limit: number | null
+        }
+        Insert: {
+          applicable_to?: string | null
+          code: string
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          discount_type: string
+          discount_value: number
+          end_date: string
+          id?: string
+          is_active?: boolean | null
+          max_discount_amount?: number | null
+          min_order_amount?: number | null
+          per_user_limit?: number | null
+          restaurant_ids?: string[] | null
+          start_date: string
+          updated_at?: string | null
+          usage_count?: number | null
+          usage_limit?: number | null
+        }
+        Update: {
+          applicable_to?: string | null
+          code?: string
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          discount_type?: string
+          discount_value?: number
+          end_date?: string
+          id?: string
+          is_active?: boolean | null
+          max_discount_amount?: number | null
+          min_order_amount?: number | null
+          per_user_limit?: number | null
+          restaurant_ids?: string[] | null
+          start_date?: string
+          updated_at?: string | null
+          usage_count?: number | null
+          usage_limit?: number | null
+        }
+        Relationships: []
+      }
+      promotional_banners: {
+        Row: {
+          clicks: number | null
+          created_at: string | null
+          created_by: string | null
+          description: string | null
+          display_order: number | null
+          end_date: string
+          id: string
+          image_url: string | null
+          impressions: number | null
+          is_active: boolean | null
+          link_type: string | null
+          link_url: string | null
+          position: string | null
+          start_date: string
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          clicks?: number | null
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          display_order?: number | null
+          end_date: string
+          id?: string
+          image_url?: string | null
+          impressions?: number | null
+          is_active?: boolean | null
+          link_type?: string | null
+          link_url?: string | null
+          position?: string | null
+          start_date: string
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          clicks?: number | null
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          display_order?: number | null
+          end_date?: string
+          id?: string
+          image_url?: string | null
+          impressions?: number | null
+          is_active?: boolean | null
+          link_type?: string | null
+          link_url?: string | null
+          position?: string | null
+          start_date?: string
+          title?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       restaurants: {
         Row: {
           city: string
+          commission_rate: number
           created_at: string
           cuisine_type: string | null
+          custom_commission: boolean
           delivery_fee: number | null
           description: string | null
           email: string | null
@@ -522,8 +760,10 @@ export type Database = {
         }
         Insert: {
           city: string
+          commission_rate?: number
           created_at?: string
           cuisine_type?: string | null
+          custom_commission?: boolean
           delivery_fee?: number | null
           description?: string | null
           email?: string | null
@@ -545,8 +785,10 @@ export type Database = {
         }
         Update: {
           city?: string
+          commission_rate?: number
           created_at?: string
           cuisine_type?: string | null
+          custom_commission?: boolean
           delivery_fee?: number | null
           description?: string | null
           email?: string | null

@@ -16,7 +16,7 @@ export default function AdminDashboard() {
   return (
     <SidebarProvider>
       <div className="min-h-screen flex w-full">
-        <AdminSidebar isSuperadmin={isSuperadmin} />
+        <AdminSidebar />
         
         <div className="flex-1">
           <header className="h-16 border-b flex items-center px-6">

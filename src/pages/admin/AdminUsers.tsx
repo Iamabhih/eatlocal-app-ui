@@ -1,27 +1,24 @@
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { useAdminData } from '@/hooks/useAdminData';
 import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 import { AdminSidebar } from '@/components/admin/AdminSidebar';
-import { useOutletContext } from 'react-router-dom';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Badge } from '@/components/ui/badge';
+import { useAdminData } from '@/hooks/useAdminData';
 
 export default function AdminUsers() {
-  const { isSuperadmin } = useOutletContext<{ isSuperadmin: boolean }>();
   const { users, usersLoading } = useAdminData();
 
   return (
     <SidebarProvider>
       <div className="min-h-screen flex w-full">
-        <AdminSidebar isSuperadmin={isSuperadmin} />
-        
-        <div className="flex-1">
-          <header className="h-16 border-b flex items-center px-6">
+        <AdminSidebar />
+        <div className="flex-1 flex flex-col">
+          <header className="h-12 flex items-center border-b px-4">
             <SidebarTrigger />
-            <h1 className="text-2xl font-bold ml-4">User Management</h1>
           </header>
+          <main className="flex-1 p-6 bg-muted/30">
+            <h1 className="text-3xl font-bold mb-6">User Management</h1>
 
-          <main className="p-6">
             <Card>
               <CardHeader>
                 <CardTitle>All Users</CardTitle>
@@ -46,11 +43,15 @@ export default function AdminUsers() {
                           <TableCell>{user.phone || 'N/A'}</TableCell>
                           <TableCell>
                             <div className="flex gap-1">
-                              {user.user_roles?.map((ur: any, idx: number) => (
-                                <Badge key={idx} variant="secondary">
-                                  {ur.role}
-                                </Badge>
-                              ))}
+                              {user.user_roles && user.user_roles.length > 0 ? (
+                                user.user_roles.map((userRole) => (
+                                  <Badge key={userRole.role} variant="outline">
+                                    {userRole.role}
+                                  </Badge>
+                                ))
+                              ) : (
+                                <Badge variant="secondary">customer</Badge>
+                              )}
                             </div>
                           </TableCell>
                           <TableCell>
