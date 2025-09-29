@@ -12,70 +12,27 @@ import {
 } from "@/components/ui/select";
 import Navbar from "@/components/shared/Navbar";
 import RestaurantCard from "@/components/shared/RestaurantCard";
+import { useRestaurants } from "@/hooks/useRestaurants";
 
 const RestaurantList = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
+  
+  const { data: restaurantsData = [], isLoading } = useRestaurants();
 
-  const restaurants = [
-    {
-      id: "1",
-      name: "Burger Palace",
-      image: "https://images.unsplash.com/photo-1571091718767-18b5b1457add?w=500&h=300&fit=crop",
-      rating: 4.5,
-      deliveryTime: "20-30 min",
-      deliveryFee: "$2.49",
-      categories: ["Burgers", "Fast Food", "American"],
-      promoted: true
-    },
-    {
-      id: "2", 
-      name: "Sushi Express",
-      image: "https://images.unsplash.com/photo-1579584425555-c3ce17fd4351?w=500&h=300&fit=crop",
-      rating: 4.7,
-      deliveryTime: "25-35 min", 
-      deliveryFee: "$1.99",
-      categories: ["Japanese", "Sushi", "Asian"]
-    },
-    {
-      id: "3",
-      name: "Pizza Corner",
-      image: "https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?w=500&h=300&fit=crop",
-      rating: 4.3,
-      deliveryTime: "15-25 min",
-      deliveryFee: "$1.49", 
-      categories: ["Pizza", "Italian", "Comfort Food"]
-    },
-    {
-      id: "4",
-      name: "Healthy Bowls",
-      image: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=500&h=300&fit=crop",
-      rating: 4.6,
-      deliveryTime: "20-30 min",
-      deliveryFee: "$2.99",
-      categories: ["Healthy", "Salads", "Bowls"]
-    },
-    {
-      id: "5",
-      name: "Taco Fiesta",
-      image: "https://images.unsplash.com/photo-1565299585323-38174c4a6471?w=500&h=300&fit=crop",
-      rating: 4.4,
-      deliveryTime: "15-25 min",
-      deliveryFee: "$1.99",
-      categories: ["Mexican", "Tacos", "Spicy"]
-    },
-    {
-      id: "6",
-      name: "Pasta House",
-      image: "https://images.unsplash.com/photo-1621996346565-e3dbc353d2e5?w=500&h=300&fit=crop",
-      rating: 4.2,
-      deliveryTime: "25-35 min",
-      deliveryFee: "$2.49",
-      categories: ["Italian", "Pasta", "Comfort Food"]
-    }
-  ];
+  // Transform database restaurants to component format
+  const restaurants = restaurantsData.map(r => ({
+    id: r.id,
+    name: r.name,
+    image: r.image_url || "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=500",
+    rating: r.rating,
+    deliveryTime: `${r.estimated_delivery_time} min`,
+    deliveryFee: `$${r.delivery_fee.toFixed(2)}`,
+    categories: r.cuisine_type ? [r.cuisine_type] : [],
+    promoted: false
+  }));
 
-  const categories = ["All", "Fast Food", "Asian", "Italian", "Mexican", "Healthy", "Pizza"];
+  const categories = ["All", "Italian", "American", "Japanese", "Mexican", "Thai", "Fast Food"];
 
   const filteredRestaurants = restaurants.filter(restaurant => {
     const matchesSearch = restaurant.name.toLowerCase().includes(searchQuery.toLowerCase());
@@ -153,11 +110,19 @@ const RestaurantList = () => {
             </p>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {filteredRestaurants.map((restaurant) => (
-              <RestaurantCard key={restaurant.id} {...restaurant} />
-            ))}
-          </div>
+          {isLoading ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              {[...Array(8)].map((_, i) => (
+                <div key={i} className="h-64 bg-muted animate-pulse rounded-lg" />
+              ))}
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              {filteredRestaurants.map((restaurant) => (
+                <RestaurantCard key={restaurant.id} {...restaurant} />
+              ))}
+            </div>
+          )}
 
           {filteredRestaurants.length === 0 && (
             <div className="text-center py-12">

@@ -1,71 +1,37 @@
-import { Trash2, Plus, Minus, MapPin, Clock } from "lucide-react";
-import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Trash2, Plus, Minus, MapPin, Clock, ArrowRight } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import Navbar from "@/components/shared/Navbar";
+import { useCart } from "@/contexts/CartContext";
+import { useState } from "react";
 
 const Cart = () => {
-  const [cartItems, setCartItems] = useState([
-    {
-      id: "1",
-      restaurantId: "1",
-      restaurantName: "Burger Palace",
-      name: "Classic Cheeseburger",
-      price: 12.99,
-      quantity: 2,
-      image: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=200&h=150&fit=crop",
-      customizations: ["No onions", "Extra cheese"]
-    },
-    {
-      id: "2",
-      restaurantId: "1", 
-      restaurantName: "Burger Palace",
-      name: "Truffle Fries",
-      price: 8.99,
-      quantity: 1,
-      image: "https://images.unsplash.com/photo-1576107232684-1279f390859f?w=200&h=150&fit=crop",
-      customizations: []
-    }
-  ]);
-
+  const { items, addItem, removeItem, updateQuantity, getCartTotal, getTotalItems } = useCart();
   const [promoCode, setPromoCode] = useState("");
   const [appliedPromo, setAppliedPromo] = useState<string | null>(null);
-
-  const updateQuantity = (itemId: string, newQuantity: number) => {
-    if (newQuantity === 0) {
-      setCartItems(prev => prev.filter(item => item.id !== itemId));
-    } else {
-      setCartItems(prev => prev.map(item => 
-        item.id === itemId ? { ...item, quantity: newQuantity } : item
-      ));
-    }
-  };
-
-  const removeItem = (itemId: string) => {
-    setCartItems(prev => prev.filter(item => item.id !== itemId));
-  };
+  const navigate = useNavigate();
 
   const applyPromoCode = () => {
-    // Mock promo code validation
     if (promoCode.toLowerCase() === "save10") {
       setAppliedPromo("SAVE10");
       setPromoCode("");
     }
   };
 
-  const subtotal = cartItems.reduce((total, item) => total + (item.price * item.quantity), 0);
+  const subtotal = getCartTotal();
   const deliveryFee = 2.49;
   const serviceFee = 1.99;
   const discount = appliedPromo === "SAVE10" ? subtotal * 0.1 : 0;
   const total = subtotal + deliveryFee + serviceFee - discount;
+  const totalItems = getTotalItems();
 
   const estimatedDelivery = "20-30 min";
 
-  if (cartItems.length === 0) {
+  if (items.length === 0) {
     return (
       <div className="min-h-screen bg-background">
         <Navbar type="customer" />
@@ -77,7 +43,7 @@ const Cart = () => {
               Add some delicious items from our restaurants to get started!
             </p>
             <Link to="/restaurants">
-              <Button className="bg-uber-green hover:bg-uber-green-hover">
+              <Button className="bg-primary hover:bg-primary/90">
                 Browse Restaurants
               </Button>
             </Link>
@@ -98,35 +64,56 @@ const Cart = () => {
             <div className="flex items-center justify-between mb-6">
               <h1 className="text-3xl font-bold">Your Cart</h1>
               <Badge variant="secondary" className="text-sm">
-                {cartItems.length} {cartItems.length === 1 ? 'item' : 'items'}
+                {totalItems} {totalItems === 1 ? 'item' : 'items'}
               </Badge>
             </div>
+
+            {/* Restaurant Name */}
+            <Card className="mb-6 shadow-card">
+              <CardContent className="p-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="font-semibold text-lg">{items[0].restaurantName}</p>
+                    <p className="text-sm text-muted-foreground">
+                      Estimated delivery: {estimatedDelivery}
+                    </p>
+                  </div>
+                  <Clock className="h-5 w-5 text-primary" />
+                </div>
+              </CardContent>
+            </Card>
 
             {/* Delivery Address */}
             <Card className="mb-6 shadow-card">
               <CardContent className="p-4">
                 <div className="flex items-center gap-3">
-                  <MapPin className="h-5 w-5 uber-green" />
+                  <MapPin className="h-5 w-5 text-primary" />
                   <div className="flex-1">
                     <p className="font-medium">Deliver to</p>
-                    <p className="text-sm text-muted-foreground">123 Main Street, Apt 4B</p>
+                    <p className="text-sm text-muted-foreground">
+                      Please sign in to select a delivery address
+                    </p>
                   </div>
-                  <Button variant="outline" size="sm">Change</Button>
+                  <Button variant="outline" size="sm" onClick={() => navigate('/auth?role=customer')}>
+                    Sign In
+                  </Button>
                 </div>
               </CardContent>
             </Card>
 
             {/* Cart Items */}
             <div className="space-y-4">
-              {cartItems.map((item) => (
-                <Card key={item.id} className="shadow-card">
+              {items.map((item) => (
+                <Card key={item.menuItemId} className="shadow-card">
                   <CardContent className="p-4">
                     <div className="flex gap-4">
-                      <img
-                        src={item.image}
-                        alt={item.name}
-                        className="w-20 h-20 object-cover rounded-lg"
-                      />
+                      {item.image_url && (
+                        <img
+                          src={item.image_url}
+                          alt={item.name}
+                          className="w-20 h-20 object-cover rounded-lg"
+                        />
+                      )}
                       <div className="flex-1">
                         <div className="flex items-start justify-between mb-2">
                           <div>
@@ -136,37 +123,27 @@ const Cart = () => {
                           <Button
                             variant="ghost"
                             size="sm"
-                            onClick={() => removeItem(item.id)}
+                            onClick={() => updateQuantity(item.menuItemId, 0)}
                             className="text-destructive hover:text-destructive"
                           >
                             <Trash2 className="h-4 w-4" />
                           </Button>
                         </div>
 
-                        {item.customizations.length > 0 && (
-                          <div className="mb-3">
-                            {item.customizations.map((customization, index) => (
-                              <Badge key={index} variant="outline" className="text-xs mr-1">
-                                {customization}
-                              </Badge>
-                            ))}
-                          </div>
-                        )}
-
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-3">
                             <Button
                               variant="outline"
                               size="sm"
-                              onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                              onClick={() => removeItem(item.menuItemId)}
                             >
                               <Minus className="h-4 w-4" />
                             </Button>
                             <span className="font-medium w-8 text-center">{item.quantity}</span>
                             <Button
                               size="sm"
-                              onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                              className="bg-uber-green hover:bg-uber-green-hover"
+                              onClick={() => addItem({ ...item })}
+                              className="bg-primary hover:bg-primary/90"
                             >
                               <Plus className="h-4 w-4" />
                             </Button>
@@ -185,8 +162,8 @@ const Cart = () => {
               <CardContent className="p-4">
                 <h3 className="font-semibold mb-3">Promo Code</h3>
                 {appliedPromo ? (
-                  <div className="flex items-center justify-between p-3 bg-uber-green-light rounded-lg">
-                    <span className="uber-green font-medium">{appliedPromo} applied!</span>
+                  <div className="flex items-center justify-between p-3 bg-primary/10 rounded-lg">
+                    <span className="text-primary font-medium">{appliedPromo} applied!</span>
                     <Button 
                       variant="ghost" 
                       size="sm"
@@ -198,7 +175,7 @@ const Cart = () => {
                 ) : (
                   <div className="flex gap-2">
                     <Input
-                      placeholder="Enter promo code"
+                      placeholder="Enter promo code (try SAVE10)"
                       value={promoCode}
                       onChange={(e) => setPromoCode(e.target.value)}
                     />
@@ -224,7 +201,7 @@ const Cart = () => {
                   
                   <div className="space-y-3 mb-4">
                     <div className="flex justify-between">
-                      <span>Subtotal ({cartItems.reduce((total, item) => total + item.quantity, 0)} items)</span>
+                      <span>Subtotal ({totalItems} items)</span>
                       <span>${subtotal.toFixed(2)}</span>
                     </div>
                     <div className="flex justify-between">
@@ -236,7 +213,7 @@ const Cart = () => {
                       <span>${serviceFee.toFixed(2)}</span>
                     </div>
                     {appliedPromo && discount > 0 && (
-                      <div className="flex justify-between uber-green">
+                      <div className="flex justify-between text-primary">
                         <span>Discount ({appliedPromo})</span>
                         <span>-${discount.toFixed(2)}</span>
                       </div>
@@ -251,18 +228,22 @@ const Cart = () => {
                   </div>
 
                   <div className="flex items-center gap-2 mb-6 p-3 bg-muted rounded-lg">
-                    <Clock className="h-4 w-4 uber-green" />
+                    <Clock className="h-4 w-4 text-primary" />
                     <span className="text-sm">
                       Estimated delivery: <span className="font-medium">{estimatedDelivery}</span>
                     </span>
                   </div>
                   
-                  <Button className="w-full bg-uber-green hover:bg-uber-green-hover text-lg py-6">
+                  <Button 
+                    className="w-full bg-primary hover:bg-primary/90 text-lg py-6"
+                    onClick={() => navigate('/auth?role=customer')}
+                  >
                     Proceed to Checkout
+                    <ArrowRight className="ml-2 h-5 w-5" />
                   </Button>
                   
                   <p className="text-xs text-muted-foreground text-center mt-4">
-                    By placing your order, you agree to our Terms & Conditions
+                    Sign in to complete your order
                   </p>
                 </CardContent>
               </Card>

@@ -4,6 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
+import { CartProvider } from "@/contexts/CartContext";
 
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
@@ -35,15 +36,16 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <AuthProvider>
-          <Routes>
-            {/* Home Page */}
-            <Route path="/" element={<Index />} />
-            
-            {/* Auth Routes */}
-            <Route path="/auth" element={<Auth />} />
+          <CartProvider>
+            <Routes>
+              {/* Home Page */}
+              <Route path="/" element={<Index />} />
+              
+              {/* Auth Routes */}
+              <Route path="/auth" element={<Auth />} />
 
-            {/* Customer App Routes */}
-            <Route path="/customer" element={<CustomerHome />} />
+              {/* Customer App Routes */}
+              <Route path="/customer" element={<CustomerHome />} />
             <Route path="/restaurants" element={<RestaurantList />} />
             <Route path="/restaurant/:id" element={<RestaurantDetail />} />
             <Route path="/cart" element={<Cart />} />
@@ -61,10 +63,11 @@ const App = () => (
             {/* Catch-all route */}
             <Route path="*" element={<NotFound />} />
           </Routes>
-        </AuthProvider>
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
+        </CartProvider>
+      </AuthProvider>
+    </BrowserRouter>
+  </TooltipProvider>
+</QueryClientProvider>
 );
 
 export default App;

@@ -7,11 +7,18 @@ export interface Restaurant {
   description: string | null;
   cuisine_type: string | null;
   image_url: string | null;
+  street_address: string;
+  city: string;
+  state: string;
+  zip_code: string;
+  phone: string;
+  email: string | null;
   rating: number;
   total_reviews: number;
   delivery_fee: number;
   minimum_order: number;
   estimated_delivery_time: number;
+  is_active: boolean;
   is_open: boolean;
 }
 
