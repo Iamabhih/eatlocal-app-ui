@@ -586,7 +586,12 @@ export type Database = {
         | "delivered"
         | "cancelled"
       payment_status: "pending" | "completed" | "failed" | "refunded"
-      user_role: "customer" | "restaurant" | "delivery_partner"
+      user_role:
+        | "customer"
+        | "restaurant"
+        | "delivery_partner"
+        | "admin"
+        | "superadmin"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -724,7 +729,13 @@ export const Constants = {
         "cancelled",
       ],
       payment_status: ["pending", "completed", "failed", "refunded"],
-      user_role: ["customer", "restaurant", "delivery_partner"],
+      user_role: [
+        "customer",
+        "restaurant",
+        "delivery_partner",
+        "admin",
+        "superadmin",
+      ],
     },
   },
 } as const
