@@ -7,48 +7,20 @@ import { Badge } from "@/components/ui/badge";
 import Navbar from "@/components/shared/Navbar";
 import RestaurantCard from "@/components/shared/RestaurantCard";
 import heroImage from "@/assets/hero-delivery.jpg";
+import { useRestaurants } from "@/hooks/useRestaurants";
 
 const CustomerHome = () => {
-  // Mock data
-  const featuredRestaurants = [
-    {
-      id: "1",
-      name: "Burger Palace",
-      image: "https://images.unsplash.com/photo-1571091718767-18b5b1457add?w=500&h=300&fit=crop",
-      rating: 4.5,
-      deliveryTime: "20-30 min",
-      deliveryFee: "$2.49",
-      categories: ["Burgers", "Fast Food", "American"],
-      promoted: true
-    },
-    {
-      id: "2", 
-      name: "Sushi Express",
-      image: "https://images.unsplash.com/photo-1579584425555-c3ce17fd4351?w=500&h=300&fit=crop",
-      rating: 4.7,
-      deliveryTime: "25-35 min", 
-      deliveryFee: "$1.99",
-      categories: ["Japanese", "Sushi", "Asian"]
-    },
-    {
-      id: "3",
-      name: "Pizza Corner",
-      image: "https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?w=500&h=300&fit=crop",
-      rating: 4.3,
-      deliveryTime: "15-25 min",
-      deliveryFee: "$1.49", 
-      categories: ["Pizza", "Italian", "Comfort Food"]
-    },
-    {
-      id: "4",
-      name: "Healthy Bowls",
-      image: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=500&h=300&fit=crop",
-      rating: 4.6,
-      deliveryTime: "20-30 min",
-      deliveryFee: "$2.99",
-      categories: ["Healthy", "Salads", "Bowls"]
-    }
-  ];
+  const { data: restaurants = [], isLoading } = useRestaurants();
+  const featuredRestaurants = restaurants.slice(0, 4).map(r => ({
+    id: r.id,
+    name: r.name,
+    image: r.image_url || "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=500",
+    rating: r.rating,
+    deliveryTime: `${r.estimated_delivery_time} min`,
+    deliveryFee: `$${r.delivery_fee.toFixed(2)}`,
+    categories: r.cuisine_type ? [r.cuisine_type] : [],
+    promoted: false
+  }));
 
   const categories = [
     { name: "Fast Food", icon: "🍔" },
@@ -123,9 +95,17 @@ const CustomerHome = () => {
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {featuredRestaurants.map((restaurant) => (
-              <RestaurantCard key={restaurant.id} {...restaurant} />
-            ))}
+            {isLoading ? (
+              <p className="col-span-full text-center text-muted-foreground">Loading restaurants...</p>
+            ) : featuredRestaurants.length === 0 ? (
+              <p className="col-span-full text-center text-muted-foreground">
+                No restaurants available. Sign up as a restaurant to add your business!
+              </p>
+            ) : (
+              featuredRestaurants.map((restaurant) => (
+                <RestaurantCard key={restaurant.id} {...restaurant} />
+              ))
+            )}
           </div>
         </div>
       </section>
