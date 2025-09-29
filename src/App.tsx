@@ -26,6 +26,13 @@ import DeliveryOrders from "./pages/delivery/DeliveryOrders";
 import DeliveryEarnings from "./pages/delivery/DeliveryEarnings";
 import { DeliveryLayout } from "./components/delivery/DeliveryLayout";
 
+// Admin Portal
+import AdminDashboard from "./pages/admin/AdminDashboard";
+import AdminUsers from "./pages/admin/AdminUsers";
+import AdminRestaurants from "./pages/admin/AdminRestaurants";
+import AdminOrders from "./pages/admin/AdminOrders";
+import { AdminLayout } from "./components/admin/AdminLayout";
+
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -61,6 +68,22 @@ const App = () => (
               <Route path="/delivery/dashboard" element={<DeliveryDashboard />} />
               <Route path="/delivery/orders" element={<DeliveryOrders />} />
               <Route path="/delivery/earnings" element={<DeliveryEarnings />} />
+            </Route>
+
+            {/* Admin Portal Routes */}
+            <Route element={<AdminLayout />}>
+              <Route path="/admin/dashboard" element={<AdminDashboard />} />
+              <Route path="/admin/users" element={<AdminUsers />} />
+              <Route path="/admin/restaurants" element={<AdminRestaurants />} />
+              <Route path="/admin/orders" element={<AdminOrders />} />
+            </Route>
+
+            {/* Superadmin shares the same routes as admin for now */}
+            <Route element={<AdminLayout />}>
+              <Route path="/superadmin/dashboard" element={<AdminDashboard />} />
+              <Route path="/superadmin/users" element={<AdminUsers />} />
+              <Route path="/superadmin/restaurants" element={<AdminRestaurants />} />
+              <Route path="/superadmin/orders" element={<AdminOrders />} />
             </Route>
 
             {/* Catch-all route */}
