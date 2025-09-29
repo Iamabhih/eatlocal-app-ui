@@ -3,6 +3,10 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { AuthProvider } from "@/contexts/AuthContext";
+
+import Index from "./pages/Index";
+import Auth from "./pages/Auth";
 
 // Customer App
 import CustomerHome from "./pages/customer/CustomerHome";
@@ -30,26 +34,34 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
-        <Routes>
-          {/* Customer App Routes */}
-          <Route path="/" element={<CustomerHome />} />
-          <Route path="/restaurants" element={<RestaurantList />} />
-          <Route path="/restaurant/:id" element={<RestaurantDetail />} />
-          <Route path="/cart" element={<Cart />} />
+        <AuthProvider>
+          <Routes>
+            {/* Home Page */}
+            <Route path="/" element={<Index />} />
+            
+            {/* Auth Routes */}
+            <Route path="/auth" element={<Auth />} />
 
-          {/* Restaurant Portal Routes */}
-          <Route path="/restaurant-portal" element={<RestaurantDashboard />} />
-          <Route path="/restaurant-portal/orders" element={<RestaurantOrders />} />
-          <Route path="/restaurant-portal/menu" element={<RestaurantMenu />} />
+            {/* Customer App Routes */}
+            <Route path="/customer" element={<CustomerHome />} />
+            <Route path="/restaurants" element={<RestaurantList />} />
+            <Route path="/restaurant/:id" element={<RestaurantDetail />} />
+            <Route path="/cart" element={<Cart />} />
 
-          {/* Delivery Partner Portal Routes */}
-          <Route path="/delivery-portal" element={<DeliveryDashboard />} />
-          <Route path="/delivery-portal/orders" element={<DeliveryOrders />} />
-          <Route path="/delivery-portal/earnings" element={<DeliveryEarnings />} />
+            {/* Restaurant Portal Routes */}
+            <Route path="/restaurant/dashboard" element={<RestaurantDashboard />} />
+            <Route path="/restaurant/orders" element={<RestaurantOrders />} />
+            <Route path="/restaurant/menu" element={<RestaurantMenu />} />
 
-          {/* Catch-all route */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
+            {/* Delivery Partner Portal Routes */}
+            <Route path="/delivery/dashboard" element={<DeliveryDashboard />} />
+            <Route path="/delivery/orders" element={<DeliveryOrders />} />
+            <Route path="/delivery/earnings" element={<DeliveryEarnings />} />
+
+            {/* Catch-all route */}
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </AuthProvider>
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
