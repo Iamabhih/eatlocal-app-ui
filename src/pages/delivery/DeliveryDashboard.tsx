@@ -6,55 +6,19 @@ import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import Navbar from "@/components/shared/Navbar";
 import deliveryHero from "@/assets/delivery-partner-hero.jpg";
+import { useDeliveryOrders } from "@/hooks/useDeliveryOrders";
+import { useDeliveryEarnings } from "@/hooks/useDeliveryEarnings";
 
 const DeliveryDashboard = () => {
-  // Mock data
-  const stats = {
-    todayEarnings: 127.50,
-    totalDeliveries: 8,
-    avgRating: 4.8,
-    totalRating: 450,
-    onlineTime: "6h 23m",
-    avgDeliveryTime: 22
-  };
+  const { orders } = useDeliveryOrders();
+  const { totalToday, deliveriesToday } = useDeliveryEarnings();
 
-  const availableOrders = [
-    {
-      id: "#D12345",
-      restaurant: "Burger Palace",
-      customer: "John D.",
-      distance: "1.2 mi",
-      estimatedTime: "25 min",
-      payout: 12.50,
-      items: 3,
-      address: "123 Main St",
-      customerRating: 4.5
-    },
-    {
-      id: "#D12346", 
-      restaurant: "Sushi Express",
-      customer: "Sarah M.",
-      distance: "0.8 mi",
-      estimatedTime: "18 min",
-      payout: 15.25,
-      items: 2,
-      address: "456 Oak Ave",
-      customerRating: 4.8
-    },
-    {
-      id: "#D12347",
-      restaurant: "Pizza Corner", 
-      customer: "Mike R.",
-      distance: "2.1 mi",
-      estimatedTime: "35 min",
-      payout: 18.75,
-      items: 4,
-      address: "789 Pine St",
-      customerRating: 4.3
-    }
-  ];
-
-  const currentDelivery = {
+  const activeOrders = orders.filter(o => 
+    ['ready_for_pickup', 'picked_up'].includes(o.status)
+  );
+  
+  const currentDelivery = activeOrders[0];
+  const availableOrders = orders.filter(o => o.status === 'pending');
     id: "#D12344",
     restaurant: "Healthy Bowls",
     customer: "Lisa J.",
@@ -100,7 +64,7 @@ const DeliveryDashboard = () => {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-muted-foreground">Today's Earnings</p>
-                  <p className="text-2xl font-bold">${stats.todayEarnings}</p>
+                  <p className="text-2xl font-bold">${totalToday.toFixed(2)}</p>
                 </div>
                 <DollarSign className="h-8 w-8 uber-green" />
               </div>
@@ -112,7 +76,7 @@ const DeliveryDashboard = () => {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-muted-foreground">Deliveries</p>
-                  <p className="text-2xl font-bold">{stats.totalDeliveries}</p>
+                  <p className="text-2xl font-bold">{deliveriesToday}</p>
                 </div>
                 <Package className="h-8 w-8 uber-green" />
               </div>
@@ -123,8 +87,8 @@ const DeliveryDashboard = () => {
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-muted-foreground">Rating</p>
-                  <p className="text-2xl font-bold">{stats.avgRating}</p>
+                  <p className="text-sm text-muted-foreground">Active Orders</p>
+                  <p className="text-2xl font-bold">{activeOrders.length}</p>
                 </div>
                 <Star className="h-8 w-8 uber-green" />
               </div>
@@ -135,8 +99,8 @@ const DeliveryDashboard = () => {
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-muted-foreground">Online Time</p>
-                  <p className="text-2xl font-bold">{stats.onlineTime}</p>
+                  <p className="text-sm text-muted-foreground">Available</p>
+                  <p className="text-2xl font-bold">{availableOrders.length}</p>
                 </div>
                 <Clock className="h-8 w-8 uber-green" />
               </div>
@@ -147,8 +111,8 @@ const DeliveryDashboard = () => {
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-muted-foreground">Avg Time</p>
-                  <p className="text-2xl font-bold">{stats.avgDeliveryTime}m</p>
+                  <p className="text-sm text-muted-foreground">Total Orders</p>
+                  <p className="text-2xl font-bold">{orders.length}</p>
                 </div>
                 <TrendingUp className="h-8 w-8 uber-green" />
               </div>
@@ -159,8 +123,8 @@ const DeliveryDashboard = () => {
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-muted-foreground">Reviews</p>
-                  <p className="text-2xl font-bold">{stats.totalRating}</p>
+                  <p className="text-sm text-muted-foreground">Pending</p>
+                  <p className="text-2xl font-bold">{orders.filter(o => o.status === 'pending').length}</p>
                 </div>
                 <Star className="h-8 w-8 uber-green" />
               </div>
@@ -170,53 +134,59 @@ const DeliveryDashboard = () => {
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Current Delivery */}
-          <Card className="shadow-card">
-            <CardHeader>
-              <CardTitle className="flex items-center justify-between">
-                Current Delivery
-                <Badge className="bg-uber-green hover:bg-uber-green-hover">
-                  In Progress
-                </Badge>
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div className="flex items-center justify-between p-4 border rounded-lg bg-uber-green-light">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-3 mb-2">
-                      <span className="font-bold">{currentDelivery.id}</span>
-                      <Badge variant="secondary">{currentDelivery.status === "picked_up" ? "Picked Up" : "En Route"}</Badge>
+          {currentDelivery ? (
+            <Card className="shadow-card">
+              <CardHeader>
+                <CardTitle className="flex items-center justify-between">
+                  Current Delivery
+                  <Badge className="bg-uber-green hover:bg-uber-green-hover">
+                    {currentDelivery.status}
+                  </Badge>
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between p-4 border rounded-lg bg-uber-green-light">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-3 mb-2">
+                        <span className="font-bold">#{currentDelivery.order_number}</span>
+                        <Badge variant="secondary">{currentDelivery.status}</Badge>
+                      </div>
+                      <p className="font-medium">{currentDelivery.restaurant?.name}</p>
+                      <p className="text-sm text-muted-foreground mb-2">
+                        {currentDelivery.delivery_address?.street_address}, {currentDelivery.delivery_address?.city}
+                      </p>
+                      <p className="text-sm text-muted-foreground">
+                        {currentDelivery.order_items?.length || 0} items
+                      </p>
                     </div>
-                    <p className="font-medium">{currentDelivery.restaurant} → {currentDelivery.customer}</p>
-                    <p className="text-sm text-muted-foreground mb-2">{currentDelivery.address}</p>
-                    <p className="text-sm text-muted-foreground">{currentDelivery.items} items • Est. {currentDelivery.estimatedTime}</p>
-                    {currentDelivery.instructions && (
-                      <p className="text-sm italic mt-2">"{currentDelivery.instructions}"</p>
-                    )}
+                    <div className="text-right">
+                      <p className="font-bold text-lg uber-green">${Number(currentDelivery.total).toFixed(2)}</p>
+                    </div>
                   </div>
-                  <div className="text-right">
-                    <p className="font-bold text-lg uber-green">${currentDelivery.payout}</p>
-                    <Button 
-                      size="sm" 
-                      className="mt-2 bg-uber-green hover:bg-uber-green-hover"
-                    >
-                      Complete Delivery
+
+                  <div className="flex gap-2">
+                    <Button variant="outline" className="flex-1">
+                      <MapPin className="h-4 w-4 mr-2" />
+                      Navigate
+                    </Button>
+                    <Button variant="outline" className="flex-1">
+                      Call Customer
                     </Button>
                   </div>
                 </div>
-
-                <div className="flex gap-2">
-                  <Button variant="outline" className="flex-1">
-                    <MapPin className="h-4 w-4 mr-2" />
-                    Navigate
-                  </Button>
-                  <Button variant="outline" className="flex-1">
-                    Call Customer
-                  </Button>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+          ) : (
+            <Card className="shadow-card">
+              <CardHeader>
+                <CardTitle>Current Delivery</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-center text-muted-foreground py-8">No active delivery</p>
+              </CardContent>
+            </Card>
+          )}
 
           {/* Available Orders */}
           <Card className="shadow-card">
@@ -224,48 +194,40 @@ const DeliveryDashboard = () => {
               <CardTitle className="flex items-center justify-between">
                 Available Orders
                 <Badge variant="secondary">
-                  {availableOrders.length} nearby
+                  {availableOrders.length} available
                 </Badge>
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
-                {availableOrders.map((order) => (
-                  <div key={order.id} className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50 transition-smooth">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-3 mb-2">
-                        <span className="font-medium">{order.id}</span>
-                        <div className="flex items-center gap-1">
-                          <Star className="h-3 w-3 fill-current text-yellow-500" />
-                          <span className="text-xs">{order.customerRating}</span>
+              {availableOrders.length === 0 ? (
+                <p className="text-center text-muted-foreground py-8">No available orders</p>
+              ) : (
+                <div className="space-y-4">
+                  {availableOrders.slice(0, 3).map((order) => (
+                    <div key={order.id} className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50 transition-smooth">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-3 mb-2">
+                          <span className="font-medium">#{order.order_number}</span>
+                        </div>
+                        <p className="font-medium text-sm">{order.restaurant?.name}</p>
+                        <p className="text-sm text-muted-foreground mb-2">{order.restaurant?.city}</p>
+                        <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                          <span>{order.order_items?.length || 0} items</span>
                         </div>
                       </div>
-                      <p className="font-medium text-sm">{order.restaurant} → {order.customer}</p>
-                      <p className="text-sm text-muted-foreground mb-2">{order.address}</p>
-                      <div className="flex items-center gap-4 text-xs text-muted-foreground">
-                        <span className="flex items-center gap-1">
-                          <MapPin className="h-3 w-3" />
-                          {order.distance}
-                        </span>
-                        <span className="flex items-center gap-1">
-                          <Clock className="h-3 w-3" />
-                          {order.estimatedTime}
-                        </span>
-                        <span>{order.items} items</span>
+                      <div className="text-right">
+                        <p className="font-bold uber-green">${Number(order.delivery_fee).toFixed(2)}</p>
+                        <Button 
+                          size="sm" 
+                          className="mt-2 bg-uber-green hover:bg-uber-green-hover"
+                        >
+                          View
+                        </Button>
                       </div>
                     </div>
-                    <div className="text-right">
-                      <p className="font-bold uber-green">${order.payout}</p>
-                      <Button 
-                        size="sm" 
-                        className="mt-2 bg-uber-green hover:bg-uber-green-hover"
-                      >
-                        Accept
-                      </Button>
-                    </div>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              )}
             </CardContent>
           </Card>
         </div>

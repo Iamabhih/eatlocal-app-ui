@@ -24,6 +24,7 @@ import RestaurantMenu from "./pages/restaurant/RestaurantMenu";
 import DeliveryDashboard from "./pages/delivery/DeliveryDashboard";
 import DeliveryOrders from "./pages/delivery/DeliveryOrders";
 import DeliveryEarnings from "./pages/delivery/DeliveryEarnings";
+import { DeliveryLayout } from "./components/delivery/DeliveryLayout";
 
 import NotFound from "./pages/NotFound";
 
@@ -56,9 +57,11 @@ const App = () => (
             <Route path="/restaurant/menu" element={<RestaurantMenu />} />
 
             {/* Delivery Partner Portal Routes */}
-            <Route path="/delivery/dashboard" element={<DeliveryDashboard />} />
-            <Route path="/delivery/orders" element={<DeliveryOrders />} />
-            <Route path="/delivery/earnings" element={<DeliveryEarnings />} />
+            <Route element={<DeliveryLayout />}>
+              <Route path="/delivery/dashboard" element={<DeliveryDashboard />} />
+              <Route path="/delivery/orders" element={<DeliveryOrders />} />
+              <Route path="/delivery/earnings" element={<DeliveryEarnings />} />
+            </Route>
 
             {/* Catch-all route */}
             <Route path="*" element={<NotFound />} />
