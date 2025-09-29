@@ -19,17 +19,6 @@ const DeliveryDashboard = () => {
   
   const currentDelivery = activeOrders[0];
   const availableOrders = orders.filter(o => o.status === 'pending');
-    id: "#D12344",
-    restaurant: "Healthy Bowls",
-    customer: "Lisa J.",
-    address: "321 Elm St, Apt 2B",
-    phone: "+1 (555) 321-9876",
-    items: 2,
-    payout: 14.25,
-    status: "picked_up",
-    estimatedTime: "12 min",
-    instructions: "Leave at door, ring bell"
-  };
 
   return (
     <div className="min-h-screen bg-background">

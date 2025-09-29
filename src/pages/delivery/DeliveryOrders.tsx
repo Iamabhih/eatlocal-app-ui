@@ -68,7 +68,7 @@ const DeliveryOrders = () => {
                 {order.restaurant?.street_address}, {order.restaurant?.city}
               </p>
             </div>
-            {(order.status === "accepted" || order.status === "picked_up") && (
+            {(order.status === "ready_for_pickup" || order.status === "picked_up") && (
               <Button variant="outline" size="sm">
                 <Navigation className="h-4 w-4" />
               </Button>
@@ -81,7 +81,7 @@ const DeliveryOrders = () => {
               C
             </div>
             <div className="flex-1">
-              <p className="font-medium">{order.customer?.full_name || 'Customer'}</p>
+              <p className="font-medium">Customer</p>
               <p className="text-sm text-muted-foreground">
                 {order.delivery_address?.street_address}, {order.delivery_address?.city}
               </p>

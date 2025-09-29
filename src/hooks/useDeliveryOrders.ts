@@ -18,7 +18,6 @@ export function useDeliveryOrders() {
           *,
           restaurant:restaurants(name, street_address, city, phone),
           delivery_address:customer_addresses(street_address, city, state, zip_code),
-          customer:profiles!orders_customer_id_fkey(full_name, phone),
           order_items(*, menu_item:menu_items(name, price))
         `)
         .eq('delivery_partner_id', user.id)
