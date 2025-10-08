@@ -236,14 +236,14 @@ const Cart = () => {
                   
                   <Button 
                     className="w-full bg-primary hover:bg-primary/90 text-lg py-6"
-                    onClick={() => navigate('/auth?role=customer')}
+                    onClick={() => navigate('/checkout')}
                   >
                     Proceed to Checkout
                     <ArrowRight className="ml-2 h-5 w-5" />
                   </Button>
                   
                   <p className="text-xs text-muted-foreground text-center mt-4">
-                    Sign in to complete your order
+                    Secure payment with PayFast
                   </p>
                 </CardContent>
               </Card>

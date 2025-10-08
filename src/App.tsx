@@ -14,6 +14,7 @@ import CustomerHome from "./pages/customer/CustomerHome";
 import RestaurantList from "./pages/customer/RestaurantList";
 import RestaurantDetail from "./pages/customer/RestaurantDetail";
 import Cart from "./pages/customer/Cart";
+import Checkout from "./pages/customer/Checkout";
 
 // Restaurant Portal
 import RestaurantDashboard from "./pages/restaurant/RestaurantDashboard";
@@ -61,6 +62,7 @@ const App = () => (
             <Route path="/restaurants" element={<RestaurantList />} />
             <Route path="/restaurant/:id" element={<RestaurantDetail />} />
             <Route path="/cart" element={<Cart />} />
+            <Route path="/checkout" element={<Checkout />} />
 
             {/* Restaurant Portal Routes */}
             <Route path="/restaurant/dashboard" element={<RestaurantDashboard />} />
