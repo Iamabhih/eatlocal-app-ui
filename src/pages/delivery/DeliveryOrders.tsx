@@ -1,14 +1,25 @@
-import { MapPin, Clock, Phone, CheckCircle, Navigation } from "lucide-react"; 
+import { MapPin, Clock, Phone, CheckCircle, Navigation, MapPinned } from "lucide-react"; 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 import Navbar from "@/components/shared/Navbar";
 import { useDeliveryOrders } from "@/hooks/useDeliveryOrders";
+import { useLocationTracking } from "@/hooks/useLocationTracking";
+import { useState } from "react";
 
 const DeliveryOrders = () => {
   const { orders, updateOrderStatus, isLoading } = useDeliveryOrders();
+  const [activeOrderId, setActiveOrderId] = useState<string | null>(null);
+  const [locationEnabled, setLocationEnabled] = useState(false);
+  
+  const { isTracking, lastLocation, startTracking, stopTracking } = useLocationTracking(
+    activeOrderId,
+    locationEnabled
+  );
 
   const getStatusColor = (status: string) => {
     const colors: Record<string, string> = {
@@ -108,25 +119,59 @@ const DeliveryOrders = () => {
         </div>
 
         {/* Action Buttons */}
-        <div className="flex gap-2">
+        <div className="space-y-2">
           {order.status === "ready_for_pickup" && (
-            <Button 
-              className="w-full bg-uber-green hover:bg-uber-green-hover"
-              onClick={() => updateOrderStatus({ orderId: order.id, status: "picked_up" })}
-            >
-              <CheckCircle className="h-4 w-4 mr-2" />
-              Mark as Picked Up
-            </Button>
+            <>
+              <Button 
+                className="w-full bg-uber-green hover:bg-uber-green-hover"
+                onClick={() => {
+                  updateOrderStatus({ orderId: order.id, status: "picked_up" });
+                  setActiveOrderId(order.id);
+                  setLocationEnabled(true);
+                }}
+              >
+                <CheckCircle className="h-4 w-4 mr-2" />
+                Mark as Picked Up & Start Tracking
+              </Button>
+            </>
           )}
           
           {order.status === "picked_up" && (
-            <Button 
-              className="w-full bg-uber-green hover:bg-uber-green-hover"
-              onClick={() => updateOrderStatus({ orderId: order.id, status: "delivered" })}
-            >
-              <CheckCircle className="h-4 w-4 mr-2" />
-              Mark as Delivered
-            </Button>
+            <>
+              <div className="flex items-center justify-between p-3 bg-muted rounded-lg mb-2">
+                <div className="flex items-center gap-2">
+                  <MapPinned className="h-4 w-4 text-primary" />
+                  <Label>Location Tracking</Label>
+                </div>
+                <Switch 
+                  checked={locationEnabled && activeOrderId === order.id}
+                  onCheckedChange={(checked) => {
+                    setLocationEnabled(checked);
+                    if (checked) {
+                      setActiveOrderId(order.id);
+                    } else {
+                      setActiveOrderId(null);
+                    }
+                  }}
+                />
+              </div>
+              {isTracking && activeOrderId === order.id && lastLocation && (
+                <p className="text-xs text-muted-foreground mb-2">
+                  📍 Location sharing active (Accuracy: {lastLocation.accuracy?.toFixed(0)}m)
+                </p>
+              )}
+              <Button 
+                className="w-full bg-uber-green hover:bg-uber-green-hover"
+                onClick={() => {
+                  updateOrderStatus({ orderId: order.id, status: "delivered" });
+                  setLocationEnabled(false);
+                  setActiveOrderId(null);
+                }}
+              >
+                <CheckCircle className="h-4 w-4 mr-2" />
+                Mark as Delivered
+              </Button>
+            </>
           )}
 
           {order.status === "delivered" && (

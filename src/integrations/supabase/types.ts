@@ -148,6 +148,53 @@ export type Database = {
           },
         ]
       }
+      delivery_partner_locations: {
+        Row: {
+          accuracy: number | null
+          created_at: string
+          delivery_partner_id: string
+          heading: number | null
+          id: string
+          latitude: number
+          longitude: number
+          order_id: string | null
+          speed: number | null
+          updated_at: string
+        }
+        Insert: {
+          accuracy?: number | null
+          created_at?: string
+          delivery_partner_id: string
+          heading?: number | null
+          id?: string
+          latitude: number
+          longitude: number
+          order_id?: string | null
+          speed?: number | null
+          updated_at?: string
+        }
+        Update: {
+          accuracy?: number | null
+          created_at?: string
+          delivery_partner_id?: string
+          heading?: number | null
+          id?: string
+          latitude?: number
+          longitude?: number
+          order_id?: string | null
+          speed?: number | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "delivery_partner_locations_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       marketing_campaigns: {
         Row: {
           campaign_type: string
