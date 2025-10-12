@@ -8,7 +8,7 @@ import { CartProvider } from "@/contexts/CartContext";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { ErrorBoundary } from "@/components/logging/ErrorBoundary";
 import { NavigationLogger } from "@/components/logging/NavigationLogger";
-import { queryCache, mutationCache } from "@/lib/reactQueryLogger";
+import { loggingService } from "@/services/loggingService";
 
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
@@ -47,8 +47,23 @@ import { AdminLayout } from "./components/admin/AdminLayout";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient({
-  queryCache,
-  mutationCache,
+  defaultOptions: {
+    queries: {
+      retry: 1,
+      refetchOnWindowFocus: false,
+    },
+    mutations: {
+      onError: (error: any) => {
+        loggingService.logApiCall({
+          endpoint: 'Mutation',
+          method: 'POST',
+          duration_ms: 0,
+          success: false,
+          error_message: error instanceof Error ? error.message : String(error),
+        });
+      },
+    },
+  },
 });
 
 const App = () => (
