@@ -4,8 +4,15 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { TrendingUp, Users, Store, Package, DollarSign } from 'lucide-react';
+import { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { useState } from 'react';
+
+const COLORS = ['hsl(var(--primary))', 'hsl(var(--secondary))', 'hsl(var(--accent))', 'hsl(var(--muted))'];
 
 export default function AdminAnalytics() {
+  const [timeRange, setTimeRange] = useState('30');
+
   const { data: analytics, isLoading } = useQuery({
     queryKey: ['admin-analytics'],
     queryFn: async () => {
@@ -98,6 +105,54 @@ export default function AdminAnalytics() {
     },
   });
 
+  const { data: orderTrends } = useQuery({
+    queryKey: ['order-trends', timeRange],
+    queryFn: async () => {
+      const daysAgo = new Date();
+      daysAgo.setDate(daysAgo.getDate() - parseInt(timeRange));
+
+      const { data: orders } = await supabase
+        .from('orders')
+        .select('created_at, total, status')
+        .gte('created_at', daysAgo.toISOString())
+        .order('created_at', { ascending: true });
+
+      const dailyData: Record<string, { date: string; orders: number; revenue: number }> = {};
+      
+      orders?.forEach(order => {
+        const date = new Date(order.created_at).toLocaleDateString();
+        if (!dailyData[date]) {
+          dailyData[date] = { date, orders: 0, revenue: 0 };
+        }
+        dailyData[date].orders++;
+        if (order.status === 'delivered') {
+          dailyData[date].revenue += Number(order.total || 0);
+        }
+      });
+
+      return Object.values(dailyData);
+    },
+  });
+
+  const { data: orderStatusData } = useQuery({
+    queryKey: ['order-status-distribution'],
+    queryFn: async () => {
+      const { data: orders } = await supabase
+        .from('orders')
+        .select('status');
+
+      const statusCounts: Record<string, number> = {};
+      orders?.forEach(order => {
+        statusCounts[order.status] = (statusCounts[order.status] || 0) + 1;
+      });
+
+      return Object.entries(statusCounts).map(([status, count]) => ({
+        name: status.replace('_', ' '),
+        value: count,
+      }));
+    },
+  });
+
   return (
     <SidebarProvider>
       <div className="min-h-screen flex w-full">
@@ -107,7 +162,22 @@ export default function AdminAnalytics() {
             <SidebarTrigger />
           </header>
           <main className="flex-1 p-6 bg-muted/30">
-            <h1 className="text-3xl font-bold mb-6">Analytics Dashboard</h1>
+            <div className="flex justify-between items-center mb-6">
+              <h1 className="text-3xl font-bold">Analytics Dashboard</h1>
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-muted-foreground">Time Range:</span>
+                <Select value={timeRange} onValueChange={setTimeRange}>
+                  <SelectTrigger className="w-[180px]">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="7">Last 7 days</SelectItem>
+                    <SelectItem value="30">Last 30 days</SelectItem>
+                    <SelectItem value="90">Last 90 days</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
 
             {isLoading ? (
               <p>Loading analytics...</p>
@@ -176,22 +246,91 @@ export default function AdminAnalytics() {
                   </Card>
                 </div>
 
-                {/* Monthly Performance */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                {/* Charts */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
                   <Card>
                     <CardHeader>
-                      <CardTitle>This Month</CardTitle>
+                      <CardTitle>Order Trends</CardTitle>
                     </CardHeader>
                     <CardContent>
-                      <div className="space-y-4">
+                      <ResponsiveContainer width="100%" height={300}>
+                        <LineChart data={orderTrends}>
+                          <CartesianGrid strokeDasharray="3 3" />
+                          <XAxis dataKey="date" />
+                          <YAxis />
+                          <Tooltip />
+                          <Legend />
+                          <Line type="monotone" dataKey="orders" stroke="hsl(var(--primary))" name="Orders" />
+                        </LineChart>
+                      </ResponsiveContainer>
+                    </CardContent>
+                  </Card>
+
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Revenue Trends</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <ResponsiveContainer width="100%" height={300}>
+                        <BarChart data={orderTrends}>
+                          <CartesianGrid strokeDasharray="3 3" />
+                          <XAxis dataKey="date" />
+                          <YAxis />
+                          <Tooltip />
+                          <Legend />
+                          <Bar dataKey="revenue" fill="hsl(var(--primary))" name="Revenue ($)" />
+                        </BarChart>
+                      </ResponsiveContainer>
+                    </CardContent>
+                  </Card>
+
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Order Status Distribution</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <ResponsiveContainer width="100%" height={300}>
+                        <PieChart>
+                          <Pie
+                            data={orderStatusData}
+                            cx="50%"
+                            cy="50%"
+                            labelLine={false}
+                            label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                            outerRadius={80}
+                            fill="#8884d8"
+                            dataKey="value"
+                          >
+                            {orderStatusData?.map((entry, index) => (
+                              <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                            ))}
+                          </Pie>
+                          <Tooltip />
+                        </PieChart>
+                      </ResponsiveContainer>
+                    </CardContent>
+                  </Card>
+
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>This Month Performance</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-6">
                         <div>
-                          <p className="text-sm text-muted-foreground">Orders</p>
-                          <p className="text-2xl font-bold">{analytics?.monthlyOrders}</p>
+                          <p className="text-sm text-muted-foreground mb-1">Orders</p>
+                          <p className="text-3xl font-bold">{analytics?.monthlyOrders}</p>
                         </div>
                         <div>
-                          <p className="text-sm text-muted-foreground">Revenue</p>
-                          <p className="text-2xl font-bold">
+                          <p className="text-sm text-muted-foreground mb-1">Revenue</p>
+                          <p className="text-3xl font-bold">
                             ${analytics?.monthlyRevenue.toFixed(2)}
+                          </p>
+                        </div>
+                        <div>
+                          <p className="text-sm text-muted-foreground mb-1">Avg Order Value</p>
+                          <p className="text-3xl font-bold">
+                            ${analytics?.monthlyOrders > 0 ? (analytics.monthlyRevenue / analytics.monthlyOrders).toFixed(2) : '0.00'}
                           </p>
                         </div>
                       </div>

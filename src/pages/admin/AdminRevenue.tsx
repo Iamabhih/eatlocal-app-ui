@@ -3,9 +3,16 @@ import { AdminSidebar } from '@/components/admin/AdminSidebar';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { DollarSign, TrendingUp, Package, Truck } from 'lucide-react';
+import { DollarSign, TrendingUp, Package, Truck, Download } from 'lucide-react';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Button } from '@/components/ui/button';
+import { useState } from 'react';
+import { useToast } from '@/hooks/use-toast';
 
 export default function AdminRevenue() {
+  const { toast } = useToast();
+  const [showTransactions, setShowTransactions] = useState(false);
+
   const { data: revenueStats, isLoading } = useQuery({
     queryKey: ['admin-revenue-stats'],
     queryFn: async () => {
@@ -84,6 +91,55 @@ export default function AdminRevenue() {
     },
   });
 
+  const { data: transactions } = useQuery({
+    queryKey: ['revenue-transactions'],
+    queryFn: async () => {
+      const { data: orders } = await supabase
+        .from('orders')
+        .select(`
+          id,
+          order_number,
+          created_at,
+          platform_commission,
+          status,
+          restaurants(name)
+        `)
+        .eq('status', 'delivered')
+        .order('created_at', { ascending: false })
+        .limit(100);
+
+      return orders;
+    },
+    enabled: showTransactions,
+  });
+
+  const exportToCSV = () => {
+    if (!transactions) return;
+
+    const headers = ['Order Number', 'Date', 'Restaurant', 'Commission', 'Status'];
+    const rows = transactions.map((t: any) => [
+      t.order_number,
+      new Date(t.created_at).toLocaleDateString(),
+      t.restaurants?.name || 'N/A',
+      `$${Number(t.platform_commission || 0).toFixed(2)}`,
+      t.status,
+    ]);
+
+    const csvContent = [
+      headers.join(','),
+      ...rows.map(row => row.join(','))
+    ].join('\n');
+
+    const blob = new Blob([csvContent], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `revenue-report-${new Date().toISOString().split('T')[0]}.csv`;
+    a.click();
+    
+    toast({ title: 'Report exported successfully' });
+  };
+
   return (
     <SidebarProvider>
       <div className="min-h-screen flex w-full">
@@ -151,34 +207,96 @@ export default function AdminRevenue() {
                 </div>
 
                 {/* Restaurant Commissions */}
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Restaurant Commission Breakdown</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-4">
-                      {restaurantCommissions?.map((restaurant) => (
-                        <div 
-                          key={restaurant.id}
-                          className="flex items-center justify-between p-4 border rounded-lg"
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Restaurant Commission Breakdown</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-4">
+                        {restaurantCommissions?.slice(0, 10).map((restaurant) => (
+                          <div 
+                            key={restaurant.id}
+                            className="flex items-center justify-between p-4 border rounded-lg"
+                          >
+                            <div>
+                              <p className="font-semibold">{restaurant.name}</p>
+                              <p className="text-sm text-muted-foreground">
+                                {restaurant.orderCount} orders • {restaurant.commission_rate}% commission
+                                {restaurant.custom_commission && ' (Custom)'}
+                              </p>
+                            </div>
+                            <div className="text-right">
+                              <p className="text-lg font-bold">
+                                ${restaurant.totalCommission.toFixed(2)}
+                              </p>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  <Card>
+                    <CardHeader className="flex flex-row items-center justify-between">
+                      <CardTitle>Recent Transactions</CardTitle>
+                      <div className="flex gap-2">
+                        <Button 
+                          size="sm" 
+                          variant="outline"
+                          onClick={() => setShowTransactions(!showTransactions)}
                         >
-                          <div>
-                            <p className="font-semibold">{restaurant.name}</p>
-                            <p className="text-sm text-muted-foreground">
-                              {restaurant.orderCount} orders • {restaurant.commission_rate}% commission
-                              {restaurant.custom_commission && ' (Custom)'}
-                            </p>
-                          </div>
-                          <div className="text-right">
-                            <p className="text-lg font-bold">
-                              ${restaurant.totalCommission.toFixed(2)}
-                            </p>
-                          </div>
+                          {showTransactions ? 'Hide' : 'Show'} Details
+                        </Button>
+                        {showTransactions && (
+                          <Button 
+                            size="sm" 
+                            onClick={exportToCSV}
+                          >
+                            <Download className="h-4 w-4 mr-2" />
+                            Export CSV
+                          </Button>
+                        )}
+                      </div>
+                    </CardHeader>
+                    <CardContent>
+                      {showTransactions && transactions ? (
+                        <div className="max-h-[500px] overflow-y-auto">
+                          <Table>
+                            <TableHeader>
+                              <TableRow>
+                                <TableHead>Order #</TableHead>
+                                <TableHead>Date</TableHead>
+                                <TableHead>Restaurant</TableHead>
+                                <TableHead>Commission</TableHead>
+                              </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                              {transactions.map((transaction: any) => (
+                                <TableRow key={transaction.id}>
+                                  <TableCell className="font-mono text-sm">
+                                    {transaction.order_number}
+                                  </TableCell>
+                                  <TableCell className="text-sm">
+                                    {new Date(transaction.created_at).toLocaleDateString()}
+                                  </TableCell>
+                                  <TableCell>{transaction.restaurants?.name}</TableCell>
+                                  <TableCell className="font-semibold">
+                                    ${Number(transaction.platform_commission || 0).toFixed(2)}
+                                  </TableCell>
+                                </TableRow>
+                              ))}
+                            </TableBody>
+                          </Table>
                         </div>
-                      ))}
-                    </div>
-                  </CardContent>
-                </Card>
+                      ) : (
+                        <p className="text-muted-foreground text-center py-8">
+                          Click "Show Details" to view transaction history
+                        </p>
+                      )}
+                    </CardContent>
+                  </Card>
+                </div>
               </>
             )}
           </main>

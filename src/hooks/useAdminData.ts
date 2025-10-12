@@ -1,10 +1,27 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/contexts/AuthContext';
 
 export function useAdminData() {
   const { toast } = useToast();
+  const { user } = useAuth();
   const queryClient = useQueryClient();
+
+  const logActivity = async (action: string, target_type: string, target_id?: string, details?: any) => {
+    if (!user) return;
+    try {
+      await supabase.from('admin_activity_logs').insert({
+        admin_id: user.id,
+        action,
+        target_type,
+        target_id,
+        details,
+      });
+    } catch (error) {
+      console.error('Failed to log activity:', error);
+    }
+  };
 
   // Fetch all users with their roles
   const { data: users, isLoading: usersLoading } = useQuery({
@@ -104,9 +121,10 @@ export function useAdminData() {
 
       if (error) throw error;
     },
-    onSuccess: () => {
+    onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['admin-orders'] });
       queryClient.invalidateQueries({ queryKey: ['admin-stats'] });
+      logActivity('update_order_status', 'order', variables.orderId, { status: variables.status });
       toast({ title: 'Order updated successfully' });
     },
     onError: () => {
@@ -124,8 +142,9 @@ export function useAdminData() {
 
       if (error) throw error;
     },
-    onSuccess: () => {
+    onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['admin-restaurants'] });
+      logActivity('update_restaurant', 'restaurant', variables.restaurantId, variables.updates);
       toast({ title: 'Restaurant updated successfully' });
     },
     onError: () => {
