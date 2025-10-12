@@ -1,6 +1,6 @@
 import { Plus, Edit, Trash2, Eye, EyeOff } from "lucide-react";
 import { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -10,83 +10,87 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import Navbar from "@/components/shared/Navbar";
+import { RestaurantLayout } from "@/components/restaurant/RestaurantLayout";
+import { useRestaurantMenuItems } from "@/hooks/useRestaurantData";
+import { useMenuCategories } from "@/hooks/useMenuItems";
+import { useMenuMutations } from "@/hooks/useMenuMutations";
+import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/contexts/AuthContext";
 
 const RestaurantMenu = () => {
-  const [menuItems, setMenuItems] = useState([
-    {
-      id: "1",
-      name: "Classic Cheeseburger",
-      description: "Angus beef patty with aged cheddar, lettuce, tomato, onion, and house sauce",
-      price: 12.99,
-      category: "Burgers",
-      image: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=300&h=200&fit=crop",
-      available: true,
-      popular: true
-    },
-    {
-      id: "2",
-      name: "BBQ Bacon Burger", 
-      description: "Double patty with crispy bacon, BBQ sauce, onion rings, and cheddar cheese",
-      price: 16.99,
-      category: "Burgers",
-      image: "https://images.unsplash.com/photo-1553979459-d2229ba7433a?w=300&h=200&fit=crop",
-      available: true,
-      popular: true
-    },
-    {
-      id: "3",
-      name: "Truffle Fries",
-      description: "Hand-cut fries with truffle oil and parmesan cheese",
-      price: 8.99,
-      category: "Sides",
-      image: "https://images.unsplash.com/photo-1576107232684-1279f390859f?w=300&h=200&fit=crop",
-      available: true,
-      popular: false
-    },
-    {
-      id: "4",
-      name: "Mushroom Swiss Burger",
-      description: "Sautéed mushrooms, Swiss cheese, and garlic aioli on brioche bun",
-      price: 14.99,
-      category: "Burgers",
-      image: "https://images.unsplash.com/photo-1551782450-17144efb9c50?w=300&h=200&fit=crop",
-      available: false,
-      popular: false
-    }
-  ]);
-
+  const { user } = useAuth();
+  const { data: menuItemsData, isLoading } = useRestaurantMenuItems();
+  const { data: categories } = useMenuCategories(user?.id || '');
+  const { createMenuItem, updateMenuItem, deleteMenuItem } = useMenuMutations();
   const [editingItem, setEditingItem] = useState<any>(null);
   const [showDialog, setShowDialog] = useState(false);
+  const { toast } = useToast();
 
-  const categories = ["Burgers", "Sides", "Drinks", "Desserts"];
+  const menuItems = menuItemsData || [];
+  const menuCategories = categories || [];
 
-  const toggleAvailability = (itemId: string) => {
-    setMenuItems(prev => prev.map(item => 
-      item.id === itemId ? { ...item, available: !item.available } : item
-    ));
-  };
-
-  const deleteItem = (itemId: string) => {
-    setMenuItems(prev => prev.filter(item => item.id !== itemId));
-  };
-
-  const saveItem = (itemData: any) => {
-    if (editingItem) {
-      // Update existing item
-      setMenuItems(prev => prev.map(item => 
-        item.id === editingItem.id ? { ...item, ...itemData } : item
-      ));
-    } else {
-      // Add new item
-      const newItem = {
-        ...itemData,
-        id: Date.now().toString(),
-      };
-      setMenuItems(prev => [...prev, newItem]);
+  const toggleAvailability = async (item: any) => {
+    try {
+      await updateMenuItem.mutateAsync({
+        id: item.id,
+        is_available: !item.is_available,
+      });
+      toast({
+        title: "Success",
+        description: `Item ${!item.is_available ? 'enabled' : 'disabled'}`,
+      });
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
     }
-    setEditingItem(null);
-    setShowDialog(false);
+  };
+
+  const handleDeleteItem = async (itemId: string) => {
+    try {
+      await deleteMenuItem.mutateAsync(itemId);
+      toast({
+        title: "Success",
+        description: "Item deleted successfully",
+      });
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
+  };
+
+  const saveItem = async (itemData: any) => {
+    try {
+      if (editingItem) {
+        await updateMenuItem.mutateAsync({
+          id: editingItem.id,
+          ...itemData,
+        });
+        toast({
+          title: "Success",
+          description: "Item updated successfully",
+        });
+      } else {
+        await createMenuItem.mutateAsync(itemData);
+        toast({
+          title: "Success",
+          description: "Item created successfully",
+        });
+      }
+      setEditingItem(null);
+      setShowDialog(false);
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
   };
 
   const openEditDialog = (item?: any) => {
@@ -94,9 +98,9 @@ const RestaurantMenu = () => {
     setShowDialog(true);
   };
 
-  const filterItemsByCategory = (category: string) => {
-    if (category === "all") return menuItems;
-    return menuItems.filter(item => item.category === category);
+  const filterItemsByCategory = (categoryId: string) => {
+    if (categoryId === "all") return menuItems;
+    return menuItems.filter((item: any) => item.category_id === categoryId);
   };
 
   const ItemForm = () => {
@@ -104,17 +108,22 @@ const RestaurantMenu = () => {
       name: editingItem?.name || "",
       description: editingItem?.description || "",
       price: editingItem?.price || "",
-      category: editingItem?.category || "Burgers",
-      image: editingItem?.image || "",
-      available: editingItem?.available ?? true,
-      popular: editingItem?.popular ?? false
+      category_id: editingItem?.category_id || menuCategories[0]?.id || "",
+      image_url: editingItem?.image_url || "",
+      is_available: editingItem?.is_available ?? true,
+      is_vegetarian: editingItem?.is_vegetarian ?? false,
+      is_vegan: editingItem?.is_vegan ?? false,
+      is_gluten_free: editingItem?.is_gluten_free ?? false,
+      preparation_time: editingItem?.preparation_time || 15,
+      calories: editingItem?.calories || "",
     });
 
     const handleSubmit = (e: React.FormEvent) => {
       e.preventDefault();
       saveItem({
         ...formData,
-        price: parseFloat(formData.price.toString())
+        price: parseFloat(formData.price.toString()),
+        calories: formData.calories ? parseInt(formData.calories.toString()) : null,
       });
     };
 
@@ -149,51 +158,87 @@ const RestaurantMenu = () => {
             id="description"
             value={formData.description}
             onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
-            required
           />
         </div>
 
         <div className="grid grid-cols-2 gap-4">
           <div>
             <Label htmlFor="category">Category</Label>
-            <Select value={formData.category} onValueChange={(value) => setFormData(prev => ({ ...prev, category: value }))}>
+            <Select value={formData.category_id} onValueChange={(value) => setFormData(prev => ({ ...prev, category_id: value }))}>
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                {categories.map(category => (
-                  <SelectItem key={category} value={category}>{category}</SelectItem>
+                {menuCategories.map((category: any) => (
+                  <SelectItem key={category.id} value={category.id}>{category.name}</SelectItem>
                 ))}
               </SelectContent>
             </Select>
           </div>
           <div>
-            <Label htmlFor="image">Image URL</Label>
+            <Label htmlFor="image_url">Image URL</Label>
             <Input
-              id="image"
+              id="image_url"
               type="url"
-              value={formData.image}
-              onChange={(e) => setFormData(prev => ({ ...prev, image: e.target.value }))}
+              value={formData.image_url}
+              onChange={(e) => setFormData(prev => ({ ...prev, image_url: e.target.value }))}
             />
           </div>
         </div>
 
-        <div className="flex items-center justify-between">
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <Label htmlFor="preparation_time">Prep Time (minutes)</Label>
+            <Input
+              id="preparation_time"
+              type="number"
+              value={formData.preparation_time}
+              onChange={(e) => setFormData(prev => ({ ...prev, preparation_time: parseInt(e.target.value) }))}
+            />
+          </div>
+          <div>
+            <Label htmlFor="calories">Calories</Label>
+            <Input
+              id="calories"
+              type="number"
+              value={formData.calories}
+              onChange={(e) => setFormData(prev => ({ ...prev, calories: e.target.value }))}
+            />
+          </div>
+        </div>
+
+        <div className="grid grid-cols-2 gap-4">
           <div className="flex items-center space-x-2">
             <Switch
               id="available"
-              checked={formData.available}
-              onCheckedChange={(checked) => setFormData(prev => ({ ...prev, available: checked }))}
+              checked={formData.is_available}
+              onCheckedChange={(checked) => setFormData(prev => ({ ...prev, is_available: checked }))}
             />
             <Label htmlFor="available">Available</Label>
           </div>
           <div className="flex items-center space-x-2">
             <Switch
-              id="popular"
-              checked={formData.popular}
-              onCheckedChange={(checked) => setFormData(prev => ({ ...prev, popular: checked }))}
+              id="vegetarian"
+              checked={formData.is_vegetarian}
+              onCheckedChange={(checked) => setFormData(prev => ({ ...prev, is_vegetarian: checked }))}
             />
-            <Label htmlFor="popular">Popular Item</Label>
+            <Label htmlFor="vegetarian">Vegetarian</Label>
+          </div>
+          <div className="flex items-center space-x-2">
+            <Switch
+              id="vegan"
+              checked={formData.is_vegan}
+              onCheckedChange={(checked) => setFormData(prev => ({ ...prev, is_vegan: checked }))}
+            />
+            <Label htmlFor="vegan">Vegan</Label>
+          </div>
+          <div className="flex items-center space-x-2">
+            <Switch
+              id="gluten_free"
+              checked={formData.is_gluten_free}
+              onCheckedChange={(checked) => setFormData(prev => ({ ...prev, is_gluten_free: checked }))}
+            />
+            <Label htmlFor="gluten_free">Gluten Free</Label>
           </div>
         </div>
 
@@ -201,7 +246,7 @@ const RestaurantMenu = () => {
           <Button type="button" variant="outline" onClick={() => setShowDialog(false)}>
             Cancel
           </Button>
-          <Button type="submit" className="bg-uber-green hover:bg-uber-green-hover">
+          <Button type="submit">
             {editingItem ? "Update Item" : "Add Item"}
           </Button>
         </div>
@@ -209,19 +254,24 @@ const RestaurantMenu = () => {
     );
   };
 
+  if (isLoading) {
+    return (
+      <RestaurantLayout>
+        <div className="flex items-center justify-center min-h-screen">
+          <p>Loading menu...</p>
+        </div>
+      </RestaurantLayout>
+    );
+  }
+
   return (
-    <div className="min-h-screen bg-background">
-      <Navbar type="restaurant" />
-      
+    <RestaurantLayout>
       <div className="container mx-auto px-4 py-8">
         <div className="flex items-center justify-between mb-8">
           <h1 className="text-3xl font-bold">Menu Management</h1>
           <Dialog open={showDialog} onOpenChange={setShowDialog}>
             <DialogTrigger asChild>
-              <Button 
-                onClick={() => openEditDialog()}
-                className="bg-uber-green hover:bg-uber-green-hover"
-              >
+              <Button onClick={() => openEditDialog()}>
                 <Plus className="h-4 w-4 mr-2" />
                 Add New Item
               </Button>
@@ -238,35 +288,28 @@ const RestaurantMenu = () => {
         </div>
 
         <Tabs defaultValue="all" className="w-full">
-          <TabsList className="grid w-full grid-cols-5">
+          <TabsList className="grid w-full" style={{ gridTemplateColumns: `repeat(${menuCategories.length + 1}, 1fr)` }}>
             <TabsTrigger value="all">All Items ({menuItems.length})</TabsTrigger>
-            {categories.map(category => (
-              <TabsTrigger key={category} value={category.toLowerCase()}>
-                {category} ({filterItemsByCategory(category).length})
+            {menuCategories.map((category: any) => (
+              <TabsTrigger key={category.id} value={category.id}>
+                {category.name} ({filterItemsByCategory(category.id).length})
               </TabsTrigger>
             ))}
           </TabsList>
           
           <TabsContent value="all" className="mt-6">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {menuItems.map((item) => (
-                <Card key={item.id} className={`shadow-card ${!item.available ? 'opacity-60' : ''}`}>
+              {menuItems.map((item: any) => (
+                <Card key={item.id} className={`${!item.is_available ? 'opacity-60' : ''}`}>
                   <div className="relative">
                     <img 
-                      src={item.image} 
+                      src={item.image_url || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=300&h=200&fit=crop'} 
                       alt={item.name}
                       className="w-full h-48 object-cover rounded-t-lg"
                     />
                     <div className="absolute top-3 right-3 flex gap-2">
-                      {item.popular && (
-                        <Badge className="bg-uber-green hover:bg-uber-green-hover">
-                          Popular
-                        </Badge>
-                      )}
-                      {!item.available && (
-                        <Badge variant="destructive">
-                          Unavailable
-                        </Badge>
+                      {!item.is_available && (
+                        <Badge variant="destructive">Unavailable</Badge>
                       )}
                     </div>
                   </div>
@@ -281,19 +324,21 @@ const RestaurantMenu = () => {
                       {item.description}
                     </p>
                     
-                    <Badge variant="secondary" className="mb-4">
-                      {item.category}
-                    </Badge>
+                    <div className="flex gap-2 mb-3">
+                      {item.is_vegetarian && <Badge variant="secondary">Vegetarian</Badge>}
+                      {item.is_vegan && <Badge variant="secondary">Vegan</Badge>}
+                      {item.is_gluten_free && <Badge variant="secondary">Gluten Free</Badge>}
+                    </div>
                     
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
                         <Switch 
-                          checked={item.available}
-                          onCheckedChange={() => toggleAvailability(item.id)}
+                          checked={item.is_available}
+                          onCheckedChange={() => toggleAvailability(item)}
                         />
                         <span className="text-sm">
-                          {item.available ? (
-                            <span className="flex items-center gap-1 uber-green">
+                          {item.is_available ? (
+                            <span className="flex items-center gap-1">
                               <Eye className="h-4 w-4" />
                               Available
                             </span>
@@ -317,7 +362,7 @@ const RestaurantMenu = () => {
                         <Button
                           variant="outline"
                           size="sm"
-                          onClick={() => deleteItem(item.id)}
+                          onClick={() => handleDeleteItem(item.id)}
                           className="text-destructive hover:text-destructive"
                         >
                           <Trash2 className="h-4 w-4" />
@@ -330,27 +375,20 @@ const RestaurantMenu = () => {
             </div>
           </TabsContent>
           
-          {categories.map(category => (
-            <TabsContent key={category} value={category.toLowerCase()} className="mt-6">
+          {menuCategories.map((category: any) => (
+            <TabsContent key={category.id} value={category.id} className="mt-6">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {filterItemsByCategory(category).map((item) => (
-                  <Card key={item.id} className={`shadow-card ${!item.available ? 'opacity-60' : ''}`}>
+                {filterItemsByCategory(category.id).map((item: any) => (
+                  <Card key={item.id} className={`${!item.is_available ? 'opacity-60' : ''}`}>
                     <div className="relative">
                       <img 
-                        src={item.image} 
+                        src={item.image_url || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=300&h=200&fit=crop'} 
                         alt={item.name}
                         className="w-full h-48 object-cover rounded-t-lg"
                       />
                       <div className="absolute top-3 right-3 flex gap-2">
-                        {item.popular && (
-                          <Badge className="bg-uber-green hover:bg-uber-green-hover">
-                            Popular
-                          </Badge>
-                        )}
-                        {!item.available && (
-                          <Badge variant="destructive">
-                            Unavailable
-                          </Badge>
+                        {!item.is_available && (
+                          <Badge variant="destructive">Unavailable</Badge>
                         )}
                       </div>
                     </div>
@@ -365,15 +403,21 @@ const RestaurantMenu = () => {
                         {item.description}
                       </p>
                       
+                      <div className="flex gap-2 mb-3">
+                        {item.is_vegetarian && <Badge variant="secondary">Vegetarian</Badge>}
+                        {item.is_vegan && <Badge variant="secondary">Vegan</Badge>}
+                        {item.is_gluten_free && <Badge variant="secondary">Gluten Free</Badge>}
+                      </div>
+                      
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
                           <Switch 
-                            checked={item.available}
-                            onCheckedChange={() => toggleAvailability(item.id)}
+                            checked={item.is_available}
+                            onCheckedChange={() => toggleAvailability(item)}
                           />
                           <span className="text-sm">
-                            {item.available ? (
-                              <span className="flex items-center gap-1 uber-green">
+                            {item.is_available ? (
+                              <span className="flex items-center gap-1">
                                 <Eye className="h-4 w-4" />
                                 Available
                               </span>
@@ -397,7 +441,7 @@ const RestaurantMenu = () => {
                           <Button
                             variant="outline"
                             size="sm"
-                            onClick={() => deleteItem(item.id)}
+                            onClick={() => handleDeleteItem(item.id)}
                             className="text-destructive hover:text-destructive"
                           >
                             <Trash2 className="h-4 w-4" />
@@ -412,7 +456,7 @@ const RestaurantMenu = () => {
           ))}
         </Tabs>
       </div>
-    </div>
+    </RestaurantLayout>
   );
 };
 

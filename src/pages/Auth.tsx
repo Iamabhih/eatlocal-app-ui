@@ -98,15 +98,19 @@ export default function Auth() {
         if (error) throw error;
 
         if (data.user) {
-          // Assign role to user
-          const { error: roleError } = await supabase
-            .from('user_roles')
-            .insert({
-              user_id: data.user.id,
-              role: role,
-            });
+          // Assign additional role to user if not customer (customer role is auto-assigned by trigger)
+          if (role !== 'customer') {
+            const { error: roleError } = await supabase
+              .from('user_roles')
+              .insert({
+                user_id: data.user.id,
+                role: role,
+              });
 
-          if (roleError) throw roleError;
+            if (roleError && roleError.code !== '23505') { // Ignore duplicate key errors
+              throw roleError;
+            }
+          }
 
           toast({
             title: 'Account created!',
