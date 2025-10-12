@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { CartProvider } from "@/contexts/CartContext";
+import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
@@ -67,15 +68,39 @@ const App = () => (
             <Route path="/orders/:orderId" element={<OrderTracking />} />
 
             {/* Restaurant Portal Routes */}
-            <Route path="/restaurant/dashboard" element={<RestaurantDashboard />} />
-            <Route path="/restaurant/orders" element={<RestaurantOrders />} />
-            <Route path="/restaurant/menu" element={<RestaurantMenu />} />
+            <Route path="/restaurant/dashboard" element={
+              <ProtectedRoute requiredRole="restaurant">
+                <RestaurantDashboard />
+              </ProtectedRoute>
+            } />
+            <Route path="/restaurant/orders" element={
+              <ProtectedRoute requiredRole="restaurant">
+                <RestaurantOrders />
+              </ProtectedRoute>
+            } />
+            <Route path="/restaurant/menu" element={
+              <ProtectedRoute requiredRole="restaurant">
+                <RestaurantMenu />
+              </ProtectedRoute>
+            } />
 
             {/* Delivery Partner Portal Routes */}
             <Route element={<DeliveryLayout />}>
-              <Route path="/delivery/dashboard" element={<DeliveryDashboard />} />
-              <Route path="/delivery/orders" element={<DeliveryOrders />} />
-              <Route path="/delivery/earnings" element={<DeliveryEarnings />} />
+              <Route path="/delivery/dashboard" element={
+                <ProtectedRoute requiredRole="delivery_partner">
+                  <DeliveryDashboard />
+                </ProtectedRoute>
+              } />
+              <Route path="/delivery/orders" element={
+                <ProtectedRoute requiredRole="delivery_partner">
+                  <DeliveryOrders />
+                </ProtectedRoute>
+              } />
+              <Route path="/delivery/earnings" element={
+                <ProtectedRoute requiredRole="delivery_partner">
+                  <DeliveryEarnings />
+                </ProtectedRoute>
+              } />
             </Route>
 
             {/* Admin Portal Routes */}

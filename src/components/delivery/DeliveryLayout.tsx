@@ -1,43 +1,21 @@
-import { useEffect } from 'react';
-import { Outlet, useNavigate } from 'react-router-dom';
-import { useAuth } from '@/contexts/AuthContext';
-import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { Outlet } from 'react-router-dom';
+import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { DeliverySidebar } from "./DeliverySidebar";
 
 export function DeliveryLayout() {
-  const { user, loading: authLoading } = useAuth();
-  const navigate = useNavigate();
-
-  const { data: hasRole, isLoading: roleLoading } = useQuery({
-    queryKey: ['user-role', user?.id],
-    queryFn: async () => {
-      if (!user) return false;
-      const { data } = await supabase
-        .from('user_roles')
-        .select('role')
-        .eq('user_id', user.id)
-        .eq('role', 'delivery_partner')
-        .maybeSingle();
-      return !!data;
-    },
-    enabled: !!user,
-  });
-
-  useEffect(() => {
-    if (!authLoading && !user) {
-      navigate('/auth');
-    } else if (!roleLoading && !hasRole && user) {
-      navigate('/');
-    }
-  }, [user, hasRole, authLoading, roleLoading, navigate]);
-
-  if (authLoading || roleLoading) {
-    return <div className="flex items-center justify-center min-h-screen">Loading...</div>;
-  }
-
-  if (!user || !hasRole) {
-    return null;
-  }
-
-  return <Outlet />;
+  return (
+    <SidebarProvider>
+      <div className="flex min-h-screen w-full">
+        <DeliverySidebar />
+        <div className="flex-1 flex flex-col">
+          <header className="h-12 flex items-center border-b px-4">
+            <SidebarTrigger />
+          </header>
+          <main className="flex-1">
+            <Outlet />
+          </main>
+        </div>
+      </div>
+    </SidebarProvider>
+  );
 }
