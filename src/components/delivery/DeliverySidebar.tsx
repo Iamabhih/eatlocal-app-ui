@@ -20,16 +20,17 @@ const menuItems = [
 ];
 
 export function DeliverySidebar() {
-  const { collapsed } = useSidebar();
+  const { state } = useSidebar();
   const location = useLocation();
   const { signOut } = useAuth();
   
+  const isCollapsed = state === "collapsed";
   const isActive = (path: string) => location.pathname === path;
   const getNavCls = ({ isActive }: { isActive: boolean }) =>
     isActive ? "bg-primary/10 text-primary font-medium" : "hover:bg-muted/50";
 
   return (
-    <Sidebar className={collapsed ? "w-14" : "w-60"} collapsible>
+    <Sidebar className={isCollapsed ? "w-14" : "w-60"} collapsible="icon">
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupLabel>Delivery Portal</SidebarGroupLabel>
@@ -40,7 +41,7 @@ export function DeliverySidebar() {
                   <SidebarMenuButton asChild>
                     <NavLink to={item.url} end className={getNavCls}>
                       <item.icon className="h-4 w-4" />
-                      {!collapsed && <span>{item.title}</span>}
+                      {!isCollapsed && <span>{item.title}</span>}
                     </NavLink>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
@@ -48,7 +49,7 @@ export function DeliverySidebar() {
               <SidebarMenuItem>
                 <SidebarMenuButton onClick={signOut}>
                   <LogOut className="h-4 w-4" />
-                  {!collapsed && <span>Sign Out</span>}
+                  {!isCollapsed && <span>Sign Out</span>}
                 </SidebarMenuButton>
               </SidebarMenuItem>
             </SidebarMenu>
