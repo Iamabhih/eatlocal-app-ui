@@ -44,6 +44,51 @@ export type Database = {
         }
         Relationships: []
       }
+      api_call_logs: {
+        Row: {
+          created_at: string
+          duration_ms: number
+          endpoint: string
+          error_message: string | null
+          id: string
+          method: string
+          request_payload: Json | null
+          response_payload: Json | null
+          session_id: string
+          status_code: number | null
+          success: boolean
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          duration_ms: number
+          endpoint: string
+          error_message?: string | null
+          id?: string
+          method: string
+          request_payload?: Json | null
+          response_payload?: Json | null
+          session_id: string
+          status_code?: number | null
+          success?: boolean
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          duration_ms?: number
+          endpoint?: string
+          error_message?: string | null
+          id?: string
+          method?: string
+          request_payload?: Json | null
+          response_payload?: Json | null
+          session_id?: string
+          status_code?: number | null
+          success?: boolean
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       customer_addresses: {
         Row: {
           city: string
@@ -194,6 +239,51 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      error_logs: {
+        Row: {
+          browser_info: Json | null
+          component: string | null
+          created_at: string
+          error_message: string
+          error_type: string
+          id: string
+          page_url: string
+          resolved: boolean
+          session_id: string
+          severity: Database["public"]["Enums"]["error_severity"]
+          stack_trace: string | null
+          user_id: string | null
+        }
+        Insert: {
+          browser_info?: Json | null
+          component?: string | null
+          created_at?: string
+          error_message: string
+          error_type: string
+          id?: string
+          page_url: string
+          resolved?: boolean
+          session_id: string
+          severity?: Database["public"]["Enums"]["error_severity"]
+          stack_trace?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          browser_info?: Json | null
+          component?: string | null
+          created_at?: string
+          error_message?: string
+          error_type?: string
+          id?: string
+          page_url?: string
+          resolved?: boolean
+          session_id?: string
+          severity?: Database["public"]["Enums"]["error_severity"]
+          stack_trace?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
       }
       marketing_campaigns: {
         Row: {
@@ -857,6 +947,108 @@ export type Database = {
         }
         Relationships: []
       }
+      system_logs: {
+        Row: {
+          action: string
+          component: string | null
+          created_at: string
+          error_message: string | null
+          id: string
+          log_level: Database["public"]["Enums"]["log_level"]
+          log_type: Database["public"]["Enums"]["log_type"]
+          metadata: Json | null
+          page_url: string
+          referrer: string | null
+          session_id: string
+          success: boolean
+          target: string | null
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          action: string
+          component?: string | null
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          log_level?: Database["public"]["Enums"]["log_level"]
+          log_type: Database["public"]["Enums"]["log_type"]
+          metadata?: Json | null
+          page_url: string
+          referrer?: string | null
+          session_id: string
+          success?: boolean
+          target?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          action?: string
+          component?: string | null
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          log_level?: Database["public"]["Enums"]["log_level"]
+          log_type?: Database["public"]["Enums"]["log_type"]
+          metadata?: Json | null
+          page_url?: string
+          referrer?: string | null
+          session_id?: string
+          success?: boolean
+          target?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      user_interaction_logs: {
+        Row: {
+          created_at: string
+          element_class: string | null
+          element_id: string | null
+          element_text: string | null
+          event_type: Database["public"]["Enums"]["interaction_event_type"]
+          id: string
+          page_path: string
+          session_id: string
+          user_id: string | null
+          viewport_height: number
+          viewport_width: number
+          x_coordinate: number | null
+          y_coordinate: number | null
+        }
+        Insert: {
+          created_at?: string
+          element_class?: string | null
+          element_id?: string | null
+          element_text?: string | null
+          event_type: Database["public"]["Enums"]["interaction_event_type"]
+          id?: string
+          page_path: string
+          session_id: string
+          user_id?: string | null
+          viewport_height: number
+          viewport_width: number
+          x_coordinate?: number | null
+          y_coordinate?: number | null
+        }
+        Update: {
+          created_at?: string
+          element_class?: string | null
+          element_id?: string | null
+          element_text?: string | null
+          event_type?: Database["public"]["Enums"]["interaction_event_type"]
+          id?: string
+          page_path?: string
+          session_id?: string
+          user_id?: string | null
+          viewport_height?: number
+          viewport_width?: number
+          x_coordinate?: number | null
+          y_coordinate?: number | null
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string
@@ -883,6 +1075,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      cleanup_old_logs: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
       generate_order_number: {
         Args: Record<PropertyKey, never>
         Returns: string
@@ -896,6 +1092,22 @@ export type Database = {
       }
     }
     Enums: {
+      error_severity: "low" | "medium" | "high" | "critical"
+      interaction_event_type:
+        | "click"
+        | "hover"
+        | "scroll"
+        | "input"
+        | "focus"
+        | "blur"
+      log_level: "info" | "warn" | "error" | "debug"
+      log_type:
+        | "click"
+        | "navigation"
+        | "api_call"
+        | "error"
+        | "performance"
+        | "form_submit"
       order_status:
         | "pending"
         | "confirmed"
@@ -1038,6 +1250,24 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      error_severity: ["low", "medium", "high", "critical"],
+      interaction_event_type: [
+        "click",
+        "hover",
+        "scroll",
+        "input",
+        "focus",
+        "blur",
+      ],
+      log_level: ["info", "warn", "error", "debug"],
+      log_type: [
+        "click",
+        "navigation",
+        "api_call",
+        "error",
+        "performance",
+        "form_submit",
+      ],
       order_status: [
         "pending",
         "confirmed",

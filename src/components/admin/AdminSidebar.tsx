@@ -7,7 +7,8 @@ import {
   Truck,
   BarChart3,
   Megaphone,
-  DollarSign
+  DollarSign,
+  FileText
 } from 'lucide-react';
 import {
   Sidebar,
@@ -30,6 +31,7 @@ const adminItems = [
   { title: 'Revenue', url: '/admin/revenue', icon: DollarSign },
   { title: 'Analytics', url: '/admin/analytics', icon: BarChart3 },
   { title: 'Marketing', url: '/admin/marketing', icon: Megaphone },
+  { title: 'System Logs', url: '/admin/logs', icon: FileText },
 ];
 
 export function AdminSidebar() {

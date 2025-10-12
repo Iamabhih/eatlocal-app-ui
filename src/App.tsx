@@ -6,6 +6,9 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { CartProvider } from "@/contexts/CartContext";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
+import { ErrorBoundary } from "@/components/logging/ErrorBoundary";
+import { NavigationLogger } from "@/components/logging/NavigationLogger";
+import { queryCache, mutationCache } from "@/lib/reactQueryLogger";
 
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
@@ -38,21 +41,27 @@ import AdminDeliveryPartners from "./pages/admin/AdminDeliveryPartners";
 import AdminRevenue from "./pages/admin/AdminRevenue";
 import AdminAnalytics from "./pages/admin/AdminAnalytics";
 import AdminMarketing from "./pages/admin/AdminMarketing";
+import AdminLogs from "./pages/admin/AdminLogs";
 import { AdminLayout } from "./components/admin/AdminLayout";
 
 import NotFound from "./pages/NotFound";
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  queryCache,
+  mutationCache,
+});
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <AuthProvider>
-          <CartProvider>
-            <Routes>
+      <ErrorBoundary>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <NavigationLogger />
+          <AuthProvider>
+            <CartProvider>
+              <Routes>
               {/* Home Page */}
               <Route path="/" element={<Index />} />
               
@@ -113,16 +122,18 @@ const App = () => (
               <Route path="/admin/revenue" element={<AdminRevenue />} />
               <Route path="/admin/analytics" element={<AdminAnalytics />} />
               <Route path="/admin/marketing" element={<AdminMarketing />} />
+              <Route path="/admin/logs" element={<AdminLogs />} />
             </Route>
 
-            {/* Catch-all route */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </CartProvider>
-      </AuthProvider>
-    </BrowserRouter>
-  </TooltipProvider>
-</QueryClientProvider>
+              {/* Catch-all route */}
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </CartProvider>
+        </AuthProvider>
+      </BrowserRouter>
+      </ErrorBoundary>
+    </TooltipProvider>
+  </QueryClientProvider>
 );
 
 export default App;
