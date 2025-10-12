@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Loader2, ShoppingBag, MapPin, CreditCard } from "lucide-react";
+import { Loader2, ShoppingBag, CreditCard } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import Navbar from "@/components/shared/Navbar";
+import { AddressSelector } from "@/components/customer/AddressSelector";
 import { useAuth } from "@/contexts/AuthContext";
 import { useCart } from "@/hooks/useCart";
 import { supabase } from "@/integrations/supabase/client";
@@ -16,6 +17,7 @@ const Checkout = () => {
   const { items, getSubtotal, getTax, getTotal, clearCart } = useCart();
   const [loading, setLoading] = useState(false);
   const [processingPayment, setProcessingPayment] = useState(false);
+  const [selectedAddressId, setSelectedAddressId] = useState<string | null>(null);
 
   useEffect(() => {
     if (!user) {
@@ -34,7 +36,14 @@ const Checkout = () => {
   const total = getTotal(deliveryFee);
 
   const handlePayment = async () => {
-    if (!user || items.length === 0) return;
+    if (!user || items.length === 0 || !selectedAddressId) {
+      toast({
+        title: "Missing Information",
+        description: "Please select a delivery address",
+        variant: "destructive",
+      });
+      return;
+    }
 
     setLoading(true);
     setProcessingPayment(true);
@@ -49,11 +58,13 @@ const Checkout = () => {
         .insert([{
           customer_id: user.id,
           restaurant_id: items[0].restaurantId,
+          delivery_address_id: selectedAddressId,
           order_number: orderNumber,
           subtotal: subtotal,
           delivery_fee: deliveryFee,
           tax: tax,
-          total: total
+          total: total,
+          status: 'pending'
         }])
         .select()
         .single();
@@ -138,20 +149,11 @@ const Checkout = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Order Summary */}
           <div className="lg:col-span-2 space-y-6">
-            {/* Delivery Address */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <MapPin className="h-5 w-5" />
-                  Delivery Address
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground">
-                  Default delivery address will be used
-                </p>
-              </CardContent>
-            </Card>
+            {/* Delivery Address Selector */}
+            <AddressSelector
+              selectedAddressId={selectedAddressId}
+              onSelectAddress={setSelectedAddressId}
+            />
 
             {/* Order Items */}
             <Card>
@@ -215,13 +217,15 @@ const Checkout = () => {
                   className="w-full"
                   size="lg"
                   onClick={handlePayment}
-                  disabled={loading || processingPayment}
+                  disabled={loading || processingPayment || !selectedAddressId}
                 >
                   {processingPayment ? (
                     <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                       Redirecting to PayFast...
                     </>
+                  ) : !selectedAddressId ? (
+                    'Select Address to Continue'
                   ) : (
                     'Pay with PayFast'
                   )}
