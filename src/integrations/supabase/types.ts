@@ -393,6 +393,8 @@ export type Database = {
       }
       menu_items: {
         Row: {
+          barcode: string | null
+          brand: string | null
           calories: number | null
           category_id: string | null
           created_at: string
@@ -406,10 +408,14 @@ export type Database = {
           name: string
           preparation_time: number | null
           price: number
+          product_type: string | null
+          quantity_in_stock: number | null
           restaurant_id: string
           updated_at: string
         }
         Insert: {
+          barcode?: string | null
+          brand?: string | null
           calories?: number | null
           category_id?: string | null
           created_at?: string
@@ -423,10 +429,14 @@ export type Database = {
           name: string
           preparation_time?: number | null
           price: number
+          product_type?: string | null
+          quantity_in_stock?: number | null
           restaurant_id: string
           updated_at?: string
         }
         Update: {
+          barcode?: string | null
+          brand?: string | null
           calories?: number | null
           category_id?: string | null
           created_at?: string
@@ -440,6 +450,8 @@ export type Database = {
           name?: string
           preparation_time?: number | null
           price?: number
+          product_type?: string | null
+          quantity_in_stock?: number | null
           restaurant_id?: string
           updated_at?: string
         }
@@ -555,10 +567,13 @@ export type Database = {
           delivery_fee: number
           delivery_partner_id: string | null
           estimated_delivery_time: string | null
+          fulfillment_type: string | null
           id: string
           net_restaurant_payout: number
           order_number: string
           picked_up_at: string | null
+          pickup_code: string | null
+          pickup_time: string | null
           platform_commission: number
           ready_at: string | null
           restaurant_id: string
@@ -582,10 +597,13 @@ export type Database = {
           delivery_fee?: number
           delivery_partner_id?: string | null
           estimated_delivery_time?: string | null
+          fulfillment_type?: string | null
           id?: string
           net_restaurant_payout?: number
           order_number: string
           picked_up_at?: string | null
+          pickup_code?: string | null
+          pickup_time?: string | null
           platform_commission?: number
           ready_at?: string | null
           restaurant_id: string
@@ -609,10 +627,13 @@ export type Database = {
           delivery_fee?: number
           delivery_partner_id?: string | null
           estimated_delivery_time?: string | null
+          fulfillment_type?: string | null
           id?: string
           net_restaurant_payout?: number
           order_number?: string
           picked_up_at?: string | null
+          pickup_code?: string | null
+          pickup_time?: string | null
           platform_commission?: number
           ready_at?: string | null
           restaurant_id?: string
@@ -880,6 +901,7 @@ export type Database = {
       }
       restaurants: {
         Row: {
+          business_type: string | null
           city: string
           commission_rate: number
           created_at: string
@@ -897,14 +919,18 @@ export type Database = {
           name: string
           owner_id: string
           phone: string
+          pickup_instructions: string | null
           rating: number | null
           state: string
           street_address: string
+          supports_delivery: boolean | null
+          supports_pickup: boolean | null
           total_reviews: number | null
           updated_at: string
           zip_code: string
         }
         Insert: {
+          business_type?: string | null
           city: string
           commission_rate?: number
           created_at?: string
@@ -922,14 +948,18 @@ export type Database = {
           name: string
           owner_id: string
           phone: string
+          pickup_instructions?: string | null
           rating?: number | null
           state: string
           street_address: string
+          supports_delivery?: boolean | null
+          supports_pickup?: boolean | null
           total_reviews?: number | null
           updated_at?: string
           zip_code: string
         }
         Update: {
+          business_type?: string | null
           city?: string
           commission_rate?: number
           created_at?: string
@@ -947,12 +977,42 @@ export type Database = {
           name?: string
           owner_id?: string
           phone?: string
+          pickup_instructions?: string | null
           rating?: number | null
           state?: string
           street_address?: string
+          supports_delivery?: boolean | null
+          supports_pickup?: boolean | null
           total_reviews?: number | null
           updated_at?: string
           zip_code?: string
+        }
+        Relationships: []
+      }
+      shop_categories: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          display_order: number | null
+          icon: string | null
+          id: string
+          name: string
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          display_order?: number | null
+          icon?: string | null
+          id?: string
+          name: string
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          display_order?: number | null
+          icon?: string | null
+          id?: string
+          name?: string
         }
         Relationships: []
       }
@@ -1132,6 +1192,7 @@ export type Database = {
         | "delivery_partner"
         | "admin"
         | "superadmin"
+        | "shop"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -1293,6 +1354,7 @@ export const Constants = {
         "delivery_partner",
         "admin",
         "superadmin",
+        "shop",
       ],
     },
   },
