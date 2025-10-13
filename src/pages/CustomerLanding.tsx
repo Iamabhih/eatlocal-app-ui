@@ -23,7 +23,7 @@ const CustomerLanding = () => {
         <div className="relative z-10 text-center text-white px-4 max-w-3xl mx-auto">
           <h1 className="text-5xl font-bold mb-6">Your Favorite Food, Delivered Fast</h1>
           <p className="text-xl mb-8">Order from the best restaurants in your area with transparent pricing and real-time tracking</p>
-          <Link to="/customer">
+          <Link to="/restaurants">
             <Button size="lg" className="text-lg px-8">
               Browse Restaurants
             </Button>
@@ -91,18 +91,16 @@ const CustomerLanding = () => {
             fees={[
               { label: "Sign Up", value: "FREE", description: "Create your account at no cost" },
               { label: "Delivery Fee", value: "R15-R35", description: "Set by restaurant, typically R20-R30" },
-              { label: "Service Fee", value: "4.5%", description: "Covers secure payment processing" },
-              { label: "Sales Tax", value: "15%", description: "Standard VAT on food orders" }
+              { label: "Service Fee", value: "4.5%", description: "Covers secure payment processing" }
             ]}
             example={{
               title: "Example Order",
               calculation: [
                 { label: "Food Subtotal", value: "R150.00" },
                 { label: "Delivery Fee", value: "R25.00" },
-                { label: "Service Fee (4.5%)", value: "R7.88" },
-                { label: "VAT (15%)", value: "R22.50" }
+                { label: "Service Fee (4.5%)", value: "R7.88" }
               ],
-              result: { label: "Total", value: "R205.38" }
+              result: { label: "Total", value: "R182.88" }
             }}
           />
         </div>
@@ -145,7 +143,7 @@ const CustomerLanding = () => {
         <div className="container mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold mb-4">Ready to Order?</h2>
           <p className="text-muted-foreground mb-8">Join thousands of satisfied customers</p>
-          <Link to="/customer">
+          <Link to="/restaurants">
             <Button size="lg">Start Ordering Now</Button>
           </Link>
         </div>

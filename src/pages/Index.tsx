@@ -53,7 +53,7 @@ export default function Index() {
               </div>
               <div className="space-y-2">
                 <Button 
-                  onClick={() => navigate('/customer')} 
+                  onClick={() => navigate('/restaurants')} 
                   className="w-full"
                 >
                   Browse Restaurants

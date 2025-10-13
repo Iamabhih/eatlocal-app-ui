@@ -105,7 +105,7 @@ export const useCart = create<CartState>()(
       },
 
       getTax: () => {
-        return get().getSubtotal() * 0.08; // 8% tax
+        return 0; // No tax charged
       },
 
       getTotal: (deliveryFee: number) => {

@@ -32,9 +32,8 @@ const Checkout = () => {
 
   const deliveryFee = 2.49;
   const subtotal = getSubtotal();
-  const tax = getTax();
-  const serviceFee = (subtotal + deliveryFee + tax) * 0.045; // 4.5% settlement fee
-  const total = subtotal + deliveryFee + tax + serviceFee;
+  const serviceFee = (subtotal + deliveryFee) * 0.045; // 4.5% settlement fee
+  const total = subtotal + deliveryFee + serviceFee;
 
   const handlePayment = async () => {
     if (!user || items.length === 0 || !selectedAddressId) {
@@ -63,7 +62,7 @@ const Checkout = () => {
           order_number: orderNumber,
           subtotal: subtotal,
           delivery_fee: deliveryFee,
-          tax: tax,
+          tax: 0,
           total: total,
           status: 'pending'
         }])
@@ -206,10 +205,6 @@ const Checkout = () => {
                   <div className="flex justify-between">
                     <span>Service Fee (4.5%)</span>
                     <span>R{serviceFee.toFixed(2)}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Tax (15%)</span>
-                    <span>R{tax.toFixed(2)}</span>
                   </div>
                   <Separator />
                   <div className="flex justify-between font-bold text-lg">
