@@ -148,6 +148,7 @@ export type Database = {
           paid_out_at: string | null
           platform_fee_amount: number
           platform_fee_rate: number
+          settlement_fee_amount: number
           tip: number | null
           total_earnings: number
         }
@@ -164,6 +165,7 @@ export type Database = {
           paid_out_at?: string | null
           platform_fee_amount?: number
           platform_fee_rate?: number
+          settlement_fee_amount?: number
           tip?: number | null
           total_earnings: number
         }
@@ -180,6 +182,7 @@ export type Database = {
           paid_out_at?: string | null
           platform_fee_amount?: number
           platform_fee_rate?: number
+          settlement_fee_amount?: number
           tip?: number | null
           total_earnings?: number
         }
@@ -553,11 +556,13 @@ export type Database = {
           delivery_partner_id: string | null
           estimated_delivery_time: string | null
           id: string
+          net_restaurant_payout: number
           order_number: string
           picked_up_at: string | null
           platform_commission: number
           ready_at: string | null
           restaurant_id: string
+          settlement_fee: number
           special_instructions: string | null
           status: Database["public"]["Enums"]["order_status"]
           subtotal: number
@@ -578,11 +583,13 @@ export type Database = {
           delivery_partner_id?: string | null
           estimated_delivery_time?: string | null
           id?: string
+          net_restaurant_payout?: number
           order_number: string
           picked_up_at?: string | null
           platform_commission?: number
           ready_at?: string | null
           restaurant_id: string
+          settlement_fee?: number
           special_instructions?: string | null
           status?: Database["public"]["Enums"]["order_status"]
           subtotal: number
@@ -603,11 +610,13 @@ export type Database = {
           delivery_partner_id?: string | null
           estimated_delivery_time?: string | null
           id?: string
+          net_restaurant_payout?: number
           order_number?: string
           picked_up_at?: string | null
           platform_commission?: number
           ready_at?: string | null
           restaurant_id?: string
+          settlement_fee?: number
           special_instructions?: string | null
           status?: Database["public"]["Enums"]["order_status"]
           subtotal?: number

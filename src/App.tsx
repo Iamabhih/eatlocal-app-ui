@@ -13,6 +13,11 @@ import { loggingService } from "@/services/loggingService";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 
+// Landing Pages
+import CustomerLanding from "./pages/CustomerLanding";
+import RestaurantLanding from "./pages/RestaurantLanding";
+import DeliveryLanding from "./pages/DeliveryLanding";
+
 // Customer App
 import CustomerHome from "./pages/customer/CustomerHome";
 import RestaurantList from "./pages/customer/RestaurantList";
@@ -79,6 +84,11 @@ const App = () => (
               <Routes>
               {/* Home Page */}
               <Route path="/" element={<Index />} />
+              
+              {/* Landing Pages */}
+              <Route path="/customer-info" element={<CustomerLanding />} />
+              <Route path="/restaurant-info" element={<RestaurantLanding />} />
+              <Route path="/delivery-info" element={<DeliveryLanding />} />
               
               {/* Auth Routes */}
               <Route path="/auth" element={<Auth />} />

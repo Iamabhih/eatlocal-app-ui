@@ -53,7 +53,8 @@ const DeliveryDashboard = () => {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-muted-foreground">Today's Earnings</p>
-                  <p className="text-2xl font-bold">${totalToday.toFixed(2)}</p>
+                  <p className="text-2xl font-bold">R{totalToday.toFixed(2)}</p>
+                  <p className="text-xs text-muted-foreground">Net after fees</p>
                 </div>
                 <DollarSign className="h-8 w-8 uber-green" />
               </div>
@@ -220,6 +221,38 @@ const DeliveryDashboard = () => {
             </CardContent>
           </Card>
         </div>
+
+        {/* Earnings Breakdown */}
+        <Card className="mt-8 shadow-card bg-muted/30">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <DollarSign className="h-5 w-5" />
+              Your Earnings Structure
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid md:grid-cols-3 gap-4">
+              <div>
+                <p className="text-sm text-muted-foreground mb-1">Platform Fee</p>
+                <p className="text-2xl font-bold">15%</p>
+                <p className="text-xs text-muted-foreground">Of delivery fee</p>
+              </div>
+              <div>
+                <p className="text-sm text-muted-foreground mb-1">Settlement Fee</p>
+                <p className="text-2xl font-bold">4.5%</p>
+                <p className="text-xs text-muted-foreground">Card processing</p>
+              </div>
+              <div>
+                <p className="text-sm text-muted-foreground mb-1">You Keep</p>
+                <p className="text-2xl font-bold text-primary">80.5%</p>
+                <p className="text-xs text-muted-foreground">+ 100% tips!</p>
+              </div>
+            </div>
+            <Button variant="link" className="mt-4 px-0" asChild>
+              <a href="/delivery-info" target="_blank">View Full Earnings Breakdown →</a>
+            </Button>
+          </CardContent>
+        </Card>
 
         {/* Quick Actions */}
         <Card className="mt-8 shadow-card">

@@ -59,11 +59,11 @@ export default function Index() {
                   Browse Restaurants
                 </Button>
                 <Button 
-                  onClick={() => navigate('/auth?role=customer')} 
+                  onClick={() => navigate('/customer-info')} 
                   variant="outline"
                   className="w-full"
                 >
-                  Sign In / Sign Up
+                  Learn More
                 </Button>
               </div>
             </CardContent>
@@ -97,12 +97,21 @@ export default function Index() {
                   <span>Track earnings</span>
                 </div>
               </div>
-              <Button 
-                onClick={() => navigate('/auth?role=restaurant')} 
-                className="w-full"
-              >
-                Restaurant Sign In
-              </Button>
+              <div className="space-y-2">
+                <Button 
+                  onClick={() => navigate('/auth?role=restaurant')} 
+                  className="w-full"
+                >
+                  Get Started
+                </Button>
+                <Button 
+                  onClick={() => navigate('/restaurant-info')} 
+                  variant="outline"
+                  className="w-full"
+                >
+                  Learn More
+                </Button>
+              </div>
             </CardContent>
           </Card>
 
@@ -134,12 +143,21 @@ export default function Index() {
                   <span>Weekly payouts</span>
                 </div>
               </div>
-              <Button 
-                onClick={() => navigate('/auth?role=delivery_partner')} 
-                className="w-full"
-              >
-                Delivery Sign In
-              </Button>
+              <div className="space-y-2">
+                <Button 
+                  onClick={() => navigate('/auth?role=delivery_partner')} 
+                  className="w-full"
+                >
+                  Get Started
+                </Button>
+                <Button 
+                  onClick={() => navigate('/delivery-info')} 
+                  variant="outline"
+                  className="w-full"
+                >
+                  Learn More
+                </Button>
+              </div>
             </CardContent>
           </Card>
         </div>

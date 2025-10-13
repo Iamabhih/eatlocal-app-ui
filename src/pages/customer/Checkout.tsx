@@ -33,7 +33,8 @@ const Checkout = () => {
   const deliveryFee = 2.49;
   const subtotal = getSubtotal();
   const tax = getTax();
-  const total = getTotal(deliveryFee);
+  const serviceFee = (subtotal + deliveryFee + tax) * 0.045; // 4.5% settlement fee
+  const total = subtotal + deliveryFee + tax + serviceFee;
 
   const handlePayment = async () => {
     if (!user || items.length === 0 || !selectedAddressId) {
@@ -196,21 +197,28 @@ const Checkout = () => {
                 <div className="space-y-2">
                   <div className="flex justify-between">
                     <span>Subtotal</span>
-                    <span>${subtotal.toFixed(2)}</span>
+                    <span>R{subtotal.toFixed(2)}</span>
                   </div>
                   <div className="flex justify-between">
                     <span>Delivery Fee</span>
-                    <span>${deliveryFee.toFixed(2)}</span>
+                    <span>R{deliveryFee.toFixed(2)}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span>Tax</span>
-                    <span>${tax.toFixed(2)}</span>
+                    <span>Service Fee (4.5%)</span>
+                    <span>R{serviceFee.toFixed(2)}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Tax (15%)</span>
+                    <span>R{tax.toFixed(2)}</span>
                   </div>
                   <Separator />
                   <div className="flex justify-between font-bold text-lg">
                     <span>Total</span>
-                    <span>${total.toFixed(2)}</span>
+                    <span>R{total.toFixed(2)}</span>
                   </div>
+                  <p className="text-xs text-muted-foreground mt-2">
+                    Service fee covers secure payment processing
+                  </p>
                 </div>
 
                 <Button

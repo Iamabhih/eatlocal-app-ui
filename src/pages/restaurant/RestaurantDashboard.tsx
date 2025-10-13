@@ -341,7 +341,7 @@ export default function RestaurantDashboard() {
             <CardContent>
               <div className="flex items-center gap-2">
                 <DollarSign className="h-4 w-4 text-primary" />
-                <div className="text-2xl font-bold">${restaurant.delivery_fee}</div>
+                <div className="text-2xl font-bold">R{restaurant.delivery_fee}</div>
               </div>
             </CardContent>
           </Card>
@@ -357,6 +357,38 @@ export default function RestaurantDashboard() {
             </CardContent>
           </Card>
         </div>
+
+        {/* Fee Structure Card */}
+        <Card className="bg-muted/30">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <DollarSign className="h-5 w-5" />
+              Your Fee Structure
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid md:grid-cols-3 gap-4">
+              <div>
+                <p className="text-sm text-muted-foreground mb-1">Platform Commission</p>
+                <p className="text-2xl font-bold">{restaurant.commission_rate}%</p>
+                <p className="text-xs text-muted-foreground">On order subtotal</p>
+              </div>
+              <div>
+                <p className="text-sm text-muted-foreground mb-1">Settlement Fee</p>
+                <p className="text-2xl font-bold">4.5%</p>
+                <p className="text-xs text-muted-foreground">Card processing</p>
+              </div>
+              <div>
+                <p className="text-sm text-muted-foreground mb-1">You Keep</p>
+                <p className="text-2xl font-bold text-primary">80.5%</p>
+                <p className="text-xs text-muted-foreground">Of every order</p>
+              </div>
+            </div>
+            <Button variant="link" className="mt-4 px-0" asChild>
+              <a href="/restaurant-info" target="_blank">View Full Fee Breakdown →</a>
+            </Button>
+          </CardContent>
+        </Card>
 
         <Card>
           <CardHeader>
