@@ -8,6 +8,9 @@ import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { ErrorBoundary } from "@/components/logging/ErrorBoundary";
 import { NavigationLogger } from "@/components/logging/NavigationLogger";
 import { loggingService } from "@/services/loggingService";
+import { RestaurantChangeModal } from "@/components/customer/RestaurantChangeModal";
+import { QUERY_CACHE } from "@/lib/constants";
+import { logger } from "@/lib/logger";
 
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
@@ -56,15 +59,23 @@ const queryClient = new QueryClient({
     queries: {
       retry: 1,
       refetchOnWindowFocus: false,
+      staleTime: QUERY_CACHE.STALE_TIME, // 5 minutes
+      cacheTime: QUERY_CACHE.CACHE_TIME, // 10 minutes
     },
     mutations: {
-      onError: (error: any) => {
+      onError: (error: unknown) => {
+        const errorMessage = error instanceof Error ? error.message : String(error);
+
+        // Log to console
+        logger.error("Mutation error:", error);
+
+        // Log to service
         loggingService.logApiCall({
-          endpoint: 'Mutation',
-          method: 'POST',
+          endpoint: "Mutation",
+          method: "POST",
           duration_ms: 0,
           success: false,
-          error_message: error instanceof Error ? error.message : String(error),
+          error_message: errorMessage,
         });
       },
     },
@@ -80,75 +91,94 @@ const App = () => (
         <NavigationLogger />
         <AuthProvider>
           <CartProvider>
+            <RestaurantChangeModal />
             <Routes>
               {/* Home Page */}
               <Route path="/" element={<Index />} />
-              
+
               {/* Landing Pages */}
               <Route path="/customer-info" element={<CustomerLanding />} />
               <Route path="/restaurant-info" element={<RestaurantLanding />} />
               <Route path="/shop-info" element={<ShopLanding />} />
               <Route path="/delivery-info" element={<DeliveryLanding />} />
-              
+
               {/* Auth Routes */}
               <Route path="/auth" element={<Auth />} />
 
               {/* Customer App Routes */}
               <Route path="/customer" element={<CustomerHome />} />
-            <Route path="/restaurants" element={<RestaurantList />} />
-            <Route path="/restaurant/:id" element={<RestaurantDetail />} />
-            <Route path="/cart" element={<Cart />} />
-            <Route path="/checkout" element={<Checkout />} />
-            <Route path="/orders/:orderId" element={<OrderTracking />} />
+              <Route path="/restaurants" element={<RestaurantList />} />
+              <Route path="/restaurant/:id" element={<RestaurantDetail />} />
+              <Route path="/cart" element={<Cart />} />
+              <Route path="/checkout" element={<Checkout />} />
+              <Route path="/orders/:orderId" element={<OrderTracking />} />
 
-            {/* Restaurant Portal Routes */}
-            <Route path="/restaurant/dashboard" element={
-              <ProtectedRoute requiredRole="restaurant">
-                <RestaurantDashboard />
-              </ProtectedRoute>
-            } />
-            <Route path="/restaurant/orders" element={
-              <ProtectedRoute requiredRole="restaurant">
-                <RestaurantOrders />
-              </ProtectedRoute>
-            } />
-            <Route path="/restaurant/menu" element={
-              <ProtectedRoute requiredRole="restaurant">
-                <RestaurantMenu />
-              </ProtectedRoute>
-            } />
+              {/* Restaurant Portal Routes */}
+              <Route
+                path="/restaurant/dashboard"
+                element={
+                  <ProtectedRoute requiredRole="restaurant">
+                    <RestaurantDashboard />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/restaurant/orders"
+                element={
+                  <ProtectedRoute requiredRole="restaurant">
+                    <RestaurantOrders />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/restaurant/menu"
+                element={
+                  <ProtectedRoute requiredRole="restaurant">
+                    <RestaurantMenu />
+                  </ProtectedRoute>
+                }
+              />
 
-            {/* Delivery Partner Portal Routes */}
-            <Route element={<DeliveryLayout />}>
-              <Route path="/delivery/dashboard" element={
-                <ProtectedRoute requiredRole="delivery_partner">
-                  <DeliveryDashboard />
-                </ProtectedRoute>
-              } />
-              <Route path="/delivery/orders" element={
-                <ProtectedRoute requiredRole="delivery_partner">
-                  <DeliveryOrders />
-                </ProtectedRoute>
-              } />
-              <Route path="/delivery/earnings" element={
-                <ProtectedRoute requiredRole="delivery_partner">
-                  <DeliveryEarnings />
-                </ProtectedRoute>
-              } />
-            </Route>
+              {/* Delivery Partner Portal Routes */}
+              <Route element={<DeliveryLayout />}>
+                <Route
+                  path="/delivery/dashboard"
+                  element={
+                    <ProtectedRoute requiredRole="delivery_partner">
+                      <DeliveryDashboard />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/delivery/orders"
+                  element={
+                    <ProtectedRoute requiredRole="delivery_partner">
+                      <DeliveryOrders />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/delivery/earnings"
+                  element={
+                    <ProtectedRoute requiredRole="delivery_partner">
+                      <DeliveryEarnings />
+                    </ProtectedRoute>
+                  }
+                />
+              </Route>
 
-            {/* Admin Portal Routes */}
-            <Route element={<AdminLayout />}>
-              <Route path="/admin/dashboard" element={<AdminDashboard />} />
-              <Route path="/admin/users" element={<AdminUsers />} />
-              <Route path="/admin/restaurants" element={<AdminRestaurants />} />
-              <Route path="/admin/orders" element={<AdminOrders />} />
-              <Route path="/admin/delivery-partners" element={<AdminDeliveryPartners />} />
-              <Route path="/admin/revenue" element={<AdminRevenue />} />
-              <Route path="/admin/analytics" element={<AdminAnalytics />} />
-              <Route path="/admin/marketing" element={<AdminMarketing />} />
-              <Route path="/admin/logs" element={<AdminLogs />} />
-            </Route>
+              {/* Admin Portal Routes */}
+              <Route element={<AdminLayout />}>
+                <Route path="/admin/dashboard" element={<AdminDashboard />} />
+                <Route path="/admin/users" element={<AdminUsers />} />
+                <Route path="/admin/restaurants" element={<AdminRestaurants />} />
+                <Route path="/admin/orders" element={<AdminOrders />} />
+                <Route path="/admin/delivery-partners" element={<AdminDeliveryPartners />} />
+                <Route path="/admin/revenue" element={<AdminRevenue />} />
+                <Route path="/admin/analytics" element={<AdminAnalytics />} />
+                <Route path="/admin/marketing" element={<AdminMarketing />} />
+                <Route path="/admin/logs" element={<AdminLogs />} />
+              </Route>
 
               {/* Catch-all route */}
               <Route path="*" element={<NotFound />} />
