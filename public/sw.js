@@ -1,4 +1,4 @@
-const CACHE_NAME = 'eatlocal-v1';
+const CACHE_NAME = 'ekhasi-v2';
 const urlsToCache = [
   '/',
   '/index.html',
