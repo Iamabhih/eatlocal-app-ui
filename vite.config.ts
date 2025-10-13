@@ -13,8 +13,6 @@ export default defineConfig(({ mode }) => ({
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
-      'react': path.resolve(__dirname, './node_modules/react'),
-      'react-dom': path.resolve(__dirname, './node_modules/react-dom'),
     },
     dedupe: ['react', 'react-dom'],
   },
@@ -22,8 +20,13 @@ export default defineConfig(({ mode }) => ({
     include: ['react', 'react-dom', '@tanstack/react-query'],
   },
   build: {
-    commonjsOptions: {
-      include: [/node_modules/],
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'react-vendor': ['react', 'react-dom'],
+          'query-vendor': ['@tanstack/react-query'],
+        },
+      },
     },
   },
 }));
