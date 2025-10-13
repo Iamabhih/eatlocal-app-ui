@@ -70,12 +70,12 @@ serve(async (req: Request) => {
       return new Response('Invalid merchant ID', { status: 400 });
     }
 
-    // Validate signature (in production, uncomment this)
-    // const isValid = await validateSignature(data, passphrase || '');
-    // if (!isValid) {
-    //   console.error('Invalid signature');
-    //   return new Response('Invalid signature', { status: 400 });
-    // }
+    // Validate signature (production security)
+    const isValid = await validateSignature(data, passphrase || '');
+    if (!isValid) {
+      console.error('Invalid signature');
+      return new Response('Invalid signature', { status: 400 });
+    }
 
     // Initialize Supabase client
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;

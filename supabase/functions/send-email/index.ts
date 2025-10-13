@@ -1,8 +1,31 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
-import { Resend } from "npm:resend@2.0.0";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3";
 
-const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
+// Simple fetch-based email sending (no external dependencies)
+const sendEmail = async (to: string, subject: string, html: string) => {
+  const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
+  
+  const response = await fetch("https://api.resend.com/emails", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${RESEND_API_KEY}`,
+    },
+    body: JSON.stringify({
+      from: "EatLocal <orders@eatlocal.app>",
+      to: [to],
+      subject,
+      html,
+    }),
+  });
+
+  if (!response.ok) {
+    const error = await response.text();
+    throw new Error(`Failed to send email: ${error}`);
+  }
+
+  return await response.json();
+};
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -131,12 +154,7 @@ const handler = async (req: Request): Promise<Response> => {
 
     const html = getEmailTemplate(type, data);
 
-    const emailResponse = await resend.emails.send({
-      from: "EatLocal <orders@eatlocal.app>",
-      to: [to],
-      subject: subject,
-      html: html,
-    });
+    const emailResponse = await sendEmail(to, subject, html);
 
     console.log("Email sent successfully:", emailResponse);
 

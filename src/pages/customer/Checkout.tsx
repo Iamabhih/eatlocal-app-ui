@@ -105,7 +105,7 @@ const Checkout = () => {
       // Create form and submit
       const form = document.createElement('form');
       form.method = 'POST';
-      form.action = 'https://sandbox.payfast.co.za/eng/process'; // Use 'https://www.payfast.co.za/eng/process' for production
+      form.action = 'https://www.payfast.co.za/eng/process'; // Production URL
 
       Object.entries(paymentData).forEach(([key, value]) => {
         const input = document.createElement('input');

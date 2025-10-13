@@ -2,23 +2,91 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.ico" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>eatlocal-app-ui</title>
-    <meta name="description" content="Lovable Generated Project" />
-    <meta name="author" content="Lovable" />
-
-    <meta property="og:title" content="eatlocal-app-ui" />
-    <meta property="og:description" content="Lovable Generated Project" />
+    
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="Order from local restaurants with transparent fees, real-time tracking, and fast delivery. Join EatLocal for the best food delivery experience in South Africa." />
+    <meta name="keywords" content="food delivery, restaurants, online ordering, South Africa, transparent fees, real-time tracking, local food" />
+    <meta name="author" content="EatLocal" />
+    <meta name="robots" content="index, follow" />
+    <link rel="canonical" href="https://eatlocal.app/" />
+    
+    <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website" />
-    <meta property="og:image" content="https://lovable.dev/opengraph-image-p98pqg.png" />
-
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:site" content="@lovable_dev" />
-    <meta name="twitter:image" content="https://lovable.dev/opengraph-image-p98pqg.png" />
+    <meta property="og:url" content="https://eatlocal.app/" />
+    <meta property="og:title" content="EatLocal - Order from Local Restaurants with Transparent Fees" />
+    <meta property="og:description" content="Discover local restaurants, order your favorite meals, and track delivery in real-time. Transparent pricing with no hidden fees." />
+    <meta property="og:image" content="https://eatlocal.app/og-image.png" />
+    
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:url" content="https://eatlocal.app/" />
+    <meta property="twitter:title" content="EatLocal - Order from Local Restaurants with Transparent Fees" />
+    <meta property="twitter:description" content="Discover local restaurants, order your favorite meals, and track delivery in real-time. Transparent pricing with no hidden fees." />
+    <meta property="twitter:image" content="https://eatlocal.app/twitter-image.png" />
+    
+    <!-- PWA -->
+    <meta name="theme-color" content="#ea384c" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="EatLocal" />
+    <link rel="manifest" href="/manifest.json" />
+    <link rel="apple-touch-icon" href="/icons/icon-192x192.png" />
+    
+    <!-- Structured Data / Schema.org -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "FoodEstablishment",
+      "name": "EatLocal",
+      "description": "Food delivery platform connecting customers with local restaurants",
+      "url": "https://eatlocal.app",
+      "logo": "https://eatlocal.app/icons/icon-512x512.png",
+      "aggregateRating": {
+        "@type": "AggregateRating",
+        "ratingValue": "4.8",
+        "reviewCount": "1250"
+      },
+      "servesCuisine": ["South African", "International", "Fast Food", "Italian", "Chinese", "Indian"],
+      "priceRange": "R",
+      "acceptsReservations": "False",
+      "paymentAccepted": ["Credit Card", "Debit Card", "EFT"],
+      "address": {
+        "@type": "PostalAddress",
+        "addressCountry": "ZA"
+      }
+    }
+    </script>
+    
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-XXXXXXXXXX');
+    </script>
+    
+    <title>EatLocal - Order from Local Restaurants with Transparent Fees | South Africa</title>
   </head>
-
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
+    
+    <!-- Service Worker Registration -->
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js')
+            .then(registration => {
+              console.log('SW registered:', registration);
+            })
+            .catch(error => {
+              console.log('SW registration failed:', error);
+            });
+        });
+      }
+    </script>
   </body>
 </html>

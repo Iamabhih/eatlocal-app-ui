@@ -1,1 +1,7 @@
 project_id = "tsyohnenxczynjuvgyrj"
+
+[functions.send-email]
+verify_jwt = true
+
+[functions.payfast-webhook]
+verify_jwt = false
