@@ -1,6 +1,5 @@
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
@@ -75,90 +74,88 @@ const queryClient = new QueryClient({
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <ErrorBoundary>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <NavigationLogger />
-          <AuthProvider>
-            <CartProvider>
-              <Routes>
-                {/* Home Page */}
-                <Route path="/" element={<Index />} />
-                
-                {/* Landing Pages */}
-                <Route path="/customer-info" element={<CustomerLanding />} />
-                <Route path="/restaurant-info" element={<RestaurantLanding />} />
-                <Route path="/shop-info" element={<ShopLanding />} />
-                <Route path="/delivery-info" element={<DeliveryLanding />} />
-                
-                {/* Auth Routes */}
-                <Route path="/auth" element={<Auth />} />
+      <Toaster />
+      <Sonner />
+      <BrowserRouter>
+        <NavigationLogger />
+        <AuthProvider>
+          <CartProvider>
+            <Routes>
+              {/* Home Page */}
+              <Route path="/" element={<Index />} />
+              
+              {/* Landing Pages */}
+              <Route path="/customer-info" element={<CustomerLanding />} />
+              <Route path="/restaurant-info" element={<RestaurantLanding />} />
+              <Route path="/shop-info" element={<ShopLanding />} />
+              <Route path="/delivery-info" element={<DeliveryLanding />} />
+              
+              {/* Auth Routes */}
+              <Route path="/auth" element={<Auth />} />
 
-                {/* Customer App Routes */}
-                <Route path="/customer" element={<CustomerHome />} />
-              <Route path="/restaurants" element={<RestaurantList />} />
-              <Route path="/restaurant/:id" element={<RestaurantDetail />} />
-              <Route path="/cart" element={<Cart />} />
-              <Route path="/checkout" element={<Checkout />} />
-              <Route path="/orders/:orderId" element={<OrderTracking />} />
+              {/* Customer App Routes */}
+              <Route path="/customer" element={<CustomerHome />} />
+            <Route path="/restaurants" element={<RestaurantList />} />
+            <Route path="/restaurant/:id" element={<RestaurantDetail />} />
+            <Route path="/cart" element={<Cart />} />
+            <Route path="/checkout" element={<Checkout />} />
+            <Route path="/orders/:orderId" element={<OrderTracking />} />
 
-              {/* Restaurant Portal Routes */}
-              <Route path="/restaurant/dashboard" element={
-                <ProtectedRoute requiredRole="restaurant">
-                  <RestaurantDashboard />
+            {/* Restaurant Portal Routes */}
+            <Route path="/restaurant/dashboard" element={
+              <ProtectedRoute requiredRole="restaurant">
+                <RestaurantDashboard />
+              </ProtectedRoute>
+            } />
+            <Route path="/restaurant/orders" element={
+              <ProtectedRoute requiredRole="restaurant">
+                <RestaurantOrders />
+              </ProtectedRoute>
+            } />
+            <Route path="/restaurant/menu" element={
+              <ProtectedRoute requiredRole="restaurant">
+                <RestaurantMenu />
+              </ProtectedRoute>
+            } />
+
+            {/* Delivery Partner Portal Routes */}
+            <Route element={<DeliveryLayout />}>
+              <Route path="/delivery/dashboard" element={
+                <ProtectedRoute requiredRole="delivery_partner">
+                  <DeliveryDashboard />
                 </ProtectedRoute>
               } />
-              <Route path="/restaurant/orders" element={
-                <ProtectedRoute requiredRole="restaurant">
-                  <RestaurantOrders />
+              <Route path="/delivery/orders" element={
+                <ProtectedRoute requiredRole="delivery_partner">
+                  <DeliveryOrders />
                 </ProtectedRoute>
               } />
-              <Route path="/restaurant/menu" element={
-                <ProtectedRoute requiredRole="restaurant">
-                  <RestaurantMenu />
+              <Route path="/delivery/earnings" element={
+                <ProtectedRoute requiredRole="delivery_partner">
+                  <DeliveryEarnings />
                 </ProtectedRoute>
               } />
+            </Route>
 
-              {/* Delivery Partner Portal Routes */}
-              <Route element={<DeliveryLayout />}>
-                <Route path="/delivery/dashboard" element={
-                  <ProtectedRoute requiredRole="delivery_partner">
-                    <DeliveryDashboard />
-                  </ProtectedRoute>
-                } />
-                <Route path="/delivery/orders" element={
-                  <ProtectedRoute requiredRole="delivery_partner">
-                    <DeliveryOrders />
-                  </ProtectedRoute>
-                } />
-                <Route path="/delivery/earnings" element={
-                  <ProtectedRoute requiredRole="delivery_partner">
-                    <DeliveryEarnings />
-                  </ProtectedRoute>
-                } />
-              </Route>
+            {/* Admin Portal Routes */}
+            <Route element={<AdminLayout />}>
+              <Route path="/admin/dashboard" element={<AdminDashboard />} />
+              <Route path="/admin/users" element={<AdminUsers />} />
+              <Route path="/admin/restaurants" element={<AdminRestaurants />} />
+              <Route path="/admin/orders" element={<AdminOrders />} />
+              <Route path="/admin/delivery-partners" element={<AdminDeliveryPartners />} />
+              <Route path="/admin/revenue" element={<AdminRevenue />} />
+              <Route path="/admin/analytics" element={<AdminAnalytics />} />
+              <Route path="/admin/marketing" element={<AdminMarketing />} />
+              <Route path="/admin/logs" element={<AdminLogs />} />
+            </Route>
 
-              {/* Admin Portal Routes */}
-              <Route element={<AdminLayout />}>
-                <Route path="/admin/dashboard" element={<AdminDashboard />} />
-                <Route path="/admin/users" element={<AdminUsers />} />
-                <Route path="/admin/restaurants" element={<AdminRestaurants />} />
-                <Route path="/admin/orders" element={<AdminOrders />} />
-                <Route path="/admin/delivery-partners" element={<AdminDeliveryPartners />} />
-                <Route path="/admin/revenue" element={<AdminRevenue />} />
-                <Route path="/admin/analytics" element={<AdminAnalytics />} />
-                <Route path="/admin/marketing" element={<AdminMarketing />} />
-                <Route path="/admin/logs" element={<AdminLogs />} />
-              </Route>
-
-                {/* Catch-all route */}
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-            </CartProvider>
-          </AuthProvider>
-        </BrowserRouter>
-      </TooltipProvider>
+              {/* Catch-all route */}
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </CartProvider>
+        </AuthProvider>
+      </BrowserRouter>
     </ErrorBoundary>
   </QueryClientProvider>
 );
