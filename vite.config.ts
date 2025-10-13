@@ -18,6 +18,7 @@ export default defineConfig(({ mode }) => ({
   },
   optimizeDeps: {
     include: ['react', 'react-dom', '@tanstack/react-query'],
+    exclude: ['@radix-ui/react-tooltip'],
     force: true,
   },
   build: {
