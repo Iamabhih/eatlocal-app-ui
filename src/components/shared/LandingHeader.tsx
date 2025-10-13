@@ -3,16 +3,23 @@ import { Button } from "@/components/ui/button";
 import { UtensilsCrossed } from "lucide-react";
 
 interface LandingHeaderProps {
-  activePortal?: "customer" | "restaurant" | "delivery";
+  activePortal?: "customer" | "restaurant" | "delivery" | "shop";
 }
 
 export const LandingHeader = ({ activePortal }: LandingHeaderProps) => {
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-16 items-center justify-between px-4">
-        <Link to="/" className="flex items-center space-x-2">
-          <UtensilsCrossed className="h-6 w-6 text-primary" />
-          <span className="font-bold text-xl">FoodDelivery</span>
+        <Link to="/" className="flex items-center space-x-3">
+          <img 
+            src="/ekhasi-logo.png" 
+            alt="Ekhasi Online Logo" 
+            className="h-10 w-10"
+          />
+          <div>
+            <span className="font-bold text-xl bg-gradient-vibrant bg-clip-text text-transparent">Ekhasi Online</span>
+            <p className="text-xs text-muted-foreground">Your Local Everything, Delivered</p>
+          </div>
         </Link>
 
         <nav className="hidden md:flex items-center space-x-6">
@@ -31,6 +38,14 @@ export const LandingHeader = ({ activePortal }: LandingHeaderProps) => {
             }`}
           >
             For Restaurants
+          </Link>
+          <Link 
+            to="/shop-info"
+            className={`text-sm font-medium transition-colors hover:text-primary ${
+              activePortal === "shop" ? "text-primary" : "text-muted-foreground"
+            }`}
+          >
+            For Shops
           </Link>
           <Link 
             to="/delivery-info"

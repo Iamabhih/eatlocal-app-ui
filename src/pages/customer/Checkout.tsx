@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import Navbar from "@/components/shared/Navbar";
 import { AddressSelector } from "@/components/customer/AddressSelector";
+import { FulfillmentSelector } from "@/components/checkout/FulfillmentSelector";
 import { useAuth } from "@/contexts/AuthContext";
 import { useCart } from "@/hooks/useCart";
 import { supabase } from "@/integrations/supabase/client";
@@ -18,6 +19,7 @@ const Checkout = () => {
   const [loading, setLoading] = useState(false);
   const [processingPayment, setProcessingPayment] = useState(false);
   const [selectedAddressId, setSelectedAddressId] = useState<string | null>(null);
+  const [fulfillmentType, setFulfillmentType] = useState<"delivery" | "pickup">("delivery");
 
   useEffect(() => {
     if (!user) {
@@ -30,13 +32,28 @@ const Checkout = () => {
     }
   }, [user, items, navigate]);
 
-  const deliveryFee = 2.49;
+  const deliveryFee = fulfillmentType === "delivery" ? 2.49 : 0; // No fee for pickup
   const subtotal = getSubtotal();
   const serviceFee = (subtotal + deliveryFee) * 0.045; // 4.5% settlement fee
   const total = subtotal + deliveryFee + serviceFee;
 
+  // Generate 4-digit pickup code
+  const generatePickupCode = () => {
+    return Math.floor(1000 + Math.random() * 9000).toString();
+  };
+
   const handlePayment = async () => {
-    if (!user || items.length === 0 || !selectedAddressId) {
+    if (!user || items.length === 0) {
+      toast({
+        title: "Missing Information",
+        description: "Please complete all required fields",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // For delivery, address is required
+    if (fulfillmentType === "delivery" && !selectedAddressId) {
       toast({
         title: "Missing Information",
         description: "Please select a delivery address",
@@ -49,8 +66,9 @@ const Checkout = () => {
     setProcessingPayment(true);
 
     try {
-      // Generate order number
+      // Generate order number and pickup code (if applicable)
       const orderNumber = `ORD-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+      const pickupCode = fulfillmentType === "pickup" ? generatePickupCode() : null;
       
       // Create order in database
       const { data: order, error: orderError } = await supabase
@@ -58,8 +76,10 @@ const Checkout = () => {
         .insert([{
           customer_id: user.id,
           restaurant_id: items[0].restaurantId,
-          delivery_address_id: selectedAddressId,
+          delivery_address_id: fulfillmentType === "delivery" ? selectedAddressId : null,
           order_number: orderNumber,
+          fulfillment_type: fulfillmentType,
+          pickup_code: pickupCode,
           subtotal: subtotal,
           delivery_fee: deliveryFee,
           tax: 0,
@@ -149,11 +169,21 @@ const Checkout = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Order Summary */}
           <div className="lg:col-span-2 space-y-6">
-            {/* Delivery Address Selector */}
-            <AddressSelector
-              selectedAddressId={selectedAddressId}
-              onSelectAddress={setSelectedAddressId}
+            {/* Fulfillment Type Selector */}
+            <FulfillmentSelector
+              selected={fulfillmentType}
+              onSelect={setFulfillmentType}
+              restaurantName={items[0]?.restaurantName || "Restaurant"}
+              restaurantAddress="123 Main St, City" // TODO: Get from restaurant data
             />
+
+            {/* Delivery Address Selector - Only show for delivery */}
+            {fulfillmentType === "delivery" && (
+              <AddressSelector
+                selectedAddressId={selectedAddressId}
+                onSelectAddress={setSelectedAddressId}
+              />
+            )}
 
             {/* Order Items */}
             <Card>
@@ -217,17 +247,17 @@ const Checkout = () => {
                 </div>
 
                 <Button
-                  className="w-full"
+                  className="w-full shadow-orange"
                   size="lg"
                   onClick={handlePayment}
-                  disabled={loading || processingPayment || !selectedAddressId}
+                  disabled={loading || processingPayment || (fulfillmentType === "delivery" && !selectedAddressId)}
                 >
                   {processingPayment ? (
                     <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                       Redirecting to PayFast...
                     </>
-                  ) : !selectedAddressId ? (
+                  ) : (fulfillmentType === "delivery" && !selectedAddressId) ? (
                     'Select Address to Continue'
                   ) : (
                     'Pay with PayFast'

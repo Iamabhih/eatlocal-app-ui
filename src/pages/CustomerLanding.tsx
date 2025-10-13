@@ -5,7 +5,7 @@ import { PricingCard } from "@/components/shared/PricingCard";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { ShoppingBag, MapPin, Clock, Shield } from "lucide-react";
-import heroImage from "@/assets/hero-delivery.jpg";
+import heroImage from "@/assets/hero-ekhasi.jpg";
 
 const CustomerLanding = () => {
   return (
@@ -21,11 +21,11 @@ const CustomerLanding = () => {
           <div className="absolute inset-0 bg-black/50" />
         </div>
         <div className="relative z-10 text-center text-white px-4 max-w-3xl mx-auto">
-          <h1 className="text-5xl font-bold mb-6">Your Favorite Food, Delivered Fast</h1>
-          <p className="text-xl mb-8">Order from the best restaurants in your area with transparent pricing and real-time tracking</p>
+          <h1 className="text-5xl font-bold mb-6 drop-shadow-lg">Food, Groceries & More from Your Local Community</h1>
+          <p className="text-xl mb-8">Order from the best restaurants and shops in your area with transparent pricing and real-time tracking</p>
           <Link to="/restaurants">
-            <Button size="lg" className="text-lg px-8">
-              Browse Restaurants
+            <Button size="lg" className="text-lg px-8 shadow-orange">
+              Start Shopping
             </Button>
           </Link>
         </div>
@@ -42,7 +42,7 @@ const CustomerLanding = () => {
                   <ShoppingBag className="h-6 w-6 text-primary" />
                 </div>
                 <h3 className="font-semibold mb-2">Browse</h3>
-                <p className="text-sm text-muted-foreground">Explore restaurants and menus in your area</p>
+                <p className="text-sm text-muted-foreground">Explore restaurants, shops, and local vendors</p>
               </CardContent>
             </Card>
 

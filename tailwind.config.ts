@@ -47,10 +47,14 @@ export default {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
-        uber: {
-          green: "hsl(var(--uber-green))",
-          "green-hover": "hsl(var(--uber-green-hover))",
-          "green-light": "hsl(var(--uber-green-light))",
+        ekhasi: {
+          orange: "hsl(var(--ekhasi-orange))",
+          "orange-hover": "hsl(var(--ekhasi-orange-hover))",
+          "orange-light": "hsl(var(--ekhasi-orange-light))",
+          purple: "hsl(var(--ekhasi-purple))",
+          "purple-dark": "hsl(var(--ekhasi-purple-dark))",
+          gold: "hsl(var(--ekhasi-gold))",
+          green: "hsl(var(--ekhasi-green))",
         },
         sidebar: {
           DEFAULT: "hsl(var(--sidebar-background))",

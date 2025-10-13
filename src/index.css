@@ -2,7 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Uber Eats Design System - All colors MUST be HSL */
+/* Ekhasi Online Design System - All colors MUST be HSL */
 
 @layer base {
   :root {
@@ -10,10 +10,14 @@
     --background: 0 0% 100%;
     --foreground: 0 0% 9%;
     
-    /* Uber Eats Signature Green */
-    --uber-green: 142 80% 35%;
-    --uber-green-hover: 142 80% 30%;
-    --uber-green-light: 142 80% 95%;
+    /* Ekhasi Signature Colors - Vibrant African-Inspired Palette */
+    --ekhasi-orange: 15 100% 60%;
+    --ekhasi-orange-hover: 15 100% 55%;
+    --ekhasi-orange-light: 15 100% 95%;
+    --ekhasi-purple: 258 88% 65%;
+    --ekhasi-purple-dark: 258 88% 50%;
+    --ekhasi-gold: 38 100% 50%;
+    --ekhasi-green: 142 76% 45%;
     
     /* UI Colors */
     --card: 0 0% 100%;
@@ -22,16 +26,16 @@
     --popover: 0 0% 100%;
     --popover-foreground: 0 0% 9%;
     
-    --primary: 142 80% 35%;
+    --primary: 15 100% 60%;
     --primary-foreground: 0 0% 100%;
     
-    --secondary: 0 0% 96%;
-    --secondary-foreground: 0 0% 9%;
+    --secondary: 258 88% 65%;
+    --secondary-foreground: 0 0% 100%;
     
     --muted: 0 0% 96%;
     --muted-foreground: 0 0% 45%;
     
-    --accent: 0 0% 96%;
+    --accent: 38 100% 50%;
     --accent-foreground: 0 0% 9%;
     
     --destructive: 0 84% 60%;
@@ -39,19 +43,21 @@
     
     --border: 0 0% 90%;
     --input: 0 0% 90%;
-    --ring: 142 80% 35%;
+    --ring: 15 100% 60%;
     
     /* Design System */
     --radius: 0.75rem;
     
-    /* Custom Gradients */
-    --gradient-hero: linear-gradient(135deg, hsl(var(--uber-green)), hsl(142 80% 40%));
+    /* Custom Gradients - Ekhasi Vibes */
+    --gradient-hero: linear-gradient(135deg, hsl(var(--ekhasi-orange)), hsl(var(--ekhasi-purple)));
     --gradient-card: linear-gradient(145deg, hsl(0 0% 100%), hsl(0 0% 98%));
+    --gradient-vibrant: linear-gradient(120deg, hsl(var(--ekhasi-orange)), hsl(var(--ekhasi-gold)), hsl(var(--ekhasi-purple)));
     
     /* Shadows */
     --shadow-card: 0 2px 8px hsl(0 0% 0% / 0.1);
     --shadow-hover: 0 4px 16px hsl(0 0% 0% / 0.15);
-    --shadow-green: 0 4px 20px hsl(var(--uber-green) / 0.25);
+    --shadow-orange: 0 4px 20px hsl(var(--ekhasi-orange) / 0.25);
+    --shadow-purple: 0 4px 20px hsl(var(--ekhasi-purple) / 0.20);
     
     /* Animations */
     --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -152,19 +158,31 @@
     transition: var(--transition-bounce);
   }
   
-  .uber-green {
-    color: hsl(var(--uber-green));
+  .ekhasi-orange {
+    color: hsl(var(--ekhasi-orange));
   }
   
-  .bg-uber-green {
-    background-color: hsl(var(--uber-green));
+  .ekhasi-purple {
+    color: hsl(var(--ekhasi-purple));
   }
   
-  .bg-uber-green-hover:hover {
-    background-color: hsl(var(--uber-green-hover));
+  .bg-ekhasi-orange {
+    background-color: hsl(var(--ekhasi-orange));
   }
   
-  .bg-uber-green-light {
-    background-color: hsl(var(--uber-green-light));
+  .bg-ekhasi-purple {
+    background-color: hsl(var(--ekhasi-purple));
+  }
+  
+  .bg-gradient-vibrant {
+    background: var(--gradient-vibrant);
+  }
+  
+  .shadow-orange {
+    box-shadow: var(--shadow-orange);
+  }
+  
+  .shadow-purple {
+    box-shadow: var(--shadow-purple);
   }
 }

@@ -17,6 +17,7 @@ import Auth from "./pages/Auth";
 import CustomerLanding from "./pages/CustomerLanding";
 import RestaurantLanding from "./pages/RestaurantLanding";
 import DeliveryLanding from "./pages/DeliveryLanding";
+import ShopLanding from "./pages/ShopLanding";
 
 // Customer App
 import CustomerHome from "./pages/customer/CustomerHome";
@@ -88,6 +89,7 @@ const App = () => (
               {/* Landing Pages */}
               <Route path="/customer-info" element={<CustomerLanding />} />
               <Route path="/restaurant-info" element={<RestaurantLanding />} />
+              <Route path="/shop-info" element={<ShopLanding />} />
               <Route path="/delivery-info" element={<DeliveryLanding />} />
               
               {/* Auth Routes */}

@@ -11,18 +11,25 @@ export default function Index() {
       {/* Hero Section */}
       <section className="container mx-auto px-4 py-20">
         <div className="text-center max-w-4xl mx-auto space-y-6 animate-fade-in">
-          <h1 className="text-5xl md:text-7xl font-bold bg-gradient-to-r from-primary via-primary/80 to-primary/60 bg-clip-text text-transparent">
-            Food delivery, your way
+          <div className="flex justify-center mb-6">
+            <img 
+              src="/ekhasi-logo.png" 
+              alt="Ekhasi Online" 
+              className="h-24 w-24 drop-shadow-lg"
+            />
+          </div>
+          <h1 className="text-5xl md:text-7xl font-bold bg-gradient-vibrant bg-clip-text text-transparent">
+            Your Local Everything, Delivered
           </h1>
           <p className="text-xl text-muted-foreground">
-            Order from your favorite restaurants, deliver with flexibility, or grow your business
+            Order food, groceries & more from your favorite local restaurants and shops
           </p>
         </div>
       </section>
 
       {/* Portal Cards */}
       <section className="container mx-auto px-4 pb-20">
-        <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-7xl mx-auto">
           {/* Customer Portal */}
           <Card className="hover-scale border-primary/20 hover:border-primary/40 transition-all">
             <CardHeader className="text-center">
@@ -115,6 +122,52 @@ export default function Index() {
             </CardContent>
           </Card>
 
+          {/* Shop Portal - NEW */}
+          <Card className="hover-scale border-primary/20 hover:border-primary/40 transition-all shadow-orange">
+            <CardHeader className="text-center">
+              <div className="flex justify-center mb-4">
+                <div className="p-4 bg-gradient-vibrant rounded-full">
+                  <ShoppingBag className="w-10 h-10 text-white" />
+                </div>
+              </div>
+              <CardTitle>Shop & Groceries</CardTitle>
+              <CardDescription>
+                List your shop online and reach local customers
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-2 text-sm text-muted-foreground">
+                <div className="flex items-center gap-2">
+                  <ChefHat className="w-4 h-4 text-primary" />
+                  <span>Sell groceries & more</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Clock className="w-4 h-4 text-primary" />
+                  <span>Easy inventory management</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <MapPin className="w-4 h-4 text-primary" />
+                  <span>Local delivery & pickup</span>
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Button 
+                  onClick={() => navigate('/auth?role=shop')} 
+                  className="w-full shadow-orange"
+                >
+                  Get Started
+                </Button>
+                <Button 
+                  onClick={() => navigate('/shop-info')} 
+                  variant="outline"
+                  className="w-full"
+                >
+                  Learn More
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+
           {/* Delivery Partner Portal */}
           <Card className="hover-scale border-primary/20 hover:border-primary/40 transition-all">
             <CardHeader className="text-center">
@@ -125,7 +178,7 @@ export default function Index() {
               </div>
               <CardTitle>Delivery Partner</CardTitle>
               <CardDescription>
-                Earn money delivering food on your schedule
+                Earn money delivering on your schedule
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -167,9 +220,9 @@ export default function Index() {
       <section className="bg-primary/5 py-20">
         <div className="container mx-auto px-4">
           <div className="text-center max-w-3xl mx-auto space-y-4 mb-12">
-            <h2 className="text-4xl font-bold">Why choose us?</h2>
+            <h2 className="text-4xl font-bold bg-gradient-vibrant bg-clip-text text-transparent">Why Choose Ekhasi Online?</h2>
             <p className="text-lg text-muted-foreground">
-              The complete food delivery platform for everyone
+              Your local community delivery platform
             </p>
           </div>
 
