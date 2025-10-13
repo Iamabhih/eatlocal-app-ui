@@ -18,6 +18,7 @@ export default defineConfig(({ mode }) => ({
   },
   optimizeDeps: {
     include: ['react', 'react-dom', '@tanstack/react-query'],
+    force: true,
   },
   build: {
     rollupOptions: {
