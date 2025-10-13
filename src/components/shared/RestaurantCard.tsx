@@ -34,7 +34,7 @@ const RestaurantCard = ({
             className="w-full h-48 object-cover rounded-t-lg"
           />
           {promoted && (
-            <Badge className="absolute top-3 left-3 bg-uber-green hover:bg-uber-green-hover">
+            <Badge className="absolute top-3 left-3 bg-primary hover:bg-primary/90">
               Promoted
             </Badge>
           )}
@@ -45,7 +45,7 @@ const RestaurantCard = ({
         </div>
         
         <CardContent className="p-4">
-          <h3 className="font-semibold text-lg mb-2 group-hover:uber-green transition-smooth">
+          <h3 className="font-semibold text-lg mb-2 group-hover:text-primary transition-smooth">
             {name}
           </h3>
           

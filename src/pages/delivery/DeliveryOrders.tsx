@@ -27,7 +27,7 @@ const DeliveryOrders = () => {
       confirmed: "bg-orange-500",
       preparing: "bg-purple-500",
       ready_for_pickup: "bg-purple-600",
-      picked_up: "bg-uber-green",
+      picked_up: "bg-primary",
       delivered: "bg-gray-500",
       cancelled: "bg-red-500",
     };
@@ -63,14 +63,14 @@ const DeliveryOrders = () => {
             </p>
           </div>
           <div className="text-right">
-            <p className="font-bold text-2xl uber-green">${Number(order.total).toFixed(2)}</p>
+            <p className="font-bold text-2xl text-primary">${Number(order.total).toFixed(2)}</p>
           </div>
         </div>
 
         <div className="space-y-4 mb-6">
           {/* Restaurant Info */}
           <div className="flex items-start gap-3 p-3 bg-muted/50 rounded-lg">
-            <div className="w-8 h-8 bg-uber-green rounded-full flex items-center justify-center text-white font-bold text-sm">
+            <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center text-primary-foreground font-bold text-sm">
               R
             </div>
             <div className="flex-1">
@@ -123,7 +123,7 @@ const DeliveryOrders = () => {
           {order.status === "ready_for_pickup" && (
             <>
               <Button 
-                className="w-full bg-uber-green hover:bg-uber-green-hover"
+                className="w-full bg-primary hover:bg-primary/90"
                 onClick={() => {
                   updateOrderStatus({ orderId: order.id, status: "picked_up" });
                   setActiveOrderId(order.id);
@@ -161,7 +161,7 @@ const DeliveryOrders = () => {
                 </p>
               )}
               <Button 
-                className="w-full bg-uber-green hover:bg-uber-green-hover"
+                className="w-full bg-primary hover:bg-primary/90"
                 onClick={() => {
                   updateOrderStatus({ orderId: order.id, status: "delivered" });
                   setLocationEnabled(false);
@@ -196,7 +196,7 @@ const DeliveryOrders = () => {
             <Badge variant="secondary">
               {filterOrdersByStatus("active").length} Active Orders
             </Badge>
-            <Badge className="bg-uber-green hover:bg-uber-green-hover">
+            <Badge className="bg-primary hover:bg-primary/90">
               Online
             </Badge>
           </div>

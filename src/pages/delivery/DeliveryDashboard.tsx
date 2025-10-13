@@ -56,7 +56,7 @@ const DeliveryDashboard = () => {
                   <p className="text-2xl font-bold">R{totalToday.toFixed(2)}</p>
                   <p className="text-xs text-muted-foreground">Net after fees</p>
                 </div>
-                <DollarSign className="h-8 w-8 uber-green" />
+                <DollarSign className="h-8 w-8 text-primary" />
               </div>
             </CardContent>
           </Card>
@@ -68,7 +68,7 @@ const DeliveryDashboard = () => {
                   <p className="text-sm text-muted-foreground">Deliveries</p>
                   <p className="text-2xl font-bold">{deliveriesToday}</p>
                 </div>
-                <Package className="h-8 w-8 uber-green" />
+                <Package className="h-8 w-8 text-primary" />
               </div>
             </CardContent>
           </Card>
@@ -80,7 +80,7 @@ const DeliveryDashboard = () => {
                   <p className="text-sm text-muted-foreground">Active Orders</p>
                   <p className="text-2xl font-bold">{activeOrders.length}</p>
                 </div>
-                <Star className="h-8 w-8 uber-green" />
+                <Star className="h-8 w-8 text-primary" />
               </div>
             </CardContent>
           </Card>
@@ -92,7 +92,7 @@ const DeliveryDashboard = () => {
                   <p className="text-sm text-muted-foreground">Available</p>
                   <p className="text-2xl font-bold">{availableOrders.length}</p>
                 </div>
-                <Clock className="h-8 w-8 uber-green" />
+                <Clock className="h-8 w-8 text-primary" />
               </div>
             </CardContent>
           </Card>
@@ -104,7 +104,7 @@ const DeliveryDashboard = () => {
                   <p className="text-sm text-muted-foreground">Total Orders</p>
                   <p className="text-2xl font-bold">{orders.length}</p>
                 </div>
-                <TrendingUp className="h-8 w-8 uber-green" />
+                <TrendingUp className="h-8 w-8 text-primary" />
               </div>
             </CardContent>
           </Card>
@@ -116,7 +116,7 @@ const DeliveryDashboard = () => {
                   <p className="text-sm text-muted-foreground">Pending</p>
                   <p className="text-2xl font-bold">{orders.filter(o => o.status === 'pending').length}</p>
                 </div>
-                <Star className="h-8 w-8 uber-green" />
+                <Star className="h-8 w-8 text-primary" />
               </div>
             </CardContent>
           </Card>
@@ -129,7 +129,7 @@ const DeliveryDashboard = () => {
               <CardHeader>
                 <CardTitle className="flex items-center justify-between">
                   Current Delivery
-                  <Badge className="bg-uber-green hover:bg-uber-green-hover">
+                  <Badge className="bg-primary hover:bg-primary/90">
                     {currentDelivery.status}
                   </Badge>
                 </CardTitle>
@@ -151,7 +151,7 @@ const DeliveryDashboard = () => {
                       </p>
                     </div>
                     <div className="text-right">
-                      <p className="font-bold text-lg uber-green">${Number(currentDelivery.total).toFixed(2)}</p>
+                      <p className="font-bold text-lg text-primary">${Number(currentDelivery.total).toFixed(2)}</p>
                     </div>
                   </div>
 
@@ -206,10 +206,10 @@ const DeliveryDashboard = () => {
                         </div>
                       </div>
                       <div className="text-right">
-                        <p className="font-bold uber-green">${Number(order.delivery_fee).toFixed(2)}</p>
+                        <p className="font-bold text-primary">${Number(order.delivery_fee).toFixed(2)}</p>
                         <Button 
                           size="sm" 
-                          className="mt-2 bg-uber-green hover:bg-uber-green-hover"
+                          className="mt-2 bg-primary hover:bg-primary/90"
                         >
                           View
                         </Button>

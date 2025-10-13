@@ -89,7 +89,7 @@ const RestaurantList = () => {
                 variant={selectedCategory === category.toLowerCase() ? "default" : "secondary"}
                 className={`cursor-pointer transition-smooth ${
                   selectedCategory === category.toLowerCase() 
-                    ? "bg-uber-green hover:bg-uber-green-hover" 
+                    ? "bg-primary hover:bg-primary/90" 
                     : "hover:bg-secondary"
                 }`}
                 onClick={() => setSelectedCategory(category.toLowerCase())}

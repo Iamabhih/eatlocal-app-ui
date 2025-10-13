@@ -54,7 +54,7 @@ const CustomerHome = () => {
               placeholder="Enter delivery address" 
               className="border-0 text-lg"
             />
-            <Button className="bg-uber-green hover:bg-uber-green-hover">
+            <Button className="bg-primary hover:bg-primary/90">
               <Search className="h-5 w-5" />
             </Button>
           </div>
@@ -75,7 +75,7 @@ const CustomerHome = () => {
                 <div className="text-4xl mb-2 group-hover:scale-110 transition-bounce">
                   {category.icon}
                 </div>
-                <span className="text-sm font-medium text-center group-hover:uber-green transition-smooth">
+                <span className="text-sm font-medium text-center group-hover:text-primary transition-smooth">
                   {category.name}
                 </span>
               </Link>
@@ -113,19 +113,19 @@ const CustomerHome = () => {
       {/* Portal Links */}
       <section className="py-16 px-4">
         <div className="container mx-auto">
-          <h2 className="text-3xl font-bold text-center mb-12">Join UberEats</h2>
+          <h2 className="text-3xl font-bold text-center mb-12">Join Ekhasi Online</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
             <Card className="group cursor-pointer hover:shadow-hover transition-all duration-300">
               <Link to="/restaurant/dashboard">
                 <CardContent className="p-8 text-center">
                   <div className="text-6xl mb-4">🏪</div>
-                  <h3 className="text-2xl font-bold mb-4 group-hover:uber-green transition-smooth">
+                  <h3 className="text-2xl font-bold mb-4 group-hover:text-primary transition-smooth">
                     Restaurant Partner
                   </h3>
                   <p className="text-muted-foreground mb-6">
-                    Grow your business and reach new customers by partnering with UberEats
+                    Grow your business and reach new customers by partnering with Ekhasi Online
                   </p>
-                  <Button className="bg-uber-green hover:bg-uber-green-hover">
+                  <Button className="bg-primary hover:bg-primary/90">
                     Get Started
                   </Button>
                 </CardContent>
@@ -136,13 +136,13 @@ const CustomerHome = () => {
               <Link to="/delivery/dashboard">
                 <CardContent className="p-8 text-center">
                   <div className="text-6xl mb-4">🏍️</div>
-                  <h3 className="text-2xl font-bold mb-4 group-hover:uber-green transition-smooth">
+                  <h3 className="text-2xl font-bold mb-4 group-hover:text-primary transition-smooth">
                     Delivery Partner
                   </h3>
                   <p className="text-muted-foreground mb-6">
-                    Make money on your schedule. Deliver with UberEats whenever you want
+                    Make money on your schedule. Deliver with Ekhasi Online whenever you want
                   </p>
-                  <Button className="bg-uber-green hover:bg-uber-green-hover">
+                  <Button className="bg-primary hover:bg-primary/90">
                     Start Earning
                   </Button>
                 </CardContent>

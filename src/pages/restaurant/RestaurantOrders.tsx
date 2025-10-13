@@ -17,7 +17,7 @@ const RestaurantOrders = () => {
       pending: "bg-blue-500",
       confirmed: "bg-orange-500",
       preparing: "bg-yellow-500",
-      ready_for_pickup: "bg-uber-green",
+      ready_for_pickup: "bg-primary",
       picked_up: "bg-purple-500",
       delivered: "bg-gray-500",
       cancelled: "bg-red-500",
@@ -146,7 +146,7 @@ const RestaurantOrders = () => {
                 <Button 
                   size="sm"
                   onClick={() => updateOrderStatus({ orderId: order.id, status: "confirmed" })}
-                  className="bg-uber-green hover:bg-uber-green-hover"
+                  className="bg-primary hover:bg-primary/90"
                 >
                   <CheckCircle className="h-4 w-4 mr-1" />
                   Accept
@@ -158,7 +158,7 @@ const RestaurantOrders = () => {
               <Button 
                 size="sm"
                 onClick={() => updateOrderStatus({ orderId: order.id, status: "ready_for_pickup" })}
-                className="bg-uber-green hover:bg-uber-green-hover"
+                className="bg-primary hover:bg-primary/90"
               >
                 Mark Ready for Pickup
               </Button>

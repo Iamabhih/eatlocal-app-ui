@@ -185,4 +185,21 @@
   .shadow-purple {
     box-shadow: var(--shadow-purple);
   }
+  
+  /* Backward compatibility - map uber-green to ekhasi-orange */
+  .uber-green {
+    color: hsl(var(--ekhasi-orange));
+  }
+  
+  .bg-uber-green {
+    background-color: hsl(var(--ekhasi-orange));
+  }
+  
+  .bg-uber-green-hover {
+    background-color: hsl(var(--ekhasi-orange-hover));
+  }
+  
+  .bg-uber-green-light {
+    background-color: hsl(var(--ekhasi-orange-light));
+  }
 }
