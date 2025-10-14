@@ -136,7 +136,7 @@ const DeliveryDashboard = () => {
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  <div className="flex items-center justify-between p-4 border rounded-lg bg-uber-green-light">
+                  <div className="flex items-center justify-between p-4 border rounded-lg bg-primary/10">
                     <div className="flex-1">
                       <div className="flex items-center gap-3 mb-2">
                         <span className="font-bold">#{currentDelivery.order_number}</span>

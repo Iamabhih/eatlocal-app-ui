@@ -50,9 +50,9 @@ const DeliveryEarnings = () => {
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-sm text-muted-foreground">Total Earnings</p>
-                      <p className="text-3xl font-bold uber-green">${totalToday.toFixed(2)}</p>
+                      <p className="text-3xl font-bold text-primary">${totalToday.toFixed(2)}</p>
                     </div>
-                    <DollarSign className="h-8 w-8 uber-green" />
+                    <DollarSign className="h-8 w-8 text-primary" />
                   </div>
                 </CardContent>
               </Card>
@@ -64,7 +64,7 @@ const DeliveryEarnings = () => {
                       <p className="text-sm text-muted-foreground">Deliveries</p>
                       <p className="text-3xl font-bold">{deliveriesToday}</p>
                     </div>
-                    <Package className="h-8 w-8 uber-green" />
+                    <Package className="h-8 w-8 text-primary" />
                   </div>
                 </CardContent>
               </Card>
@@ -76,7 +76,7 @@ const DeliveryEarnings = () => {
                       <p className="text-sm text-muted-foreground">Tips</p>
                       <p className="text-3xl font-bold">${totalTips.toFixed(2)}</p>
                     </div>
-                    <TrendingUp className="h-8 w-8 uber-green" />
+                    <TrendingUp className="h-8 w-8 text-primary" />
                   </div>
                 </CardContent>
               </Card>
@@ -101,7 +101,7 @@ const DeliveryEarnings = () => {
                       </div>
                       <div className="flex justify-between items-center">
                         <span>Tips</span>
-                        <span className="font-bold uber-green">${totalTips.toFixed(2)}</span>
+                        <span className="font-bold text-primary">${totalTips.toFixed(2)}</span>
                       </div>
                       <div className="flex justify-between items-center">
                         <span>Bonuses</span>
@@ -112,7 +112,7 @@ const DeliveryEarnings = () => {
                       <div className="border-t pt-4">
                         <div className="flex justify-between items-center text-lg">
                           <span className="font-bold">Total</span>
-                          <span className="font-bold uber-green">${totalToday.toFixed(2)}</span>
+                          <span className="font-bold text-primary">${totalToday.toFixed(2)}</span>
                         </div>
                       </div>
                     </div>
@@ -148,7 +148,7 @@ const DeliveryEarnings = () => {
                           </p>
                         </div>
                         <div className="text-right">
-                          <p className="font-bold text-lg uber-green">${Number(earning.total_earnings).toFixed(2)}</p>
+                          <p className="font-bold text-lg text-primary">${Number(earning.total_earnings).toFixed(2)}</p>
                           <div className="text-xs text-muted-foreground">
                             <span>Base: ${Number(earning.base_fee).toFixed(2)}</span>
                             {Number(earning.tip || 0) > 0 && <span> • Tip: ${Number(earning.tip).toFixed(2)}</span>}

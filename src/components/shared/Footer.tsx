@@ -58,7 +58,7 @@ export const Footer = () => {
         </div>
 
         <div className="border-t mt-8 pt-8 text-center text-muted-foreground">
-          <p>&copy; {new Date().getFullYear()} Food Delivery Platform. All rights reserved.</p>
+          <p>&copy; {new Date().getFullYear()} Ekhasi Online. All rights reserved.</p>
         </div>
       </div>
     </footer>
