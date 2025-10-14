@@ -86,8 +86,8 @@ export function useRestaurantOrders(restaurantId: string | undefined) {
         .select(
           `
           *,
-          customer:profiles!customer_id(id, full_name, phone),
-          delivery_address:customer_addresses(street_address, city, state, zip_code),
+          customer:profiles!orders_customer_id_fkey(id, full_name, phone),
+          delivery_address:customer_addresses!orders_delivery_address_id_fkey(street_address, city, state, zip_code),
           order_items(
             *,
             menu_item:menu_items(name, price)
@@ -103,7 +103,7 @@ export function useRestaurantOrders(restaurantId: string | undefined) {
       }
 
       logger.log(`Fetched ${data?.length || 0} orders`);
-      return data as Order[];
+      return data as unknown as Order[];
     },
     enabled: !!restaurantId,
   });
@@ -164,7 +164,7 @@ export function useRestaurantOrders(restaurantId: string | undefined) {
   const updateOrderStatus = useMutation({
     mutationFn: async ({ orderId, status }: UpdateOrderStatusParams) => {
       const timestamp = new Date().toISOString();
-      const updates: Partial<Order> = { status };
+      const updates: Record<string, any> = { status };
 
       // Set appropriate timestamp based on status
       if (status === "confirmed") {

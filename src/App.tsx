@@ -60,7 +60,7 @@ const queryClient = new QueryClient({
       retry: 1,
       refetchOnWindowFocus: false,
       staleTime: QUERY_CACHE.STALE_TIME, // 5 minutes
-      cacheTime: QUERY_CACHE.CACHE_TIME, // 10 minutes
+      gcTime: QUERY_CACHE.GC_TIME, // 10 minutes (renamed from cacheTime in React Query v5)
     },
     mutations: {
       onError: (error: unknown) => {

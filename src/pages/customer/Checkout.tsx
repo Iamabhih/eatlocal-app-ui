@@ -297,7 +297,14 @@ const Checkout = () => {
                 <CardTitle>Fulfillment Method</CardTitle>
               </CardHeader>
               <CardContent>
-                <FulfillmentSelector value={fulfillmentType} onChange={setFulfillmentType} />
+                <FulfillmentSelector 
+                  selected={fulfillmentType} 
+                  onSelect={setFulfillmentType}
+                  restaurantName={restaurant.name}
+                  restaurantAddress={`${restaurant.street_address}, ${restaurant.city}`}
+                  supportsPickup={restaurant.supports_pickup}
+                  supportsDelivery={restaurant.supports_delivery}
+                />
               </CardContent>
             </Card>
 

@@ -106,21 +106,9 @@ const RestaurantOrders = () => {
             ))}
           </div>
           <div className="mt-4 pt-3 border-t space-y-1 text-sm">
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">Order Total</span>
+            <div className="flex justify-between font-bold">
+              <span>Order Total</span>
               <span>R{Number(order.total).toFixed(2)}</span>
-            </div>
-            <div className="flex justify-between text-destructive">
-              <span>Platform Commission (15%)</span>
-              <span>- R{Number(order.platform_commission || 0).toFixed(2)}</span>
-            </div>
-            <div className="flex justify-between text-destructive">
-              <span>Settlement Fee (4.5%)</span>
-              <span>- R{Number(order.settlement_fee || 0).toFixed(2)}</span>
-            </div>
-            <div className="flex justify-between font-bold text-primary pt-2 border-t">
-              <span>Your Payout</span>
-              <span>R{Number(order.net_restaurant_payout || 0).toFixed(2)}</span>
             </div>
           </div>
         </div>
