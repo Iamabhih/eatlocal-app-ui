@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3";
+import { z } from "https://deno.land/x/zod@v3.22.4/mod.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -18,6 +19,16 @@ interface PayFastITN {
   merchant_id: string;
   signature: string;
 }
+
+// Validation schema for PayFast webhook data
+const PayFastSchema = z.object({
+  m_payment_id: z.string().uuid('Invalid order ID format'),
+  pf_payment_id: z.string().min(1, 'Payment ID required'),
+  payment_status: z.enum(['COMPLETE', 'FAILED', 'CANCELLED', 'PENDING']),
+  amount_gross: z.string().refine((val) => !isNaN(parseFloat(val)) && parseFloat(val) > 0, 'Invalid amount'),
+  merchant_id: z.string().min(1, 'Merchant ID required'),
+  signature: z.string().min(1, 'Signature required')
+});
 
 const validateSignature = async (data: Record<string, string>, passPhrase: string): Promise<boolean> => {
   // Remove signature from data
@@ -60,6 +71,16 @@ serve(async (req: Request) => {
     });
 
     console.log('PayFast ITN data:', data);
+
+    // Validate input data
+    const validationResult = PayFastSchema.safeParse(data);
+    if (!validationResult.success) {
+      console.error('Validation error:', validationResult.error);
+      return new Response(
+        JSON.stringify({ error: 'Invalid webhook data', details: validationResult.error.issues }),
+        { status: 400, headers: corsHeaders }
+      );
+    }
 
     const merchantId = Deno.env.get('PAYFAST_MERCHANT_ID');
     const passphrase = Deno.env.get('PAYFAST_PASSPHRASE');
