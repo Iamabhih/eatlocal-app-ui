@@ -24,7 +24,7 @@ const CustomerLanding = () => {
           <h1 className="text-5xl font-bold mb-6 drop-shadow-lg">Food, Groceries & More from Your Local Community</h1>
           <p className="text-xl mb-8">Order from the best restaurants and shops in your area with transparent pricing and real-time tracking</p>
           <Link to="/restaurants">
-            <Button size="lg" className="text-lg px-8 shadow-orange">
+            <Button size="lg" className="text-lg px-8">
               Start Shopping
             </Button>
           </Link>

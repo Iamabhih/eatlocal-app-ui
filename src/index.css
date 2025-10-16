@@ -10,14 +10,14 @@
     --background: 0 0% 100%;
     --foreground: 0 0% 9%;
     
-    /* Ekhasi Signature Colors - Vibrant African-Inspired Palette */
-    --ekhasi-orange: 15 100% 60%;
-    --ekhasi-orange-hover: 15 100% 55%;
-    --ekhasi-orange-light: 15 100% 95%;
-    --ekhasi-purple: 258 88% 65%;
-    --ekhasi-purple-dark: 258 88% 50%;
-    --ekhasi-gold: 38 100% 50%;
-    --ekhasi-green: 142 76% 45%;
+    /* UberEats Signature Colors */
+    --uber-green: 142 95% 39%;
+    --uber-green-hover: 142 95% 32%;
+    --uber-green-light: 142 95% 95%;
+    --uber-green-dark: 142 95% 25%;
+    --uber-black: 0 0% 0%;
+    --uber-gray: 0 0% 45%;
+    --uber-light-gray: 0 0% 96%;
     
     /* UI Colors */
     --card: 0 0% 100%;
@@ -26,38 +26,37 @@
     --popover: 0 0% 100%;
     --popover-foreground: 0 0% 9%;
     
-    --primary: 15 100% 60%;
+    --primary: 142 95% 39%;
     --primary-foreground: 0 0% 100%;
     
-    --secondary: 258 88% 65%;
-    --secondary-foreground: 0 0% 100%;
+    --secondary: 0 0% 96%;
+    --secondary-foreground: 0 0% 9%;
     
     --muted: 0 0% 96%;
     --muted-foreground: 0 0% 45%;
     
-    --accent: 38 100% 50%;
-    --accent-foreground: 0 0% 9%;
+    --accent: 142 95% 39%;
+    --accent-foreground: 0 0% 100%;
     
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
     
     --border: 0 0% 90%;
     --input: 0 0% 90%;
-    --ring: 15 100% 60%;
+    --ring: 142 95% 39%;
     
     /* Design System */
-    --radius: 0.75rem;
+    --radius: 0.5rem;
     
-    /* Custom Gradients - Ekhasi Vibes */
-    --gradient-hero: linear-gradient(135deg, hsl(var(--ekhasi-orange)), hsl(var(--ekhasi-purple)));
+    /* Custom Gradients - UberEats Style */
+    --gradient-hero: linear-gradient(135deg, hsl(var(--uber-green)), hsl(var(--uber-green-dark)));
     --gradient-card: linear-gradient(145deg, hsl(0 0% 100%), hsl(0 0% 98%));
-    --gradient-vibrant: linear-gradient(120deg, hsl(var(--ekhasi-orange)), hsl(var(--ekhasi-gold)), hsl(var(--ekhasi-purple)));
+    --gradient-vibrant: linear-gradient(90deg, hsl(var(--uber-green)), hsl(var(--uber-green-hover)));
     
     /* Shadows */
-    --shadow-card: 0 2px 8px hsl(0 0% 0% / 0.1);
-    --shadow-hover: 0 4px 16px hsl(0 0% 0% / 0.15);
-    --shadow-orange: 0 4px 20px hsl(var(--ekhasi-orange) / 0.25);
-    --shadow-purple: 0 4px 20px hsl(var(--ekhasi-purple) / 0.20);
+    --shadow-card: 0 2px 8px hsl(0 0% 0% / 0.08);
+    --shadow-hover: 0 4px 16px hsl(0 0% 0% / 0.12);
+    --shadow-green: 0 4px 20px hsl(var(--uber-green) / 0.25);
     
     /* Animations */
     --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -158,48 +157,40 @@
     transition: var(--transition-bounce);
   }
   
-  .ekhasi-orange {
-    color: hsl(var(--ekhasi-orange));
+  .uber-green {
+    color: hsl(var(--uber-green));
   }
   
-  .ekhasi-purple {
-    color: hsl(var(--ekhasi-purple));
+  .bg-uber-green {
+    background-color: hsl(var(--uber-green));
   }
   
-  .bg-ekhasi-orange {
-    background-color: hsl(var(--ekhasi-orange));
+  .bg-uber-green-hover {
+    background-color: hsl(var(--uber-green-hover));
   }
   
-  .bg-ekhasi-purple {
-    background-color: hsl(var(--ekhasi-purple));
+  .bg-uber-green-light {
+    background-color: hsl(var(--uber-green-light));
   }
   
   .bg-gradient-vibrant {
     background: var(--gradient-vibrant);
   }
   
+  .shadow-green {
+    box-shadow: var(--shadow-green);
+  }
+  
+  /* Legacy compatibility */
+  .ekhasi-orange {
+    color: hsl(var(--uber-green));
+  }
+  
+  .bg-ekhasi-orange {
+    background-color: hsl(var(--uber-green));
+  }
+  
   .shadow-orange {
-    box-shadow: var(--shadow-orange);
-  }
-  
-  .shadow-purple {
-    box-shadow: var(--shadow-purple);
-  }
-  
-  /* Backward compatibility - map uber-green to ekhasi-orange */
-  .uber-green {
-    color: hsl(var(--ekhasi-orange));
-  }
-  
-  .bg-uber-green {
-    background-color: hsl(var(--ekhasi-orange));
-  }
-  
-  .bg-uber-green-hover {
-    background-color: hsl(var(--ekhasi-orange-hover));
-  }
-  
-  .bg-uber-green-light {
-    background-color: hsl(var(--ekhasi-orange-light));
+    box-shadow: var(--shadow-green);
   }
 }

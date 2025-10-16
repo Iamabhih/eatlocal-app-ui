@@ -25,7 +25,7 @@ const ShopLanding = () => {
           <h1 className="text-5xl font-bold mb-6">Bring Your Shop Online</h1>
           <p className="text-xl mb-8">Sell groceries, household items, and more to thousands of local customers. Free to join, easy to manage, transparent pricing.</p>
           <Link to="/auth?role=shop">
-            <Button size="lg" className="text-lg px-8 shadow-orange">
+            <Button size="lg" className="text-lg px-8">
               Start Selling Online
             </Button>
           </Link>
@@ -147,7 +147,7 @@ const ShopLanding = () => {
             <Card>
               <CardContent className="pt-6">
                 <div className="flex items-start space-x-4">
-                  <div className="h-10 w-10 rounded-full bg-gradient-vibrant text-white flex items-center justify-center flex-shrink-0 font-bold">
+                  <div className="h-10 w-10 rounded-full bg-primary text-white flex items-center justify-center flex-shrink-0 font-bold">
                     1
                   </div>
                   <div>
@@ -161,7 +161,7 @@ const ShopLanding = () => {
             <Card>
               <CardContent className="pt-6">
                 <div className="flex items-start space-x-4">
-                  <div className="h-10 w-10 rounded-full bg-gradient-vibrant text-white flex items-center justify-center flex-shrink-0 font-bold">
+                  <div className="h-10 w-10 rounded-full bg-primary text-white flex items-center justify-center flex-shrink-0 font-bold">
                     2
                   </div>
                   <div>
@@ -175,7 +175,7 @@ const ShopLanding = () => {
             <Card>
               <CardContent className="pt-6">
                 <div className="flex items-start space-x-4">
-                  <div className="h-10 w-10 rounded-full bg-gradient-vibrant text-white flex items-center justify-center flex-shrink-0 font-bold">
+                  <div className="h-10 w-10 rounded-full bg-primary text-white flex items-center justify-center flex-shrink-0 font-bold">
                     3
                   </div>
                   <div>
@@ -189,7 +189,7 @@ const ShopLanding = () => {
             <Card>
               <CardContent className="pt-6">
                 <div className="flex items-start space-x-4">
-                  <div className="h-10 w-10 rounded-full bg-gradient-vibrant text-white flex items-center justify-center flex-shrink-0 font-bold">
+                  <div className="h-10 w-10 rounded-full bg-primary text-white flex items-center justify-center flex-shrink-0 font-bold">
                     4
                   </div>
                   <div>
@@ -209,7 +209,7 @@ const ShopLanding = () => {
           <h2 className="text-3xl font-bold mb-4">Ready to Go Digital?</h2>
           <p className="text-muted-foreground mb-8">Join hundreds of successful local shops on Ekhasi Online</p>
           <Link to="/auth?role=shop">
-            <Button size="lg" className="shadow-orange">Sign Up Now - It's Free</Button>
+            <Button size="lg">Sign Up Now - It's Free</Button>
           </Link>
         </div>
       </section>
