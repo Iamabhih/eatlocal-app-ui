@@ -17,7 +17,7 @@ export const LandingHeader = ({ activePortal }: LandingHeaderProps) => {
             className="h-10 w-10"
           />
           <div>
-            <span className="font-bold text-xl bg-gradient-vibrant bg-clip-text text-transparent">Ekhasi Online</span>
+            <span className="font-bold text-xl bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">Ekhasi Online</span>
             <p className="text-xs text-muted-foreground">Your Local Everything, Delivered</p>
           </div>
         </Link>
