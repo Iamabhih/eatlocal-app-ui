@@ -243,6 +243,232 @@ export type Database = {
           },
         ]
       }
+      driver_documents: {
+        Row: {
+          created_at: string
+          document_type: string
+          document_url: string
+          driver_id: string
+          expiry_date: string | null
+          id: string
+          rejection_reason: string | null
+          status: Database["public"]["Enums"]["verification_status"] | null
+          updated_at: string
+          verified_at: string | null
+          verified_by: string | null
+        }
+        Insert: {
+          created_at?: string
+          document_type: string
+          document_url: string
+          driver_id: string
+          expiry_date?: string | null
+          id?: string
+          rejection_reason?: string | null
+          status?: Database["public"]["Enums"]["verification_status"] | null
+          updated_at?: string
+          verified_at?: string | null
+          verified_by?: string | null
+        }
+        Update: {
+          created_at?: string
+          document_type?: string
+          document_url?: string
+          driver_id?: string
+          expiry_date?: string | null
+          id?: string
+          rejection_reason?: string | null
+          status?: Database["public"]["Enums"]["verification_status"] | null
+          updated_at?: string
+          verified_at?: string | null
+          verified_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "driver_documents_driver_id_fkey"
+            columns: ["driver_id"]
+            isOneToOne: false
+            referencedRelation: "drivers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      driver_locations: {
+        Row: {
+          accuracy: number | null
+          created_at: string
+          driver_id: string
+          heading: number | null
+          id: string
+          latitude: number
+          location: unknown | null
+          longitude: number
+          ride_id: string | null
+          speed: number | null
+          updated_at: string
+        }
+        Insert: {
+          accuracy?: number | null
+          created_at?: string
+          driver_id: string
+          heading?: number | null
+          id?: string
+          latitude: number
+          location?: unknown | null
+          longitude: number
+          ride_id?: string | null
+          speed?: number | null
+          updated_at?: string
+        }
+        Update: {
+          accuracy?: number | null
+          created_at?: string
+          driver_id?: string
+          heading?: number | null
+          id?: string
+          latitude?: number
+          location?: unknown | null
+          longitude?: number
+          ride_id?: string | null
+          speed?: number | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "driver_locations_driver_id_fkey"
+            columns: ["driver_id"]
+            isOneToOne: false
+            referencedRelation: "drivers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "driver_locations_ride_id_fkey"
+            columns: ["ride_id"]
+            isOneToOne: false
+            referencedRelation: "rides"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      driver_tier_verifications: {
+        Row: {
+          created_at: string
+          driver_id: string
+          id: string
+          rejection_reason: string | null
+          status: Database["public"]["Enums"]["verification_status"] | null
+          tier: Database["public"]["Enums"]["service_tier"]
+          updated_at: string
+          verified_at: string | null
+          verified_by: string | null
+        }
+        Insert: {
+          created_at?: string
+          driver_id: string
+          id?: string
+          rejection_reason?: string | null
+          status?: Database["public"]["Enums"]["verification_status"] | null
+          tier: Database["public"]["Enums"]["service_tier"]
+          updated_at?: string
+          verified_at?: string | null
+          verified_by?: string | null
+        }
+        Update: {
+          created_at?: string
+          driver_id?: string
+          id?: string
+          rejection_reason?: string | null
+          status?: Database["public"]["Enums"]["verification_status"] | null
+          tier?: Database["public"]["Enums"]["service_tier"]
+          updated_at?: string
+          verified_at?: string | null
+          verified_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "driver_tier_verifications_driver_id_fkey"
+            columns: ["driver_id"]
+            isOneToOne: false
+            referencedRelation: "drivers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      drivers: {
+        Row: {
+          acceptance_rate: number | null
+          average_rating: number | null
+          bank_account_holder: string | null
+          bank_account_number: string | null
+          bank_name: string | null
+          cancelled_rides: number | null
+          completed_rides: number | null
+          created_at: string
+          current_tier: Database["public"]["Enums"]["service_tier"] | null
+          id: string
+          is_available: boolean | null
+          is_verified: boolean | null
+          total_earnings: number | null
+          total_rides: number | null
+          updated_at: string
+          user_id: string
+          vehicle_color: string
+          vehicle_license_plate: string
+          vehicle_make: string
+          vehicle_model: string
+          vehicle_type: string
+          vehicle_year: number
+        }
+        Insert: {
+          acceptance_rate?: number | null
+          average_rating?: number | null
+          bank_account_holder?: string | null
+          bank_account_number?: string | null
+          bank_name?: string | null
+          cancelled_rides?: number | null
+          completed_rides?: number | null
+          created_at?: string
+          current_tier?: Database["public"]["Enums"]["service_tier"] | null
+          id?: string
+          is_available?: boolean | null
+          is_verified?: boolean | null
+          total_earnings?: number | null
+          total_rides?: number | null
+          updated_at?: string
+          user_id: string
+          vehicle_color: string
+          vehicle_license_plate: string
+          vehicle_make: string
+          vehicle_model: string
+          vehicle_type?: string
+          vehicle_year: number
+        }
+        Update: {
+          acceptance_rate?: number | null
+          average_rating?: number | null
+          bank_account_holder?: string | null
+          bank_account_number?: string | null
+          bank_name?: string | null
+          cancelled_rides?: number | null
+          completed_rides?: number | null
+          created_at?: string
+          current_tier?: Database["public"]["Enums"]["service_tier"] | null
+          id?: string
+          is_available?: boolean | null
+          is_verified?: boolean | null
+          total_earnings?: number | null
+          total_rides?: number | null
+          updated_at?: string
+          user_id?: string
+          vehicle_color?: string
+          vehicle_license_plate?: string
+          vehicle_make?: string
+          vehicle_model?: string
+          vehicle_type?: string
+          vehicle_year?: number
+        }
+        Relationships: []
+      }
       error_logs: {
         Row: {
           browser_info: Json | null
@@ -989,6 +1215,387 @@ export type Database = {
         }
         Relationships: []
       }
+      ride_emergencies: {
+        Row: {
+          created_at: string
+          emergency_type: string
+          id: string
+          location_latitude: number | null
+          location_longitude: number | null
+          notes: string | null
+          reported_by: string
+          resolved: boolean | null
+          resolved_at: string | null
+          resolved_by: string | null
+          ride_id: string
+        }
+        Insert: {
+          created_at?: string
+          emergency_type: string
+          id?: string
+          location_latitude?: number | null
+          location_longitude?: number | null
+          notes?: string | null
+          reported_by: string
+          resolved?: boolean | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          ride_id: string
+        }
+        Update: {
+          created_at?: string
+          emergency_type?: string
+          id?: string
+          location_latitude?: number | null
+          location_longitude?: number | null
+          notes?: string | null
+          reported_by?: string
+          resolved?: boolean | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          ride_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ride_emergencies_ride_id_fkey"
+            columns: ["ride_id"]
+            isOneToOne: false
+            referencedRelation: "rides"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ride_ratings: {
+        Row: {
+          cleanliness_rating: number | null
+          comment: string | null
+          communication_rating: number | null
+          created_at: string
+          id: string
+          overall_rating: number
+          professionalism_rating: number | null
+          rated_by: string
+          rated_user_id: string
+          ride_id: string
+          safety_rating: number | null
+        }
+        Insert: {
+          cleanliness_rating?: number | null
+          comment?: string | null
+          communication_rating?: number | null
+          created_at?: string
+          id?: string
+          overall_rating: number
+          professionalism_rating?: number | null
+          rated_by: string
+          rated_user_id: string
+          ride_id: string
+          safety_rating?: number | null
+        }
+        Update: {
+          cleanliness_rating?: number | null
+          comment?: string | null
+          communication_rating?: number | null
+          created_at?: string
+          id?: string
+          overall_rating?: number
+          professionalism_rating?: number | null
+          rated_by?: string
+          rated_user_id?: string
+          ride_id?: string
+          safety_rating?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ride_ratings_ride_id_fkey"
+            columns: ["ride_id"]
+            isOneToOne: false
+            referencedRelation: "rides"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ride_service_tiers: {
+        Row: {
+          base_fare: number
+          created_at: string
+          description: string | null
+          features: Json | null
+          id: string
+          is_active: boolean | null
+          minimum_rating: number
+          minimum_vehicle_year: number
+          name: string
+          per_km_rate: number
+          per_minute_rate: number
+          platform_commission_rate: number
+          requirements: Json | null
+          tier: Database["public"]["Enums"]["service_tier"]
+          updated_at: string
+        }
+        Insert: {
+          base_fare: number
+          created_at?: string
+          description?: string | null
+          features?: Json | null
+          id?: string
+          is_active?: boolean | null
+          minimum_rating: number
+          minimum_vehicle_year: number
+          name: string
+          per_km_rate: number
+          per_minute_rate: number
+          platform_commission_rate: number
+          requirements?: Json | null
+          tier: Database["public"]["Enums"]["service_tier"]
+          updated_at?: string
+        }
+        Update: {
+          base_fare?: number
+          created_at?: string
+          description?: string | null
+          features?: Json | null
+          id?: string
+          is_active?: boolean | null
+          minimum_rating?: number
+          minimum_vehicle_year?: number
+          name?: string
+          per_km_rate?: number
+          per_minute_rate?: number
+          platform_commission_rate?: number
+          requirements?: Json | null
+          tier?: Database["public"]["Enums"]["service_tier"]
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      ride_status_history: {
+        Row: {
+          changed_by: string | null
+          created_at: string
+          id: string
+          notes: string | null
+          ride_id: string
+          status: Database["public"]["Enums"]["ride_status"]
+        }
+        Insert: {
+          changed_by?: string | null
+          created_at?: string
+          id?: string
+          notes?: string | null
+          ride_id: string
+          status: Database["public"]["Enums"]["ride_status"]
+        }
+        Update: {
+          changed_by?: string | null
+          created_at?: string
+          id?: string
+          notes?: string | null
+          ride_id?: string
+          status?: Database["public"]["Enums"]["ride_status"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ride_status_history_ride_id_fkey"
+            columns: ["ride_id"]
+            isOneToOne: false
+            referencedRelation: "rides"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      riders: {
+        Row: {
+          average_rating: number | null
+          created_at: string
+          emergency_contact_name: string | null
+          emergency_contact_phone: string | null
+          id: string
+          preferred_journey_mode:
+            | Database["public"]["Enums"]["journey_mode"]
+            | null
+          total_rides: number | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          average_rating?: number | null
+          created_at?: string
+          emergency_contact_name?: string | null
+          emergency_contact_phone?: string | null
+          id?: string
+          preferred_journey_mode?:
+            | Database["public"]["Enums"]["journey_mode"]
+            | null
+          total_rides?: number | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          average_rating?: number | null
+          created_at?: string
+          emergency_contact_name?: string | null
+          emergency_contact_phone?: string | null
+          id?: string
+          preferred_journey_mode?:
+            | Database["public"]["Enums"]["journey_mode"]
+            | null
+          total_rides?: number | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      rides: {
+        Row: {
+          accepted_at: string | null
+          actual_distance_km: number | null
+          actual_duration_minutes: number | null
+          base_fare: number
+          cancellation_reason: string | null
+          cancelled_at: string | null
+          cancelled_by: string | null
+          completed_at: string | null
+          created_at: string
+          distance_fare: number | null
+          driver_arrived_at: string | null
+          driver_id: string | null
+          dropoff_address: string
+          dropoff_latitude: number
+          dropoff_location: unknown | null
+          dropoff_longitude: number
+          emergency_contact_notified: boolean | null
+          estimated_distance_km: number | null
+          estimated_duration_minutes: number | null
+          id: string
+          journey_mode: Database["public"]["Enums"]["journey_mode"]
+          net_driver_payout: number | null
+          pickup_address: string
+          pickup_latitude: number
+          pickup_location: unknown | null
+          pickup_longitude: number
+          platform_commission: number | null
+          requested_at: string
+          ride_number: string
+          rider_id: string
+          service_tier: Database["public"]["Enums"]["service_tier"]
+          settlement_fee: number | null
+          special_instructions: string | null
+          started_at: string | null
+          status: Database["public"]["Enums"]["ride_status"]
+          subtotal: number
+          surge_multiplier: number | null
+          time_fare: number | null
+          tip: number | null
+          total: number
+          trip_share_token: string | null
+          updated_at: string
+        }
+        Insert: {
+          accepted_at?: string | null
+          actual_distance_km?: number | null
+          actual_duration_minutes?: number | null
+          base_fare: number
+          cancellation_reason?: string | null
+          cancelled_at?: string | null
+          cancelled_by?: string | null
+          completed_at?: string | null
+          created_at?: string
+          distance_fare?: number | null
+          driver_arrived_at?: string | null
+          driver_id?: string | null
+          dropoff_address: string
+          dropoff_latitude: number
+          dropoff_location?: unknown | null
+          dropoff_longitude: number
+          emergency_contact_notified?: boolean | null
+          estimated_distance_km?: number | null
+          estimated_duration_minutes?: number | null
+          id?: string
+          journey_mode?: Database["public"]["Enums"]["journey_mode"]
+          net_driver_payout?: number | null
+          pickup_address: string
+          pickup_latitude: number
+          pickup_location?: unknown | null
+          pickup_longitude: number
+          platform_commission?: number | null
+          requested_at?: string
+          ride_number: string
+          rider_id: string
+          service_tier?: Database["public"]["Enums"]["service_tier"]
+          settlement_fee?: number | null
+          special_instructions?: string | null
+          started_at?: string | null
+          status?: Database["public"]["Enums"]["ride_status"]
+          subtotal: number
+          surge_multiplier?: number | null
+          time_fare?: number | null
+          tip?: number | null
+          total: number
+          trip_share_token?: string | null
+          updated_at?: string
+        }
+        Update: {
+          accepted_at?: string | null
+          actual_distance_km?: number | null
+          actual_duration_minutes?: number | null
+          base_fare?: number
+          cancellation_reason?: string | null
+          cancelled_at?: string | null
+          cancelled_by?: string | null
+          completed_at?: string | null
+          created_at?: string
+          distance_fare?: number | null
+          driver_arrived_at?: string | null
+          driver_id?: string | null
+          dropoff_address?: string
+          dropoff_latitude?: number
+          dropoff_location?: unknown | null
+          dropoff_longitude?: number
+          emergency_contact_notified?: boolean | null
+          estimated_distance_km?: number | null
+          estimated_duration_minutes?: number | null
+          id?: string
+          journey_mode?: Database["public"]["Enums"]["journey_mode"]
+          net_driver_payout?: number | null
+          pickup_address?: string
+          pickup_latitude?: number
+          pickup_location?: unknown | null
+          pickup_longitude?: number
+          platform_commission?: number | null
+          requested_at?: string
+          ride_number?: string
+          rider_id?: string
+          service_tier?: Database["public"]["Enums"]["service_tier"]
+          settlement_fee?: number | null
+          special_instructions?: string | null
+          started_at?: string | null
+          status?: Database["public"]["Enums"]["ride_status"]
+          subtotal?: number
+          surge_multiplier?: number | null
+          time_fare?: number | null
+          tip?: number | null
+          total?: number
+          trip_share_token?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rides_driver_id_fkey"
+            columns: ["driver_id"]
+            isOneToOne: false
+            referencedRelation: "drivers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rides_rider_id_fkey"
+            columns: ["rider_id"]
+            isOneToOne: false
+            referencedRelation: "riders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       shop_categories: {
         Row: {
           created_at: string | null
@@ -1013,6 +1620,30 @@ export type Database = {
           icon?: string | null
           id?: string
           name?: string
+        }
+        Relationships: []
+      }
+      spatial_ref_sys: {
+        Row: {
+          auth_name: string | null
+          auth_srid: number | null
+          proj4text: string | null
+          srid: number
+          srtext: string | null
+        }
+        Insert: {
+          auth_name?: string | null
+          auth_srid?: number | null
+          proj4text?: string | null
+          srid: number
+          srtext?: string | null
+        }
+        Update: {
+          auth_name?: string | null
+          auth_srid?: number | null
+          proj4text?: string | null
+          srid?: number
+          srtext?: string | null
         }
         Relationships: []
       }
@@ -1141,16 +1772,525 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      geography_columns: {
+        Row: {
+          coord_dimension: number | null
+          f_geography_column: unknown | null
+          f_table_catalog: unknown | null
+          f_table_name: unknown | null
+          f_table_schema: unknown | null
+          srid: number | null
+          type: string | null
+        }
+        Relationships: []
+      }
+      geometry_columns: {
+        Row: {
+          coord_dimension: number | null
+          f_geometry_column: unknown | null
+          f_table_catalog: string | null
+          f_table_name: unknown | null
+          f_table_schema: unknown | null
+          srid: number | null
+          type: string | null
+        }
+        Insert: {
+          coord_dimension?: number | null
+          f_geometry_column?: unknown | null
+          f_table_catalog?: string | null
+          f_table_name?: unknown | null
+          f_table_schema?: unknown | null
+          srid?: number | null
+          type?: string | null
+        }
+        Update: {
+          coord_dimension?: number | null
+          f_geometry_column?: unknown | null
+          f_table_catalog?: string | null
+          f_table_name?: unknown | null
+          f_table_schema?: unknown | null
+          srid?: number | null
+          type?: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
+      _postgis_deprecate: {
+        Args: { newname: string; oldname: string; version: string }
+        Returns: undefined
+      }
+      _postgis_index_extent: {
+        Args: { col: string; tbl: unknown }
+        Returns: unknown
+      }
+      _postgis_pgsql_version: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
+      _postgis_scripts_pgsql_version: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
+      _postgis_selectivity: {
+        Args: { att_name: string; geom: unknown; mode?: string; tbl: unknown }
+        Returns: number
+      }
+      _st_3dintersects: {
+        Args: { geom1: unknown; geom2: unknown }
+        Returns: boolean
+      }
+      _st_bestsrid: {
+        Args: { "": unknown }
+        Returns: number
+      }
+      _st_contains: {
+        Args: { geom1: unknown; geom2: unknown }
+        Returns: boolean
+      }
+      _st_containsproperly: {
+        Args: { geom1: unknown; geom2: unknown }
+        Returns: boolean
+      }
+      _st_coveredby: {
+        Args:
+          | { geog1: unknown; geog2: unknown }
+          | { geom1: unknown; geom2: unknown }
+        Returns: boolean
+      }
+      _st_covers: {
+        Args:
+          | { geog1: unknown; geog2: unknown }
+          | { geom1: unknown; geom2: unknown }
+        Returns: boolean
+      }
+      _st_crosses: {
+        Args: { geom1: unknown; geom2: unknown }
+        Returns: boolean
+      }
+      _st_dwithin: {
+        Args: {
+          geog1: unknown
+          geog2: unknown
+          tolerance: number
+          use_spheroid?: boolean
+        }
+        Returns: boolean
+      }
+      _st_equals: {
+        Args: { geom1: unknown; geom2: unknown }
+        Returns: boolean
+      }
+      _st_intersects: {
+        Args: { geom1: unknown; geom2: unknown }
+        Returns: boolean
+      }
+      _st_linecrossingdirection: {
+        Args: { line1: unknown; line2: unknown }
+        Returns: number
+      }
+      _st_longestline: {
+        Args: { geom1: unknown; geom2: unknown }
+        Returns: unknown
+      }
+      _st_maxdistance: {
+        Args: { geom1: unknown; geom2: unknown }
+        Returns: number
+      }
+      _st_orderingequals: {
+        Args: { geom1: unknown; geom2: unknown }
+        Returns: boolean
+      }
+      _st_overlaps: {
+        Args: { geom1: unknown; geom2: unknown }
+        Returns: boolean
+      }
+      _st_pointoutside: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      _st_sortablehash: {
+        Args: { geom: unknown }
+        Returns: number
+      }
+      _st_touches: {
+        Args: { geom1: unknown; geom2: unknown }
+        Returns: boolean
+      }
+      _st_voronoi: {
+        Args: {
+          clip?: unknown
+          g1: unknown
+          return_polygons?: boolean
+          tolerance?: number
+        }
+        Returns: unknown
+      }
+      _st_within: {
+        Args: { geom1: unknown; geom2: unknown }
+        Returns: boolean
+      }
+      addauth: {
+        Args: { "": string }
+        Returns: boolean
+      }
+      addgeometrycolumn: {
+        Args:
+          | {
+              catalog_name: string
+              column_name: string
+              new_dim: number
+              new_srid_in: number
+              new_type: string
+              schema_name: string
+              table_name: string
+              use_typmod?: boolean
+            }
+          | {
+              column_name: string
+              new_dim: number
+              new_srid: number
+              new_type: string
+              schema_name: string
+              table_name: string
+              use_typmod?: boolean
+            }
+          | {
+              column_name: string
+              new_dim: number
+              new_srid: number
+              new_type: string
+              table_name: string
+              use_typmod?: boolean
+            }
+        Returns: string
+      }
+      box: {
+        Args: { "": unknown } | { "": unknown }
+        Returns: unknown
+      }
+      box2d: {
+        Args: { "": unknown } | { "": unknown }
+        Returns: unknown
+      }
+      box2d_in: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      box2d_out: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      box2df_in: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      box2df_out: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      box3d: {
+        Args: { "": unknown } | { "": unknown }
+        Returns: unknown
+      }
+      box3d_in: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      box3d_out: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      box3dtobox: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      bytea: {
+        Args: { "": unknown } | { "": unknown }
+        Returns: string
+      }
       cleanup_old_logs: {
         Args: Record<PropertyKey, never>
         Returns: undefined
       }
+      disablelongtransactions: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
+      dropgeometrycolumn: {
+        Args:
+          | {
+              catalog_name: string
+              column_name: string
+              schema_name: string
+              table_name: string
+            }
+          | { column_name: string; schema_name: string; table_name: string }
+          | { column_name: string; table_name: string }
+        Returns: string
+      }
+      dropgeometrytable: {
+        Args:
+          | { catalog_name: string; schema_name: string; table_name: string }
+          | { schema_name: string; table_name: string }
+          | { table_name: string }
+        Returns: string
+      }
+      enablelongtransactions: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
+      equals: {
+        Args: { geom1: unknown; geom2: unknown }
+        Returns: boolean
+      }
       generate_order_number: {
         Args: Record<PropertyKey, never>
         Returns: string
+      }
+      generate_ride_number: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
+      geography: {
+        Args: { "": string } | { "": unknown }
+        Returns: unknown
+      }
+      geography_analyze: {
+        Args: { "": unknown }
+        Returns: boolean
+      }
+      geography_gist_compress: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      geography_gist_decompress: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      geography_out: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      geography_send: {
+        Args: { "": unknown }
+        Returns: string
+      }
+      geography_spgist_compress_nd: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      geography_typmod_in: {
+        Args: { "": unknown[] }
+        Returns: number
+      }
+      geography_typmod_out: {
+        Args: { "": number }
+        Returns: unknown
+      }
+      geometry: {
+        Args:
+          | { "": string }
+          | { "": string }
+          | { "": unknown }
+          | { "": unknown }
+          | { "": unknown }
+          | { "": unknown }
+          | { "": unknown }
+          | { "": unknown }
+        Returns: unknown
+      }
+      geometry_above: {
+        Args: { geom1: unknown; geom2: unknown }
+        Returns: boolean
+      }
+      geometry_analyze: {
+        Args: { "": unknown }
+        Returns: boolean
+      }
+      geometry_below: {
+        Args: { geom1: unknown; geom2: unknown }
+        Returns: boolean
+      }
+      geometry_cmp: {
+        Args: { geom1: unknown; geom2: unknown }
+        Returns: number
+      }
+      geometry_contained_3d: {
+        Args: { geom1: unknown; geom2: unknown }
+        Returns: boolean
+      }
+      geometry_contains: {
+        Args: { geom1: unknown; geom2: unknown }
+        Returns: boolean
+      }
+      geometry_contains_3d: {
+        Args: { geom1: unknown; geom2: unknown }
+        Returns: boolean
+      }
+      geometry_distance_box: {
+        Args: { geom1: unknown; geom2: unknown }
+        Returns: number
+      }
+      geometry_distance_centroid: {
+        Args: { geom1: unknown; geom2: unknown }
+        Returns: number
+      }
+      geometry_eq: {
+        Args: { geom1: unknown; geom2: unknown }
+        Returns: boolean
+      }
+      geometry_ge: {
+        Args: { geom1: unknown; geom2: unknown }
+        Returns: boolean
+      }
+      geometry_gist_compress_2d: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      geometry_gist_compress_nd: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      geometry_gist_decompress_2d: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      geometry_gist_decompress_nd: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      geometry_gist_sortsupport_2d: {
+        Args: { "": unknown }
+        Returns: undefined
+      }
+      geometry_gt: {
+        Args: { geom1: unknown; geom2: unknown }
+        Returns: boolean
+      }
+      geometry_hash: {
+        Args: { "": unknown }
+        Returns: number
+      }
+      geometry_in: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      geometry_le: {
+        Args: { geom1: unknown; geom2: unknown }
+        Returns: boolean
+      }
+      geometry_left: {
+        Args: { geom1: unknown; geom2: unknown }
+        Returns: boolean
+      }
+      geometry_lt: {
+        Args: { geom1: unknown; geom2: unknown }
+        Returns: boolean
+      }
+      geometry_out: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      geometry_overabove: {
+        Args: { geom1: unknown; geom2: unknown }
+        Returns: boolean
+      }
+      geometry_overbelow: {
+        Args: { geom1: unknown; geom2: unknown }
+        Returns: boolean
+      }
+      geometry_overlaps: {
+        Args: { geom1: unknown; geom2: unknown }
+        Returns: boolean
+      }
+      geometry_overlaps_3d: {
+        Args: { geom1: unknown; geom2: unknown }
+        Returns: boolean
+      }
+      geometry_overleft: {
+        Args: { geom1: unknown; geom2: unknown }
+        Returns: boolean
+      }
+      geometry_overright: {
+        Args: { geom1: unknown; geom2: unknown }
+        Returns: boolean
+      }
+      geometry_recv: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      geometry_right: {
+        Args: { geom1: unknown; geom2: unknown }
+        Returns: boolean
+      }
+      geometry_same: {
+        Args: { geom1: unknown; geom2: unknown }
+        Returns: boolean
+      }
+      geometry_same_3d: {
+        Args: { geom1: unknown; geom2: unknown }
+        Returns: boolean
+      }
+      geometry_send: {
+        Args: { "": unknown }
+        Returns: string
+      }
+      geometry_sortsupport: {
+        Args: { "": unknown }
+        Returns: undefined
+      }
+      geometry_spgist_compress_2d: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      geometry_spgist_compress_3d: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      geometry_spgist_compress_nd: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      geometry_typmod_in: {
+        Args: { "": unknown[] }
+        Returns: number
+      }
+      geometry_typmod_out: {
+        Args: { "": number }
+        Returns: unknown
+      }
+      geometry_within: {
+        Args: { geom1: unknown; geom2: unknown }
+        Returns: boolean
+      }
+      geometrytype: {
+        Args: { "": unknown } | { "": unknown }
+        Returns: string
+      }
+      geomfromewkb: {
+        Args: { "": string }
+        Returns: unknown
+      }
+      geomfromewkt: {
+        Args: { "": string }
+        Returns: unknown
+      }
+      get_proj4_from_srid: {
+        Args: { "": number }
+        Returns: string
+      }
+      gettransactionid: {
+        Args: Record<PropertyKey, never>
+        Returns: unknown
+      }
+      gidx_in: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      gidx_out: {
+        Args: { "": unknown }
+        Returns: unknown
       }
       has_role: {
         Args: {
@@ -1158,6 +2298,1295 @@ export type Database = {
           _user_id: string
         }
         Returns: boolean
+      }
+      json: {
+        Args: { "": unknown }
+        Returns: Json
+      }
+      jsonb: {
+        Args: { "": unknown }
+        Returns: Json
+      }
+      longtransactionsenabled: {
+        Args: Record<PropertyKey, never>
+        Returns: boolean
+      }
+      path: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      pgis_asflatgeobuf_finalfn: {
+        Args: { "": unknown }
+        Returns: string
+      }
+      pgis_asgeobuf_finalfn: {
+        Args: { "": unknown }
+        Returns: string
+      }
+      pgis_asmvt_finalfn: {
+        Args: { "": unknown }
+        Returns: string
+      }
+      pgis_asmvt_serialfn: {
+        Args: { "": unknown }
+        Returns: string
+      }
+      pgis_geometry_clusterintersecting_finalfn: {
+        Args: { "": unknown }
+        Returns: unknown[]
+      }
+      pgis_geometry_clusterwithin_finalfn: {
+        Args: { "": unknown }
+        Returns: unknown[]
+      }
+      pgis_geometry_collect_finalfn: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      pgis_geometry_makeline_finalfn: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      pgis_geometry_polygonize_finalfn: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      pgis_geometry_union_parallel_finalfn: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      pgis_geometry_union_parallel_serialfn: {
+        Args: { "": unknown }
+        Returns: string
+      }
+      point: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      polygon: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      populate_geometry_columns: {
+        Args:
+          | { tbl_oid: unknown; use_typmod?: boolean }
+          | { use_typmod?: boolean }
+        Returns: string
+      }
+      postgis_addbbox: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      postgis_constraint_dims: {
+        Args: { geomcolumn: string; geomschema: string; geomtable: string }
+        Returns: number
+      }
+      postgis_constraint_srid: {
+        Args: { geomcolumn: string; geomschema: string; geomtable: string }
+        Returns: number
+      }
+      postgis_constraint_type: {
+        Args: { geomcolumn: string; geomschema: string; geomtable: string }
+        Returns: string
+      }
+      postgis_dropbbox: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      postgis_extensions_upgrade: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
+      postgis_full_version: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
+      postgis_geos_noop: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      postgis_geos_version: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
+      postgis_getbbox: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      postgis_hasbbox: {
+        Args: { "": unknown }
+        Returns: boolean
+      }
+      postgis_index_supportfn: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      postgis_lib_build_date: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
+      postgis_lib_revision: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
+      postgis_lib_version: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
+      postgis_libjson_version: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
+      postgis_liblwgeom_version: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
+      postgis_libprotobuf_version: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
+      postgis_libxml_version: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
+      postgis_noop: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      postgis_proj_version: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
+      postgis_scripts_build_date: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
+      postgis_scripts_installed: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
+      postgis_scripts_released: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
+      postgis_svn_version: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
+      postgis_type_name: {
+        Args: {
+          coord_dimension: number
+          geomname: string
+          use_new_name?: boolean
+        }
+        Returns: string
+      }
+      postgis_typmod_dims: {
+        Args: { "": number }
+        Returns: number
+      }
+      postgis_typmod_srid: {
+        Args: { "": number }
+        Returns: number
+      }
+      postgis_typmod_type: {
+        Args: { "": number }
+        Returns: string
+      }
+      postgis_version: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
+      postgis_wagyu_version: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
+      spheroid_in: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      spheroid_out: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      st_3dclosestpoint: {
+        Args: { geom1: unknown; geom2: unknown }
+        Returns: unknown
+      }
+      st_3ddistance: {
+        Args: { geom1: unknown; geom2: unknown }
+        Returns: number
+      }
+      st_3dintersects: {
+        Args: { geom1: unknown; geom2: unknown }
+        Returns: boolean
+      }
+      st_3dlength: {
+        Args: { "": unknown }
+        Returns: number
+      }
+      st_3dlongestline: {
+        Args: { geom1: unknown; geom2: unknown }
+        Returns: unknown
+      }
+      st_3dmakebox: {
+        Args: { geom1: unknown; geom2: unknown }
+        Returns: unknown
+      }
+      st_3dmaxdistance: {
+        Args: { geom1: unknown; geom2: unknown }
+        Returns: number
+      }
+      st_3dperimeter: {
+        Args: { "": unknown }
+        Returns: number
+      }
+      st_3dshortestline: {
+        Args: { geom1: unknown; geom2: unknown }
+        Returns: unknown
+      }
+      st_addpoint: {
+        Args: { geom1: unknown; geom2: unknown }
+        Returns: unknown
+      }
+      st_angle: {
+        Args:
+          | { line1: unknown; line2: unknown }
+          | { pt1: unknown; pt2: unknown; pt3: unknown; pt4?: unknown }
+        Returns: number
+      }
+      st_area: {
+        Args:
+          | { "": string }
+          | { "": unknown }
+          | { geog: unknown; use_spheroid?: boolean }
+        Returns: number
+      }
+      st_area2d: {
+        Args: { "": unknown }
+        Returns: number
+      }
+      st_asbinary: {
+        Args: { "": unknown } | { "": unknown }
+        Returns: string
+      }
+      st_asencodedpolyline: {
+        Args: { geom: unknown; nprecision?: number }
+        Returns: string
+      }
+      st_asewkb: {
+        Args: { "": unknown }
+        Returns: string
+      }
+      st_asewkt: {
+        Args: { "": string } | { "": unknown } | { "": unknown }
+        Returns: string
+      }
+      st_asgeojson: {
+        Args:
+          | { "": string }
+          | { geog: unknown; maxdecimaldigits?: number; options?: number }
+          | { geom: unknown; maxdecimaldigits?: number; options?: number }
+          | {
+              geom_column?: string
+              maxdecimaldigits?: number
+              pretty_bool?: boolean
+              r: Record<string, unknown>
+            }
+        Returns: string
+      }
+      st_asgml: {
+        Args:
+          | { "": string }
+          | {
+              geog: unknown
+              id?: string
+              maxdecimaldigits?: number
+              nprefix?: string
+              options?: number
+            }
+          | {
+              geog: unknown
+              id?: string
+              maxdecimaldigits?: number
+              nprefix?: string
+              options?: number
+              version: number
+            }
+          | {
+              geom: unknown
+              id?: string
+              maxdecimaldigits?: number
+              nprefix?: string
+              options?: number
+              version: number
+            }
+          | { geom: unknown; maxdecimaldigits?: number; options?: number }
+        Returns: string
+      }
+      st_ashexewkb: {
+        Args: { "": unknown }
+        Returns: string
+      }
+      st_askml: {
+        Args:
+          | { "": string }
+          | { geog: unknown; maxdecimaldigits?: number; nprefix?: string }
+          | { geom: unknown; maxdecimaldigits?: number; nprefix?: string }
+        Returns: string
+      }
+      st_aslatlontext: {
+        Args: { geom: unknown; tmpl?: string }
+        Returns: string
+      }
+      st_asmarc21: {
+        Args: { format?: string; geom: unknown }
+        Returns: string
+      }
+      st_asmvtgeom: {
+        Args: {
+          bounds: unknown
+          buffer?: number
+          clip_geom?: boolean
+          extent?: number
+          geom: unknown
+        }
+        Returns: unknown
+      }
+      st_assvg: {
+        Args:
+          | { "": string }
+          | { geog: unknown; maxdecimaldigits?: number; rel?: number }
+          | { geom: unknown; maxdecimaldigits?: number; rel?: number }
+        Returns: string
+      }
+      st_astext: {
+        Args: { "": string } | { "": unknown } | { "": unknown }
+        Returns: string
+      }
+      st_astwkb: {
+        Args:
+          | {
+              geom: unknown[]
+              ids: number[]
+              prec?: number
+              prec_m?: number
+              prec_z?: number
+              with_boxes?: boolean
+              with_sizes?: boolean
+            }
+          | {
+              geom: unknown
+              prec?: number
+              prec_m?: number
+              prec_z?: number
+              with_boxes?: boolean
+              with_sizes?: boolean
+            }
+        Returns: string
+      }
+      st_asx3d: {
+        Args: { geom: unknown; maxdecimaldigits?: number; options?: number }
+        Returns: string
+      }
+      st_azimuth: {
+        Args:
+          | { geog1: unknown; geog2: unknown }
+          | { geom1: unknown; geom2: unknown }
+        Returns: number
+      }
+      st_boundary: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      st_boundingdiagonal: {
+        Args: { fits?: boolean; geom: unknown }
+        Returns: unknown
+      }
+      st_buffer: {
+        Args:
+          | { geom: unknown; options?: string; radius: number }
+          | { geom: unknown; quadsegs: number; radius: number }
+        Returns: unknown
+      }
+      st_buildarea: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      st_centroid: {
+        Args: { "": string } | { "": unknown }
+        Returns: unknown
+      }
+      st_cleangeometry: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      st_clipbybox2d: {
+        Args: { box: unknown; geom: unknown }
+        Returns: unknown
+      }
+      st_closestpoint: {
+        Args: { geom1: unknown; geom2: unknown }
+        Returns: unknown
+      }
+      st_clusterintersecting: {
+        Args: { "": unknown[] }
+        Returns: unknown[]
+      }
+      st_collect: {
+        Args: { "": unknown[] } | { geom1: unknown; geom2: unknown }
+        Returns: unknown
+      }
+      st_collectionextract: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      st_collectionhomogenize: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      st_concavehull: {
+        Args: {
+          param_allow_holes?: boolean
+          param_geom: unknown
+          param_pctconvex: number
+        }
+        Returns: unknown
+      }
+      st_contains: {
+        Args: { geom1: unknown; geom2: unknown }
+        Returns: boolean
+      }
+      st_containsproperly: {
+        Args: { geom1: unknown; geom2: unknown }
+        Returns: boolean
+      }
+      st_convexhull: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      st_coorddim: {
+        Args: { geometry: unknown }
+        Returns: number
+      }
+      st_coveredby: {
+        Args:
+          | { geog1: unknown; geog2: unknown }
+          | { geom1: unknown; geom2: unknown }
+        Returns: boolean
+      }
+      st_covers: {
+        Args:
+          | { geog1: unknown; geog2: unknown }
+          | { geom1: unknown; geom2: unknown }
+        Returns: boolean
+      }
+      st_crosses: {
+        Args: { geom1: unknown; geom2: unknown }
+        Returns: boolean
+      }
+      st_curvetoline: {
+        Args: { flags?: number; geom: unknown; tol?: number; toltype?: number }
+        Returns: unknown
+      }
+      st_delaunaytriangles: {
+        Args: { flags?: number; g1: unknown; tolerance?: number }
+        Returns: unknown
+      }
+      st_difference: {
+        Args: { geom1: unknown; geom2: unknown; gridsize?: number }
+        Returns: unknown
+      }
+      st_dimension: {
+        Args: { "": unknown }
+        Returns: number
+      }
+      st_disjoint: {
+        Args: { geom1: unknown; geom2: unknown }
+        Returns: boolean
+      }
+      st_distance: {
+        Args:
+          | { geog1: unknown; geog2: unknown; use_spheroid?: boolean }
+          | { geom1: unknown; geom2: unknown }
+        Returns: number
+      }
+      st_distancesphere: {
+        Args:
+          | { geom1: unknown; geom2: unknown }
+          | { geom1: unknown; geom2: unknown; radius: number }
+        Returns: number
+      }
+      st_distancespheroid: {
+        Args: { geom1: unknown; geom2: unknown }
+        Returns: number
+      }
+      st_dump: {
+        Args: { "": unknown }
+        Returns: Database["public"]["CompositeTypes"]["geometry_dump"][]
+      }
+      st_dumppoints: {
+        Args: { "": unknown }
+        Returns: Database["public"]["CompositeTypes"]["geometry_dump"][]
+      }
+      st_dumprings: {
+        Args: { "": unknown }
+        Returns: Database["public"]["CompositeTypes"]["geometry_dump"][]
+      }
+      st_dumpsegments: {
+        Args: { "": unknown }
+        Returns: Database["public"]["CompositeTypes"]["geometry_dump"][]
+      }
+      st_dwithin: {
+        Args: {
+          geog1: unknown
+          geog2: unknown
+          tolerance: number
+          use_spheroid?: boolean
+        }
+        Returns: boolean
+      }
+      st_endpoint: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      st_envelope: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      st_equals: {
+        Args: { geom1: unknown; geom2: unknown }
+        Returns: boolean
+      }
+      st_expand: {
+        Args:
+          | { box: unknown; dx: number; dy: number }
+          | { box: unknown; dx: number; dy: number; dz?: number }
+          | { dm?: number; dx: number; dy: number; dz?: number; geom: unknown }
+        Returns: unknown
+      }
+      st_exteriorring: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      st_flipcoordinates: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      st_force2d: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      st_force3d: {
+        Args: { geom: unknown; zvalue?: number }
+        Returns: unknown
+      }
+      st_force3dm: {
+        Args: { geom: unknown; mvalue?: number }
+        Returns: unknown
+      }
+      st_force3dz: {
+        Args: { geom: unknown; zvalue?: number }
+        Returns: unknown
+      }
+      st_force4d: {
+        Args: { geom: unknown; mvalue?: number; zvalue?: number }
+        Returns: unknown
+      }
+      st_forcecollection: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      st_forcecurve: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      st_forcepolygonccw: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      st_forcepolygoncw: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      st_forcerhr: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      st_forcesfs: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      st_generatepoints: {
+        Args:
+          | { area: unknown; npoints: number }
+          | { area: unknown; npoints: number; seed: number }
+        Returns: unknown
+      }
+      st_geogfromtext: {
+        Args: { "": string }
+        Returns: unknown
+      }
+      st_geogfromwkb: {
+        Args: { "": string }
+        Returns: unknown
+      }
+      st_geographyfromtext: {
+        Args: { "": string }
+        Returns: unknown
+      }
+      st_geohash: {
+        Args:
+          | { geog: unknown; maxchars?: number }
+          | { geom: unknown; maxchars?: number }
+        Returns: string
+      }
+      st_geomcollfromtext: {
+        Args: { "": string }
+        Returns: unknown
+      }
+      st_geomcollfromwkb: {
+        Args: { "": string }
+        Returns: unknown
+      }
+      st_geometricmedian: {
+        Args: {
+          fail_if_not_converged?: boolean
+          g: unknown
+          max_iter?: number
+          tolerance?: number
+        }
+        Returns: unknown
+      }
+      st_geometryfromtext: {
+        Args: { "": string }
+        Returns: unknown
+      }
+      st_geometrytype: {
+        Args: { "": unknown }
+        Returns: string
+      }
+      st_geomfromewkb: {
+        Args: { "": string }
+        Returns: unknown
+      }
+      st_geomfromewkt: {
+        Args: { "": string }
+        Returns: unknown
+      }
+      st_geomfromgeojson: {
+        Args: { "": Json } | { "": Json } | { "": string }
+        Returns: unknown
+      }
+      st_geomfromgml: {
+        Args: { "": string }
+        Returns: unknown
+      }
+      st_geomfromkml: {
+        Args: { "": string }
+        Returns: unknown
+      }
+      st_geomfrommarc21: {
+        Args: { marc21xml: string }
+        Returns: unknown
+      }
+      st_geomfromtext: {
+        Args: { "": string }
+        Returns: unknown
+      }
+      st_geomfromtwkb: {
+        Args: { "": string }
+        Returns: unknown
+      }
+      st_geomfromwkb: {
+        Args: { "": string }
+        Returns: unknown
+      }
+      st_gmltosql: {
+        Args: { "": string }
+        Returns: unknown
+      }
+      st_hasarc: {
+        Args: { geometry: unknown }
+        Returns: boolean
+      }
+      st_hausdorffdistance: {
+        Args: { geom1: unknown; geom2: unknown }
+        Returns: number
+      }
+      st_hexagon: {
+        Args: { cell_i: number; cell_j: number; origin?: unknown; size: number }
+        Returns: unknown
+      }
+      st_hexagongrid: {
+        Args: { bounds: unknown; size: number }
+        Returns: Record<string, unknown>[]
+      }
+      st_interpolatepoint: {
+        Args: { line: unknown; point: unknown }
+        Returns: number
+      }
+      st_intersection: {
+        Args: { geom1: unknown; geom2: unknown; gridsize?: number }
+        Returns: unknown
+      }
+      st_intersects: {
+        Args:
+          | { geog1: unknown; geog2: unknown }
+          | { geom1: unknown; geom2: unknown }
+        Returns: boolean
+      }
+      st_isclosed: {
+        Args: { "": unknown }
+        Returns: boolean
+      }
+      st_iscollection: {
+        Args: { "": unknown }
+        Returns: boolean
+      }
+      st_isempty: {
+        Args: { "": unknown }
+        Returns: boolean
+      }
+      st_ispolygonccw: {
+        Args: { "": unknown }
+        Returns: boolean
+      }
+      st_ispolygoncw: {
+        Args: { "": unknown }
+        Returns: boolean
+      }
+      st_isring: {
+        Args: { "": unknown }
+        Returns: boolean
+      }
+      st_issimple: {
+        Args: { "": unknown }
+        Returns: boolean
+      }
+      st_isvalid: {
+        Args: { "": unknown }
+        Returns: boolean
+      }
+      st_isvaliddetail: {
+        Args: { flags?: number; geom: unknown }
+        Returns: Database["public"]["CompositeTypes"]["valid_detail"]
+      }
+      st_isvalidreason: {
+        Args: { "": unknown }
+        Returns: string
+      }
+      st_isvalidtrajectory: {
+        Args: { "": unknown }
+        Returns: boolean
+      }
+      st_length: {
+        Args:
+          | { "": string }
+          | { "": unknown }
+          | { geog: unknown; use_spheroid?: boolean }
+        Returns: number
+      }
+      st_length2d: {
+        Args: { "": unknown }
+        Returns: number
+      }
+      st_letters: {
+        Args: { font?: Json; letters: string }
+        Returns: unknown
+      }
+      st_linecrossingdirection: {
+        Args: { line1: unknown; line2: unknown }
+        Returns: number
+      }
+      st_linefromencodedpolyline: {
+        Args: { nprecision?: number; txtin: string }
+        Returns: unknown
+      }
+      st_linefrommultipoint: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      st_linefromtext: {
+        Args: { "": string }
+        Returns: unknown
+      }
+      st_linefromwkb: {
+        Args: { "": string }
+        Returns: unknown
+      }
+      st_linelocatepoint: {
+        Args: { geom1: unknown; geom2: unknown }
+        Returns: number
+      }
+      st_linemerge: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      st_linestringfromwkb: {
+        Args: { "": string }
+        Returns: unknown
+      }
+      st_linetocurve: {
+        Args: { geometry: unknown }
+        Returns: unknown
+      }
+      st_locatealong: {
+        Args: { geometry: unknown; leftrightoffset?: number; measure: number }
+        Returns: unknown
+      }
+      st_locatebetween: {
+        Args: {
+          frommeasure: number
+          geometry: unknown
+          leftrightoffset?: number
+          tomeasure: number
+        }
+        Returns: unknown
+      }
+      st_locatebetweenelevations: {
+        Args: { fromelevation: number; geometry: unknown; toelevation: number }
+        Returns: unknown
+      }
+      st_longestline: {
+        Args: { geom1: unknown; geom2: unknown }
+        Returns: unknown
+      }
+      st_m: {
+        Args: { "": unknown }
+        Returns: number
+      }
+      st_makebox2d: {
+        Args: { geom1: unknown; geom2: unknown }
+        Returns: unknown
+      }
+      st_makeline: {
+        Args: { "": unknown[] } | { geom1: unknown; geom2: unknown }
+        Returns: unknown
+      }
+      st_makepolygon: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      st_makevalid: {
+        Args: { "": unknown } | { geom: unknown; params: string }
+        Returns: unknown
+      }
+      st_maxdistance: {
+        Args: { geom1: unknown; geom2: unknown }
+        Returns: number
+      }
+      st_maximuminscribedcircle: {
+        Args: { "": unknown }
+        Returns: Record<string, unknown>
+      }
+      st_memsize: {
+        Args: { "": unknown }
+        Returns: number
+      }
+      st_minimumboundingcircle: {
+        Args: { inputgeom: unknown; segs_per_quarter?: number }
+        Returns: unknown
+      }
+      st_minimumboundingradius: {
+        Args: { "": unknown }
+        Returns: Record<string, unknown>
+      }
+      st_minimumclearance: {
+        Args: { "": unknown }
+        Returns: number
+      }
+      st_minimumclearanceline: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      st_mlinefromtext: {
+        Args: { "": string }
+        Returns: unknown
+      }
+      st_mlinefromwkb: {
+        Args: { "": string }
+        Returns: unknown
+      }
+      st_mpointfromtext: {
+        Args: { "": string }
+        Returns: unknown
+      }
+      st_mpointfromwkb: {
+        Args: { "": string }
+        Returns: unknown
+      }
+      st_mpolyfromtext: {
+        Args: { "": string }
+        Returns: unknown
+      }
+      st_mpolyfromwkb: {
+        Args: { "": string }
+        Returns: unknown
+      }
+      st_multi: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      st_multilinefromwkb: {
+        Args: { "": string }
+        Returns: unknown
+      }
+      st_multilinestringfromtext: {
+        Args: { "": string }
+        Returns: unknown
+      }
+      st_multipointfromtext: {
+        Args: { "": string }
+        Returns: unknown
+      }
+      st_multipointfromwkb: {
+        Args: { "": string }
+        Returns: unknown
+      }
+      st_multipolyfromwkb: {
+        Args: { "": string }
+        Returns: unknown
+      }
+      st_multipolygonfromtext: {
+        Args: { "": string }
+        Returns: unknown
+      }
+      st_ndims: {
+        Args: { "": unknown }
+        Returns: number
+      }
+      st_node: {
+        Args: { g: unknown }
+        Returns: unknown
+      }
+      st_normalize: {
+        Args: { geom: unknown }
+        Returns: unknown
+      }
+      st_npoints: {
+        Args: { "": unknown }
+        Returns: number
+      }
+      st_nrings: {
+        Args: { "": unknown }
+        Returns: number
+      }
+      st_numgeometries: {
+        Args: { "": unknown }
+        Returns: number
+      }
+      st_numinteriorring: {
+        Args: { "": unknown }
+        Returns: number
+      }
+      st_numinteriorrings: {
+        Args: { "": unknown }
+        Returns: number
+      }
+      st_numpatches: {
+        Args: { "": unknown }
+        Returns: number
+      }
+      st_numpoints: {
+        Args: { "": unknown }
+        Returns: number
+      }
+      st_offsetcurve: {
+        Args: { distance: number; line: unknown; params?: string }
+        Returns: unknown
+      }
+      st_orderingequals: {
+        Args: { geom1: unknown; geom2: unknown }
+        Returns: boolean
+      }
+      st_orientedenvelope: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      st_overlaps: {
+        Args: { geom1: unknown; geom2: unknown }
+        Returns: boolean
+      }
+      st_perimeter: {
+        Args: { "": unknown } | { geog: unknown; use_spheroid?: boolean }
+        Returns: number
+      }
+      st_perimeter2d: {
+        Args: { "": unknown }
+        Returns: number
+      }
+      st_pointfromtext: {
+        Args: { "": string }
+        Returns: unknown
+      }
+      st_pointfromwkb: {
+        Args: { "": string }
+        Returns: unknown
+      }
+      st_pointm: {
+        Args: {
+          mcoordinate: number
+          srid?: number
+          xcoordinate: number
+          ycoordinate: number
+        }
+        Returns: unknown
+      }
+      st_pointonsurface: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      st_points: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      st_pointz: {
+        Args: {
+          srid?: number
+          xcoordinate: number
+          ycoordinate: number
+          zcoordinate: number
+        }
+        Returns: unknown
+      }
+      st_pointzm: {
+        Args: {
+          mcoordinate: number
+          srid?: number
+          xcoordinate: number
+          ycoordinate: number
+          zcoordinate: number
+        }
+        Returns: unknown
+      }
+      st_polyfromtext: {
+        Args: { "": string }
+        Returns: unknown
+      }
+      st_polyfromwkb: {
+        Args: { "": string }
+        Returns: unknown
+      }
+      st_polygonfromtext: {
+        Args: { "": string }
+        Returns: unknown
+      }
+      st_polygonfromwkb: {
+        Args: { "": string }
+        Returns: unknown
+      }
+      st_polygonize: {
+        Args: { "": unknown[] }
+        Returns: unknown
+      }
+      st_project: {
+        Args: { azimuth: number; distance: number; geog: unknown }
+        Returns: unknown
+      }
+      st_quantizecoordinates: {
+        Args: {
+          g: unknown
+          prec_m?: number
+          prec_x: number
+          prec_y?: number
+          prec_z?: number
+        }
+        Returns: unknown
+      }
+      st_reduceprecision: {
+        Args: { geom: unknown; gridsize: number }
+        Returns: unknown
+      }
+      st_relate: {
+        Args: { geom1: unknown; geom2: unknown }
+        Returns: string
+      }
+      st_removerepeatedpoints: {
+        Args: { geom: unknown; tolerance?: number }
+        Returns: unknown
+      }
+      st_reverse: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      st_segmentize: {
+        Args: { geog: unknown; max_segment_length: number }
+        Returns: unknown
+      }
+      st_setsrid: {
+        Args: { geog: unknown; srid: number } | { geom: unknown; srid: number }
+        Returns: unknown
+      }
+      st_sharedpaths: {
+        Args: { geom1: unknown; geom2: unknown }
+        Returns: unknown
+      }
+      st_shiftlongitude: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      st_shortestline: {
+        Args: { geom1: unknown; geom2: unknown }
+        Returns: unknown
+      }
+      st_simplifypolygonhull: {
+        Args: { geom: unknown; is_outer?: boolean; vertex_fraction: number }
+        Returns: unknown
+      }
+      st_split: {
+        Args: { geom1: unknown; geom2: unknown }
+        Returns: unknown
+      }
+      st_square: {
+        Args: { cell_i: number; cell_j: number; origin?: unknown; size: number }
+        Returns: unknown
+      }
+      st_squaregrid: {
+        Args: { bounds: unknown; size: number }
+        Returns: Record<string, unknown>[]
+      }
+      st_srid: {
+        Args: { geog: unknown } | { geom: unknown }
+        Returns: number
+      }
+      st_startpoint: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      st_subdivide: {
+        Args: { geom: unknown; gridsize?: number; maxvertices?: number }
+        Returns: unknown[]
+      }
+      st_summary: {
+        Args: { "": unknown } | { "": unknown }
+        Returns: string
+      }
+      st_swapordinates: {
+        Args: { geom: unknown; ords: unknown }
+        Returns: unknown
+      }
+      st_symdifference: {
+        Args: { geom1: unknown; geom2: unknown; gridsize?: number }
+        Returns: unknown
+      }
+      st_symmetricdifference: {
+        Args: { geom1: unknown; geom2: unknown }
+        Returns: unknown
+      }
+      st_tileenvelope: {
+        Args: {
+          bounds?: unknown
+          margin?: number
+          x: number
+          y: number
+          zoom: number
+        }
+        Returns: unknown
+      }
+      st_touches: {
+        Args: { geom1: unknown; geom2: unknown }
+        Returns: boolean
+      }
+      st_transform: {
+        Args:
+          | { from_proj: string; geom: unknown; to_proj: string }
+          | { from_proj: string; geom: unknown; to_srid: number }
+          | { geom: unknown; to_proj: string }
+        Returns: unknown
+      }
+      st_triangulatepolygon: {
+        Args: { g1: unknown }
+        Returns: unknown
+      }
+      st_union: {
+        Args:
+          | { "": unknown[] }
+          | { geom1: unknown; geom2: unknown }
+          | { geom1: unknown; geom2: unknown; gridsize: number }
+        Returns: unknown
+      }
+      st_voronoilines: {
+        Args: { extend_to?: unknown; g1: unknown; tolerance?: number }
+        Returns: unknown
+      }
+      st_voronoipolygons: {
+        Args: { extend_to?: unknown; g1: unknown; tolerance?: number }
+        Returns: unknown
+      }
+      st_within: {
+        Args: { geom1: unknown; geom2: unknown }
+        Returns: boolean
+      }
+      st_wkbtosql: {
+        Args: { wkb: string }
+        Returns: unknown
+      }
+      st_wkttosql: {
+        Args: { "": string }
+        Returns: unknown
+      }
+      st_wrapx: {
+        Args: { geom: unknown; move: number; wrap: number }
+        Returns: unknown
+      }
+      st_x: {
+        Args: { "": unknown }
+        Returns: number
+      }
+      st_xmax: {
+        Args: { "": unknown }
+        Returns: number
+      }
+      st_xmin: {
+        Args: { "": unknown }
+        Returns: number
+      }
+      st_y: {
+        Args: { "": unknown }
+        Returns: number
+      }
+      st_ymax: {
+        Args: { "": unknown }
+        Returns: number
+      }
+      st_ymin: {
+        Args: { "": unknown }
+        Returns: number
+      }
+      st_z: {
+        Args: { "": unknown }
+        Returns: number
+      }
+      st_zmax: {
+        Args: { "": unknown }
+        Returns: number
+      }
+      st_zmflag: {
+        Args: { "": unknown }
+        Returns: number
+      }
+      st_zmin: {
+        Args: { "": unknown }
+        Returns: number
+      }
+      text: {
+        Args: { "": unknown }
+        Returns: string
+      }
+      unlockrows: {
+        Args: { "": string }
+        Returns: number
+      }
+      updategeometrysrid: {
+        Args: {
+          catalogn_name: string
+          column_name: string
+          new_srid_in: number
+          schema_name: string
+          table_name: string
+        }
+        Returns: string
       }
     }
     Enums: {
@@ -1169,6 +3598,15 @@ export type Database = {
         | "input"
         | "focus"
         | "blur"
+      journey_mode:
+        | "budget"
+        | "night_out"
+        | "family"
+        | "shopping"
+        | "business"
+        | "quick"
+        | "eco"
+        | "accessible"
       log_level: "info" | "warn" | "error" | "debug"
       log_type:
         | "click"
@@ -1186,6 +3624,14 @@ export type Database = {
         | "delivered"
         | "cancelled"
       payment_status: "pending" | "completed" | "failed" | "refunded"
+      ride_status:
+        | "requested"
+        | "accepted"
+        | "driver_arriving"
+        | "started"
+        | "completed"
+        | "cancelled"
+      service_tier: "budget" | "enhanced" | "premium" | "luxury"
       user_role:
         | "customer"
         | "restaurant"
@@ -1195,9 +3641,18 @@ export type Database = {
         | "shop"
         | "rider"
         | "driver"
+      verification_status: "pending" | "approved" | "rejected"
     }
     CompositeTypes: {
-      [_ in never]: never
+      geometry_dump: {
+        path: number[] | null
+        geom: unknown | null
+      }
+      valid_detail: {
+        valid: boolean | null
+        reason: string | null
+        location: unknown | null
+      }
     }
   }
 }
@@ -1331,6 +3786,16 @@ export const Constants = {
         "focus",
         "blur",
       ],
+      journey_mode: [
+        "budget",
+        "night_out",
+        "family",
+        "shopping",
+        "business",
+        "quick",
+        "eco",
+        "accessible",
+      ],
       log_level: ["info", "warn", "error", "debug"],
       log_type: [
         "click",
@@ -1350,6 +3815,15 @@ export const Constants = {
         "cancelled",
       ],
       payment_status: ["pending", "completed", "failed", "refunded"],
+      ride_status: [
+        "requested",
+        "accepted",
+        "driver_arriving",
+        "started",
+        "completed",
+        "cancelled",
+      ],
+      service_tier: ["budget", "enhanced", "premium", "luxury"],
       user_role: [
         "customer",
         "restaurant",
@@ -1360,6 +3834,7 @@ export const Constants = {
         "rider",
         "driver",
       ],
+      verification_status: ["pending", "approved", "rejected"],
     },
   },
 } as const
