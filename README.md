@@ -231,6 +231,99 @@ npm run build
 npm run preview  # Test production build locally
 ```
 
+## 🚀 Production Deployment
+
+### Pre-Launch Checklist
+- [ ] Environment variables configured in Lovable Cloud Secrets (not .env file)
+- [ ] PayFast credentials updated to production
+- [ ] All API keys rotated (if .env was exposed)
+- [ ] Production database backup created
+- [ ] SSL certificate verified
+- [ ] Health check endpoint tested
+- [ ] Payment flow tested with real transactions
+- [ ] Email notifications tested with real emails
+- [ ] Mobile responsiveness verified on real devices
+- [ ] PWA installation tested
+- [ ] Real-time tracking functional
+- [ ] All TypeScript strict errors resolved
+
+### Environment Variables Required
+Set these in **Lovable Cloud Secrets** (never in .env file):
+- `PAYFAST_MERCHANT_ID` (Production credentials)
+- `PAYFAST_MERCHANT_KEY` (Production credentials)
+- `PAYFAST_PASSPHRASE` (Production credentials)
+- `RESEND_API_KEY` (Email service)
+- `ENVIRONMENT=production` (Triggers production mode)
+- `GOOGLE_MAPS_API_KEY` (For geocoding)
+- `LOVABLE_API_KEY` (Auto-configured for AI features)
+
+### Deployment Process
+1. **Pre-deployment:**
+   - Complete launch checklist at `/admin/launch-checklist`
+   - Run final security scan
+   - Create database backup
+   - Verify all secrets are configured
+
+2. **Deploy:**
+   - Lovable auto-deploys to production on push
+   - Database migrations run automatically
+   - Edge functions deployed automatically
+
+3. **Post-deployment:**
+   - Verify health check: `https://your-domain.com/functions/v1/health-check`
+   - Test critical user flows:
+     - User signup & login
+     - Browse restaurants
+     - Place order
+     - Process payment
+     - Track delivery
+   - Monitor error logs for first 24 hours
+   - Check system health dashboard
+
+### Performance Targets
+- **Frontend:**
+  - First Contentful Paint < 1.5s
+  - Time to Interactive < 3s
+  - Largest Contentful Paint < 2.5s
+  
+- **Backend:**
+  - Database queries < 100ms
+  - API response times < 200ms
+  - Edge function cold start < 500ms
+
+### Reliability Targets
+- 99.9% uptime (first week)
+- Payment success rate > 95%
+- Email delivery rate > 98%
+- Zero critical security vulnerabilities
+- Zero data loss incidents
+
+### Rollback Procedure
+If critical issues occur:
+1. Go to Lovable Settings > Deployments
+2. Click "Rollback" to previous stable version
+3. Investigate issues in development environment
+4. Fix and test thoroughly
+5. Redeploy when stable
+
+### First 24 Hours Monitoring
+- [ ] Check health endpoint every 5 minutes
+- [ ] Monitor error logs in real-time
+- [ ] Watch payment success rate
+- [ ] Track email delivery rate
+- [ ] Monitor database query performance
+- [ ] Check API response times
+- [ ] Verify real-time updates working
+- [ ] Test from different locations/devices
+
+### Support Escalation
+For production issues:
+1. Check system health dashboard
+2. Review error logs in Admin > Logs
+3. Check Lovable Cloud status
+4. Contact support if needed
+
+
 ## 🎨 Design System
 
 ### Semantic Color Tokens

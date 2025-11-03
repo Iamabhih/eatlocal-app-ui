@@ -5,12 +5,15 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { CartProvider } from "@/contexts/CartContext";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
-import { ErrorBoundary } from "@/components/logging/ErrorBoundary";
+import { GlobalErrorBoundary } from "@/components/errors/GlobalErrorBoundary";
 import { NavigationLogger } from "@/components/logging/NavigationLogger";
 import { loggingService } from "@/services/loggingService";
 import { RestaurantChangeModal } from "@/components/customer/RestaurantChangeModal";
 import { QUERY_CACHE } from "@/lib/constants";
 import { logger } from "@/lib/logger";
+import { useNetworkStatus } from "@/hooks/useNetworkStatus";
+import { recoverPendingOrders } from "@/lib/orderRecovery";
+import { useEffect } from "react";
 
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
@@ -83,17 +86,28 @@ const queryClient = new QueryClient({
   },
 });
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <ErrorBoundary>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <NavigationLogger />
-        <AuthProvider>
-          <CartProvider>
-            <RestaurantChangeModal />
-            <Routes>
+function AppContent() {
+  const { isOnline } = useNetworkStatus();
+
+  useEffect(() => {
+    // Recover any pending orders on app load
+    recoverPendingOrders().then(recovered => {
+      if (recovered.length > 0) {
+        logger.log('Recovered pending orders:', recovered);
+      }
+    });
+  }, []);
+
+  return (
+    <>
+      {!isOnline && (
+        <div className="fixed top-0 left-0 right-0 bg-destructive text-destructive-foreground py-2 px-4 text-center z-50">
+          <p className="text-sm font-medium">
+            You're offline. Some features may not be available.
+          </p>
+        </div>
+      )}
+      <Routes>
               {/* Home Page */}
               <Route path="/" element={<Index />} />
 
@@ -184,12 +198,29 @@ const App = () => (
 
               {/* Catch-all route */}
               <Route path="*" element={<NotFound />} />
-            </Routes>
+      </Routes>
+    </>
+  );
+}
+
+const App = () => (
+  <QueryClientProvider client={queryClient}>
+    <GlobalErrorBoundary>
+      <Toaster />
+      <Sonner />
+      <BrowserRouter>
+        <NavigationLogger />
+        <AuthProvider>
+          <CartProvider>
+            <RestaurantChangeModal />
+            <AppContent />
           </CartProvider>
         </AuthProvider>
       </BrowserRouter>
-    </ErrorBoundary>
+    </GlobalErrorBoundary>
   </QueryClientProvider>
 );
 
 export default App;
+
+

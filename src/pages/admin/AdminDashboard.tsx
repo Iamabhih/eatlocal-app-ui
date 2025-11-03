@@ -6,6 +6,7 @@ import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 import { AdminSidebar } from '@/components/admin/AdminSidebar';
 import { useOutletContext } from 'react-router-dom';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { SystemStatus } from '@/components/admin/SystemStatus';
 
 export default function AdminDashboard() {
   const { isSuperadmin } = useOutletContext<{ isSuperadmin: boolean }>();
@@ -92,7 +93,7 @@ export default function AdminDashboard() {
                         <TableCell>
                           <Badge variant="secondary">{order.status}</Badge>
                         </TableCell>
-                        <TableCell>${Number(order.total).toFixed(2)}</TableCell>
+                        <TableCell>R{Number(order.total).toFixed(2)}</TableCell>
                         <TableCell>
                           {new Date(order.created_at).toLocaleDateString()}
                         </TableCell>
@@ -102,9 +103,13 @@ export default function AdminDashboard() {
                 </Table>
               </CardContent>
             </Card>
+
+            {/* System Status */}
+            <SystemStatus />
           </main>
         </div>
       </div>
     </SidebarProvider>
   );
 }
+
