@@ -83,11 +83,21 @@ export function useRides() {
         .from('rides')
         .insert({
           rider_id: rider.id,
-          ...rideData,
-          base_fare: 0, // Will be calculated by trigger
-          subtotal: 0, // Will be calculated by trigger
-          total: 0, // Will be calculated by trigger
-        })
+          pickup_address: rideData.pickup_address,
+          pickup_latitude: rideData.pickup_latitude,
+          pickup_longitude: rideData.pickup_longitude,
+          dropoff_address: rideData.dropoff_address,
+          dropoff_latitude: rideData.dropoff_latitude,
+          dropoff_longitude: rideData.dropoff_longitude,
+          journey_mode: rideData.journey_mode,
+          service_tier: rideData.service_tier,
+          estimated_distance_km: rideData.estimated_distance_km,
+          estimated_duration_minutes: rideData.estimated_duration_minutes,
+          special_instructions: rideData.special_instructions,
+          base_fare: 0,
+          subtotal: 0,
+          total: 0,
+        } as any)
         .select()
         .single();
 

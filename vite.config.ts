@@ -19,16 +19,29 @@ export default defineConfig(({ mode }) => ({
   optimizeDeps: {
     include: ['react', 'react-dom', '@tanstack/react-query'],
     exclude: ['@radix-ui/react-tooltip'],
-    force: true,
   },
   build: {
+    target: 'es2020',
+    minify: 'terser',
+    terserOptions: {
+      compress: {
+        drop_console: mode === 'production',
+        drop_debugger: true,
+        pure_funcs: mode === 'production' ? ['console.log', 'console.info', 'console.debug'] : []
+      }
+    },
     rollupOptions: {
       output: {
         manualChunks: {
           'react-vendor': ['react', 'react-dom'],
           'query-vendor': ['@tanstack/react-query'],
+          'ui-vendor': ['@radix-ui/react-dialog', '@radix-ui/react-dropdown-menu', '@radix-ui/react-alert-dialog'],
+          'form-vendor': ['react-hook-form', 'zod', '@hookform/resolvers'],
+          'map-vendor': ['@react-google-maps/api'],
         },
       },
     },
+    chunkSizeWarningLimit: 800,
+    sourcemap: mode !== 'production',
   },
 }));

@@ -48,6 +48,7 @@ import AdminOrders from "./pages/admin/AdminOrders";
 import AdminDeliveryPartners from "./pages/admin/AdminDeliveryPartners";
 import AdminRevenue from "./pages/admin/AdminRevenue";
 import AdminAnalytics from "./pages/admin/AdminAnalytics";
+import LaunchChecklist from "./pages/admin/LaunchChecklist";
 import AdminMarketing from "./pages/admin/AdminMarketing";
 import AdminLogs from "./pages/admin/AdminLogs";
 import { AdminLayout } from "./components/admin/AdminLayout";
@@ -178,6 +179,7 @@ const App = () => (
                 <Route path="/admin/analytics" element={<AdminAnalytics />} />
                 <Route path="/admin/marketing" element={<AdminMarketing />} />
                 <Route path="/admin/logs" element={<AdminLogs />} />
+                <Route path="/admin/launch-checklist" element={<LaunchChecklist />} />
               </Route>
 
               {/* Catch-all route */}

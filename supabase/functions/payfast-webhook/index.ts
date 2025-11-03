@@ -82,20 +82,25 @@ serve(async (req: Request) => {
       );
     }
 
+    const isProduction = Deno.env.get('ENVIRONMENT') === 'production';
     const merchantId = Deno.env.get('PAYFAST_MERCHANT_ID');
     const passphrase = Deno.env.get('PAYFAST_PASSPHRASE');
 
-    // Verify merchant ID
-    if (data.merchant_id !== merchantId) {
-      console.error('Invalid merchant ID');
-      return new Response('Invalid merchant ID', { status: 400 });
+    // CRITICAL: Always verify merchant ID
+    if (!merchantId || data.merchant_id !== merchantId) {
+      console.error('Invalid merchant ID - potential fraud attempt');
+      return new Response('Unauthorized', { status: 401 });
     }
 
-    // Validate signature (production security)
-    const isValid = await validateSignature(data, passphrase || '');
-    if (!isValid) {
-      console.error('Invalid signature');
-      return new Response('Invalid signature', { status: 400 });
+    // CRITICAL: Always validate signature in production
+    if (isProduction) {
+      const isValid = await validateSignature(data, passphrase || '');
+      if (!isValid) {
+        console.error('Invalid signature - potential fraud attempt');
+        return new Response('Invalid signature', { status: 403 });
+      }
+    } else {
+      console.warn('Running in sandbox mode - signature validation relaxed');
     }
 
     // Initialize Supabase client
@@ -105,6 +110,18 @@ serve(async (req: Request) => {
 
     const orderId = data.m_payment_id;
     const paymentStatus = data.payment_status;
+
+    // Initialize Supabase client
+    const { data: existingOrder } = await supabase
+      .from('orders')
+      .select('status')
+      .eq('id', orderId)
+      .single();
+
+    if (existingOrder && existingOrder.status !== 'pending') {
+      console.log('Order already processed, ignoring duplicate webhook');
+      return new Response('OK - Already processed', { status: 200 });
+    }
 
     console.log(`Processing payment for order ${orderId}, status: ${paymentStatus}`);
 
