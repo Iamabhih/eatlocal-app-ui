@@ -3,9 +3,9 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
-import { CartProvider } from "@/contexts/CartContext";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { GlobalErrorBoundary } from "@/components/errors/GlobalErrorBoundary";
+import { RouteErrorBoundary } from "@/components/errors/RouteErrorBoundary";
 import { NavigationLogger } from "@/components/logging/NavigationLogger";
 import { loggingService } from "@/services/loggingService";
 import { RestaurantChangeModal } from "@/components/customer/RestaurantChangeModal";
@@ -13,50 +13,64 @@ import { QUERY_CACHE } from "@/lib/constants";
 import { logger } from "@/lib/logger";
 import { useNetworkStatus } from "@/hooks/useNetworkStatus";
 import { recoverPendingOrders } from "@/lib/orderRecovery";
-import { useEffect } from "react";
+import { useEffect, lazy, Suspense } from "react";
 
+// Core pages (loaded immediately)
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 
-// Landing Pages
+// Landing Pages (loaded immediately - marketing pages)
 import CustomerLanding from "./pages/CustomerLanding";
 import RestaurantLanding from "./pages/RestaurantLanding";
 import DeliveryLanding from "./pages/DeliveryLanding";
 import ShopLanding from "./pages/ShopLanding";
 
-// Customer App
+// Customer App (loaded immediately - main user flow)
 import CustomerHome from "./pages/customer/CustomerHome";
 import RestaurantList from "./pages/customer/RestaurantList";
 import RestaurantDetail from "./pages/customer/RestaurantDetail";
 import Cart from "./pages/customer/Cart";
 import Checkout from "./pages/customer/Checkout";
 import OrderTracking from "./pages/customer/OrderTracking";
-
-// Restaurant Portal
-import RestaurantDashboard from "./pages/restaurant/RestaurantDashboard";
-import RestaurantOrders from "./pages/restaurant/RestaurantOrders";
-import RestaurantMenu from "./pages/restaurant/RestaurantMenu";
-
-// Delivery Partner Portal
-import DeliveryDashboard from "./pages/delivery/DeliveryDashboard";
-import DeliveryOrders from "./pages/delivery/DeliveryOrders";
-import DeliveryEarnings from "./pages/delivery/DeliveryEarnings";
-import { DeliveryLayout } from "./components/delivery/DeliveryLayout";
-
-// Admin Portal
-import AdminDashboard from "./pages/admin/AdminDashboard";
-import AdminUsers from "./pages/admin/AdminUsers";
-import AdminRestaurants from "./pages/admin/AdminRestaurants";
-import AdminOrders from "./pages/admin/AdminOrders";
-import AdminDeliveryPartners from "./pages/admin/AdminDeliveryPartners";
-import AdminRevenue from "./pages/admin/AdminRevenue";
-import AdminAnalytics from "./pages/admin/AdminAnalytics";
-import LaunchChecklist from "./pages/admin/LaunchChecklist";
-import AdminMarketing from "./pages/admin/AdminMarketing";
-import AdminLogs from "./pages/admin/AdminLogs";
-import { AdminLayout } from "./components/admin/AdminLayout";
-
 import NotFound from "./pages/NotFound";
+
+// Lazy-loaded: Ride-Sharing App
+const BookRide = lazy(() => import("./pages/rider/BookRide"));
+const MyRides = lazy(() => import("./pages/rider/MyRides"));
+
+// Lazy-loaded: Restaurant Portal
+const RestaurantDashboard = lazy(() => import("./pages/restaurant/RestaurantDashboard"));
+const RestaurantOrders = lazy(() => import("./pages/restaurant/RestaurantOrders"));
+const RestaurantMenu = lazy(() => import("./pages/restaurant/RestaurantMenu"));
+
+// Lazy-loaded: Delivery Partner Portal
+const DeliveryDashboard = lazy(() => import("./pages/delivery/DeliveryDashboard"));
+const DeliveryOrders = lazy(() => import("./pages/delivery/DeliveryOrders"));
+const DeliveryEarnings = lazy(() => import("./pages/delivery/DeliveryEarnings"));
+const DeliveryLayout = lazy(() => import("./components/delivery/DeliveryLayout").then(m => ({ default: m.DeliveryLayout })));
+
+// Lazy-loaded: Admin Portal
+const AdminDashboard = lazy(() => import("./pages/admin/AdminDashboard"));
+const AdminUsers = lazy(() => import("./pages/admin/AdminUsers"));
+const AdminRestaurants = lazy(() => import("./pages/admin/AdminRestaurants"));
+const AdminOrders = lazy(() => import("./pages/admin/AdminOrders"));
+const AdminDeliveryPartners = lazy(() => import("./pages/admin/AdminDeliveryPartners"));
+const AdminRevenue = lazy(() => import("./pages/admin/AdminRevenue"));
+const AdminAnalytics = lazy(() => import("./pages/admin/AdminAnalytics"));
+const LaunchChecklist = lazy(() => import("./pages/admin/LaunchChecklist"));
+const AdminMarketing = lazy(() => import("./pages/admin/AdminMarketing"));
+const AdminLogs = lazy(() => import("./pages/admin/AdminLogs"));
+const AdminLayout = lazy(() => import("./components/admin/AdminLayout").then(m => ({ default: m.AdminLayout })));
+
+// Loading component for lazy-loaded routes
+const PageLoader = () => (
+  <div className="min-h-screen flex items-center justify-center bg-background">
+    <div className="text-center">
+      <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-primary border-r-transparent"></div>
+      <p className="mt-4 text-muted-foreground">Loading...</p>
+    </div>
+  </div>
+);
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -121,79 +135,242 @@ function AppContent() {
               <Route path="/auth" element={<Auth />} />
 
               {/* Customer App Routes */}
-              <Route path="/customer" element={<CustomerHome />} />
-              <Route path="/restaurants" element={<RestaurantList />} />
-              <Route path="/restaurant/:id" element={<RestaurantDetail />} />
-              <Route path="/cart" element={<Cart />} />
-              <Route path="/checkout" element={<Checkout />} />
-              <Route path="/orders/:orderId" element={<OrderTracking />} />
+              <Route path="/customer" element={
+                <RouteErrorBoundary fallbackTitle="Customer Portal Error">
+                  <CustomerHome />
+                </RouteErrorBoundary>
+              } />
+              <Route path="/restaurants" element={
+                <RouteErrorBoundary fallbackTitle="Restaurant List Error">
+                  <RestaurantList />
+                </RouteErrorBoundary>
+              } />
+              <Route path="/restaurant/:id" element={
+                <RouteErrorBoundary fallbackTitle="Restaurant Details Error">
+                  <RestaurantDetail />
+                </RouteErrorBoundary>
+              } />
+              <Route path="/cart" element={
+                <RouteErrorBoundary fallbackTitle="Cart Error">
+                  <Cart />
+                </RouteErrorBoundary>
+              } />
+              <Route path="/checkout" element={
+                <RouteErrorBoundary fallbackTitle="Checkout Error">
+                  <Checkout />
+                </RouteErrorBoundary>
+              } />
+              <Route path="/orders/:orderId" element={
+                <RouteErrorBoundary fallbackTitle="Order Tracking Error">
+                  <OrderTracking />
+                </RouteErrorBoundary>
+              } />
+
+              {/* Ride-Sharing Routes */}
+              <Route path="/rides/book" element={
+                <RouteErrorBoundary fallbackTitle="Ride Booking Error">
+                  <Suspense fallback={<PageLoader />}>
+                    <BookRide />
+                  </Suspense>
+                </RouteErrorBoundary>
+              } />
+              <Route
+                path="/rides/my-rides"
+                element={
+                  <RouteErrorBoundary fallbackTitle="My Rides Error">
+                    <Suspense fallback={<PageLoader />}>
+                      <ProtectedRoute requiredRole="rider">
+                        <MyRides />
+                      </ProtectedRoute>
+                    </Suspense>
+                  </RouteErrorBoundary>
+                }
+              />
 
               {/* Restaurant Portal Routes */}
               <Route
                 path="/restaurant/dashboard"
                 element={
-                  <ProtectedRoute requiredRole="restaurant">
-                    <RestaurantDashboard />
-                  </ProtectedRoute>
+                  <RouteErrorBoundary fallbackTitle="Restaurant Dashboard Error">
+                    <Suspense fallback={<PageLoader />}>
+                      <ProtectedRoute requiredRole="restaurant">
+                        <RestaurantDashboard />
+                      </ProtectedRoute>
+                    </Suspense>
+                  </RouteErrorBoundary>
                 }
               />
               <Route
                 path="/restaurant/orders"
                 element={
-                  <ProtectedRoute requiredRole="restaurant">
-                    <RestaurantOrders />
-                  </ProtectedRoute>
+                  <RouteErrorBoundary fallbackTitle="Restaurant Orders Error">
+                    <Suspense fallback={<PageLoader />}>
+                      <ProtectedRoute requiredRole="restaurant">
+                        <RestaurantOrders />
+                      </ProtectedRoute>
+                    </Suspense>
+                  </RouteErrorBoundary>
                 }
               />
               <Route
                 path="/restaurant/menu"
                 element={
-                  <ProtectedRoute requiredRole="restaurant">
-                    <RestaurantMenu />
-                  </ProtectedRoute>
+                  <RouteErrorBoundary fallbackTitle="Restaurant Menu Error">
+                    <Suspense fallback={<PageLoader />}>
+                      <ProtectedRoute requiredRole="restaurant">
+                        <RestaurantMenu />
+                      </ProtectedRoute>
+                    </Suspense>
+                  </RouteErrorBoundary>
                 }
               />
 
               {/* Delivery Partner Portal Routes */}
-              <Route element={<DeliveryLayout />}>
+              <Route element={
+                <Suspense fallback={<PageLoader />}>
+                  <DeliveryLayout />
+                </Suspense>
+              }>
                 <Route
                   path="/delivery/dashboard"
                   element={
-                    <ProtectedRoute requiredRole="delivery_partner">
-                      <DeliveryDashboard />
-                    </ProtectedRoute>
+                    <RouteErrorBoundary fallbackTitle="Delivery Dashboard Error">
+                      <Suspense fallback={<PageLoader />}>
+                        <ProtectedRoute requiredRole="delivery_partner">
+                          <DeliveryDashboard />
+                        </ProtectedRoute>
+                      </Suspense>
+                    </RouteErrorBoundary>
                   }
                 />
                 <Route
                   path="/delivery/orders"
                   element={
-                    <ProtectedRoute requiredRole="delivery_partner">
-                      <DeliveryOrders />
-                    </ProtectedRoute>
+                    <RouteErrorBoundary fallbackTitle="Delivery Orders Error">
+                      <Suspense fallback={<PageLoader />}>
+                        <ProtectedRoute requiredRole="delivery_partner">
+                          <DeliveryOrders />
+                        </ProtectedRoute>
+                      </Suspense>
+                    </RouteErrorBoundary>
                   }
                 />
                 <Route
                   path="/delivery/earnings"
                   element={
-                    <ProtectedRoute requiredRole="delivery_partner">
-                      <DeliveryEarnings />
-                    </ProtectedRoute>
+                    <RouteErrorBoundary fallbackTitle="Delivery Earnings Error">
+                      <Suspense fallback={<PageLoader />}>
+                        <ProtectedRoute requiredRole="delivery_partner">
+                          <DeliveryEarnings />
+                        </ProtectedRoute>
+                      </Suspense>
+                    </RouteErrorBoundary>
                   }
                 />
               </Route>
 
-              {/* Admin Portal Routes */}
+              {/* Admin Portal Routes - Protected */}
               <Route element={<AdminLayout />}>
-                <Route path="/admin/dashboard" element={<AdminDashboard />} />
-                <Route path="/admin/users" element={<AdminUsers />} />
-                <Route path="/admin/restaurants" element={<AdminRestaurants />} />
-                <Route path="/admin/orders" element={<AdminOrders />} />
-                <Route path="/admin/delivery-partners" element={<AdminDeliveryPartners />} />
-                <Route path="/admin/revenue" element={<AdminRevenue />} />
-                <Route path="/admin/analytics" element={<AdminAnalytics />} />
-                <Route path="/admin/marketing" element={<AdminMarketing />} />
-                <Route path="/admin/logs" element={<AdminLogs />} />
-                <Route path="/admin/launch-checklist" element={<LaunchChecklist />} />
+                <Route
+                  path="/admin/dashboard"
+                  element={
+                    <RouteErrorBoundary fallbackTitle="Admin Dashboard Error">
+                      <ProtectedRoute requiredRole="admin">
+                        <AdminDashboard />
+                      </ProtectedRoute>
+                    </RouteErrorBoundary>
+                  }
+                />
+                <Route
+                  path="/admin/users"
+                  element={
+                    <RouteErrorBoundary fallbackTitle="Admin Users Error">
+                      <ProtectedRoute requiredRole="admin">
+                        <AdminUsers />
+                      </ProtectedRoute>
+                    </RouteErrorBoundary>
+                  }
+                />
+                <Route
+                  path="/admin/restaurants"
+                  element={
+                    <RouteErrorBoundary fallbackTitle="Admin Restaurants Error">
+                      <ProtectedRoute requiredRole="admin">
+                        <AdminRestaurants />
+                      </ProtectedRoute>
+                    </RouteErrorBoundary>
+                  }
+                />
+                <Route
+                  path="/admin/orders"
+                  element={
+                    <RouteErrorBoundary fallbackTitle="Admin Orders Error">
+                      <ProtectedRoute requiredRole="admin">
+                        <AdminOrders />
+                      </ProtectedRoute>
+                    </RouteErrorBoundary>
+                  }
+                />
+                <Route
+                  path="/admin/delivery-partners"
+                  element={
+                    <RouteErrorBoundary fallbackTitle="Admin Delivery Partners Error">
+                      <ProtectedRoute requiredRole="admin">
+                        <AdminDeliveryPartners />
+                      </ProtectedRoute>
+                    </RouteErrorBoundary>
+                  }
+                />
+                <Route
+                  path="/admin/revenue"
+                  element={
+                    <RouteErrorBoundary fallbackTitle="Admin Revenue Error">
+                      <ProtectedRoute requiredRole="admin">
+                        <AdminRevenue />
+                      </ProtectedRoute>
+                    </RouteErrorBoundary>
+                  }
+                />
+                <Route
+                  path="/admin/analytics"
+                  element={
+                    <RouteErrorBoundary fallbackTitle="Admin Analytics Error">
+                      <ProtectedRoute requiredRole="admin">
+                        <AdminAnalytics />
+                      </ProtectedRoute>
+                    </RouteErrorBoundary>
+                  }
+                />
+                <Route
+                  path="/admin/marketing"
+                  element={
+                    <RouteErrorBoundary fallbackTitle="Admin Marketing Error">
+                      <ProtectedRoute requiredRole="admin">
+                        <AdminMarketing />
+                      </ProtectedRoute>
+                    </RouteErrorBoundary>
+                  }
+                />
+                <Route
+                  path="/admin/logs"
+                  element={
+                    <RouteErrorBoundary fallbackTitle="Admin Logs Error">
+                      <ProtectedRoute requiredRole="admin">
+                        <AdminLogs />
+                      </ProtectedRoute>
+                    </RouteErrorBoundary>
+                  }
+                />
+                <Route
+                  path="/admin/launch-checklist"
+                  element={
+                    <RouteErrorBoundary fallbackTitle="Admin Launch Checklist Error">
+                      <ProtectedRoute requiredRole="admin">
+                        <LaunchChecklist />
+                      </ProtectedRoute>
+                    </RouteErrorBoundary>
+                  }
+                />
               </Route>
 
               {/* Catch-all route */}
@@ -211,10 +388,8 @@ const App = () => (
       <BrowserRouter>
         <NavigationLogger />
         <AuthProvider>
-          <CartProvider>
-            <RestaurantChangeModal />
-            <AppContent />
-          </CartProvider>
+          <RestaurantChangeModal />
+          <AppContent />
         </AuthProvider>
       </BrowserRouter>
     </GlobalErrorBoundary>

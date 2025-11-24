@@ -110,7 +110,7 @@ export default function BookRide() {
         {/* Left: Map */}
         <Card className="p-4">
           <LoadScript
-            googleMapsApiKey=""
+            googleMapsApiKey={import.meta.env.VITE_GOOGLE_MAPS_API_KEY || ""}
             libraries={libraries}
           >
             <GoogleMap

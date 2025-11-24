@@ -8,7 +8,9 @@ import { Separator } from "@/components/ui/separator";
 import Navbar from "@/components/shared/Navbar";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
+import { logger } from "@/lib/logger";
 import { toast } from "@/hooks/use-toast";
+import { LiveLocationMap } from "@/components/tracking/LiveLocationMap";
 
 interface Order {
   id: string;
@@ -21,6 +23,7 @@ interface Order {
   estimated_delivery_time: string | null;
   created_at: string;
   restaurant_id: string;
+  delivery_address_id: string | null;
   delivery_partner_id: string | null;
 }
 
@@ -30,6 +33,8 @@ interface Restaurant {
   street_address: string;
   city: string;
   state: string;
+  latitude: number;
+  longitude: number;
 }
 
 interface DeliveryLocation {
@@ -44,6 +49,7 @@ const OrderTracking = () => {
   const { user } = useAuth();
   const [order, setOrder] = useState<Order | null>(null);
   const [restaurant, setRestaurant] = useState<Restaurant | null>(null);
+  const [deliveryAddress, setDeliveryAddress] = useState<{ lat: number; lng: number } | null>(null);
   const [deliveryLocation, setDeliveryLocation] = useState<DeliveryLocation | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -73,14 +79,30 @@ const OrderTracking = () => {
       setOrder(orderData);
 
       // Fetch restaurant
-      const { data: restaurantData, error: restaurantError } = await supabase
+      const { data: restaurantData, error: restaurantError} = await supabase
         .from('restaurants')
-        .select('name, phone, street_address, city, state')
+        .select('name, phone, street_address, city, state, latitude, longitude')
         .eq('id', orderData.restaurant_id)
         .single();
 
       if (restaurantError) throw restaurantError;
       setRestaurant(restaurantData);
+
+      // Fetch delivery address coordinates
+      if (orderData.delivery_address_id) {
+        const { data: addressData } = await supabase
+          .from('customer_addresses')
+          .select('latitude, longitude')
+          .eq('id', orderData.delivery_address_id)
+          .single();
+
+        if (addressData && addressData.latitude && addressData.longitude) {
+          setDeliveryAddress({
+            lat: addressData.latitude,
+            lng: addressData.longitude,
+          });
+        }
+      }
 
       // Fetch delivery partner location if assigned
       if (orderData.delivery_partner_id) {
@@ -99,7 +121,7 @@ const OrderTracking = () => {
 
       setLoading(false);
     } catch (error: any) {
-      console.error('Error fetching order:', error);
+      logger.error('Error fetching order:', error);
       toast({
         title: "Error",
         description: "Failed to load order details",
@@ -124,7 +146,7 @@ const OrderTracking = () => {
           filter: `id=eq.${orderId}`,
         },
         (payload) => {
-          console.log('Order updated:', payload);
+          logger.debug('Order updated:', payload);
           setOrder(payload.new as Order);
         }
       )
@@ -142,7 +164,7 @@ const OrderTracking = () => {
           filter: `order_id=eq.${orderId}`,
         },
         (payload) => {
-          console.log('Location updated:', payload);
+          logger.debug('Location updated:', payload);
           if (payload.new) {
             setDeliveryLocation(payload.new as DeliveryLocation);
           }
@@ -306,6 +328,21 @@ const OrderTracking = () => {
             </div>
           </CardContent>
         </Card>
+
+        {/* Live Location Map */}
+        {order.delivery_partner_id && restaurant && deliveryAddress && restaurant.latitude && restaurant.longitude && (
+          <div className="mb-6">
+            <LiveLocationMap
+              orderId={order.id}
+              deliveryPartnerId={order.delivery_partner_id}
+              restaurantLocation={{
+                lat: restaurant.latitude,
+                lng: restaurant.longitude,
+              }}
+              deliveryLocation={deliveryAddress}
+            />
+          </div>
+        )}
 
         {/* Restaurant Details */}
         <Card className="mb-6">

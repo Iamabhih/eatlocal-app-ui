@@ -6,14 +6,28 @@ import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import Navbar from "@/components/shared/Navbar";
-import { useCart } from "@/contexts/CartContext";
-import { useState } from "react";
+import { useCart } from "@/hooks/useCart";
+import { useState, useEffect } from "react";
 
 const Cart = () => {
-  const { items, addItem, removeItem, updateQuantity, getCartTotal, getTotalItems } = useCart();
+  const {
+    items,
+    addItem,
+    removeItem,
+    updateQuantity,
+    getCartTotal,
+    getTotalItems,
+    getServiceFee,
+    checkExpiry,
+  } = useCart();
   const [promoCode, setPromoCode] = useState("");
   const [appliedPromo, setAppliedPromo] = useState<string | null>(null);
   const navigate = useNavigate();
+
+  // Check cart expiry on mount
+  useEffect(() => {
+    checkExpiry();
+  }, [checkExpiry]);
 
   const applyPromoCode = () => {
     if (promoCode.toLowerCase() === "save10") {
@@ -24,7 +38,7 @@ const Cart = () => {
 
   const subtotal = getCartTotal();
   const deliveryFee = 2.49;
-  const serviceFee = 1.99;
+  const serviceFee = getServiceFee();
   const discount = appliedPromo === "SAVE10" ? subtotal * 0.1 : 0;
   const total = subtotal + deliveryFee + serviceFee - discount;
   const totalItems = getTotalItems();
@@ -142,7 +156,14 @@ const Cart = () => {
                             <span className="font-medium w-8 text-center">{item.quantity}</span>
                             <Button
                               size="sm"
-                              onClick={() => addItem({ ...item })}
+                              onClick={() => addItem({
+                                menuItemId: item.menuItemId,
+                                name: item.name,
+                                price: item.price,
+                                image_url: item.image_url,
+                                restaurantId: item.restaurantId,
+                                restaurantName: item.restaurantName,
+                              })}
                               className="bg-primary hover:bg-primary/90"
                             >
                               <Plus className="h-4 w-4" />
