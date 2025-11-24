@@ -3,7 +3,6 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
-import { CartProvider } from "@/contexts/CartContext";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { GlobalErrorBoundary } from "@/components/errors/GlobalErrorBoundary";
 import { NavigationLogger } from "@/components/logging/NavigationLogger";
@@ -13,50 +12,64 @@ import { QUERY_CACHE } from "@/lib/constants";
 import { logger } from "@/lib/logger";
 import { useNetworkStatus } from "@/hooks/useNetworkStatus";
 import { recoverPendingOrders } from "@/lib/orderRecovery";
-import { useEffect } from "react";
+import { useEffect, lazy, Suspense } from "react";
 
+// Core pages (loaded immediately)
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 
-// Landing Pages
+// Landing Pages (loaded immediately - marketing pages)
 import CustomerLanding from "./pages/CustomerLanding";
 import RestaurantLanding from "./pages/RestaurantLanding";
 import DeliveryLanding from "./pages/DeliveryLanding";
 import ShopLanding from "./pages/ShopLanding";
 
-// Customer App
+// Customer App (loaded immediately - main user flow)
 import CustomerHome from "./pages/customer/CustomerHome";
 import RestaurantList from "./pages/customer/RestaurantList";
 import RestaurantDetail from "./pages/customer/RestaurantDetail";
 import Cart from "./pages/customer/Cart";
 import Checkout from "./pages/customer/Checkout";
 import OrderTracking from "./pages/customer/OrderTracking";
-
-// Restaurant Portal
-import RestaurantDashboard from "./pages/restaurant/RestaurantDashboard";
-import RestaurantOrders from "./pages/restaurant/RestaurantOrders";
-import RestaurantMenu from "./pages/restaurant/RestaurantMenu";
-
-// Delivery Partner Portal
-import DeliveryDashboard from "./pages/delivery/DeliveryDashboard";
-import DeliveryOrders from "./pages/delivery/DeliveryOrders";
-import DeliveryEarnings from "./pages/delivery/DeliveryEarnings";
-import { DeliveryLayout } from "./components/delivery/DeliveryLayout";
-
-// Admin Portal
-import AdminDashboard from "./pages/admin/AdminDashboard";
-import AdminUsers from "./pages/admin/AdminUsers";
-import AdminRestaurants from "./pages/admin/AdminRestaurants";
-import AdminOrders from "./pages/admin/AdminOrders";
-import AdminDeliveryPartners from "./pages/admin/AdminDeliveryPartners";
-import AdminRevenue from "./pages/admin/AdminRevenue";
-import AdminAnalytics from "./pages/admin/AdminAnalytics";
-import LaunchChecklist from "./pages/admin/LaunchChecklist";
-import AdminMarketing from "./pages/admin/AdminMarketing";
-import AdminLogs from "./pages/admin/AdminLogs";
-import { AdminLayout } from "./components/admin/AdminLayout";
-
 import NotFound from "./pages/NotFound";
+
+// Lazy-loaded: Ride-Sharing App
+const BookRide = lazy(() => import("./pages/rider/BookRide"));
+const MyRides = lazy(() => import("./pages/rider/MyRides"));
+
+// Lazy-loaded: Restaurant Portal
+const RestaurantDashboard = lazy(() => import("./pages/restaurant/RestaurantDashboard"));
+const RestaurantOrders = lazy(() => import("./pages/restaurant/RestaurantOrders"));
+const RestaurantMenu = lazy(() => import("./pages/restaurant/RestaurantMenu"));
+
+// Lazy-loaded: Delivery Partner Portal
+const DeliveryDashboard = lazy(() => import("./pages/delivery/DeliveryDashboard"));
+const DeliveryOrders = lazy(() => import("./pages/delivery/DeliveryOrders"));
+const DeliveryEarnings = lazy(() => import("./pages/delivery/DeliveryEarnings"));
+const DeliveryLayout = lazy(() => import("./components/delivery/DeliveryLayout").then(m => ({ default: m.DeliveryLayout })));
+
+// Lazy-loaded: Admin Portal
+const AdminDashboard = lazy(() => import("./pages/admin/AdminDashboard"));
+const AdminUsers = lazy(() => import("./pages/admin/AdminUsers"));
+const AdminRestaurants = lazy(() => import("./pages/admin/AdminRestaurants"));
+const AdminOrders = lazy(() => import("./pages/admin/AdminOrders"));
+const AdminDeliveryPartners = lazy(() => import("./pages/admin/AdminDeliveryPartners"));
+const AdminRevenue = lazy(() => import("./pages/admin/AdminRevenue"));
+const AdminAnalytics = lazy(() => import("./pages/admin/AdminAnalytics"));
+const LaunchChecklist = lazy(() => import("./pages/admin/LaunchChecklist"));
+const AdminMarketing = lazy(() => import("./pages/admin/AdminMarketing"));
+const AdminLogs = lazy(() => import("./pages/admin/AdminLogs"));
+const AdminLayout = lazy(() => import("./components/admin/AdminLayout").then(m => ({ default: m.AdminLayout })));
+
+// Loading component for lazy-loaded routes
+const PageLoader = () => (
+  <div className="min-h-screen flex items-center justify-center bg-background">
+    <div className="text-center">
+      <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-primary border-r-transparent"></div>
+      <p className="mt-4 text-muted-foreground">Loading...</p>
+    </div>
+  </div>
+);
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -128,72 +141,175 @@ function AppContent() {
               <Route path="/checkout" element={<Checkout />} />
               <Route path="/orders/:orderId" element={<OrderTracking />} />
 
+              {/* Ride-Sharing Routes */}
+              <Route path="/rides/book" element={
+                <Suspense fallback={<PageLoader />}>
+                  <BookRide />
+                </Suspense>
+              } />
+              <Route
+                path="/rides/my-rides"
+                element={
+                  <Suspense fallback={<PageLoader />}>
+                    <ProtectedRoute requiredRole="rider">
+                      <MyRides />
+                    </ProtectedRoute>
+                  </Suspense>
+                }
+              />
+
               {/* Restaurant Portal Routes */}
               <Route
                 path="/restaurant/dashboard"
                 element={
-                  <ProtectedRoute requiredRole="restaurant">
-                    <RestaurantDashboard />
-                  </ProtectedRoute>
+                  <Suspense fallback={<PageLoader />}>
+                    <ProtectedRoute requiredRole="restaurant">
+                      <RestaurantDashboard />
+                    </ProtectedRoute>
+                  </Suspense>
                 }
               />
               <Route
                 path="/restaurant/orders"
                 element={
-                  <ProtectedRoute requiredRole="restaurant">
-                    <RestaurantOrders />
-                  </ProtectedRoute>
+                  <Suspense fallback={<PageLoader />}>
+                    <ProtectedRoute requiredRole="restaurant">
+                      <RestaurantOrders />
+                    </ProtectedRoute>
+                  </Suspense>
                 }
               />
               <Route
                 path="/restaurant/menu"
                 element={
-                  <ProtectedRoute requiredRole="restaurant">
-                    <RestaurantMenu />
-                  </ProtectedRoute>
+                  <Suspense fallback={<PageLoader />}>
+                    <ProtectedRoute requiredRole="restaurant">
+                      <RestaurantMenu />
+                    </ProtectedRoute>
+                  </Suspense>
                 }
               />
 
               {/* Delivery Partner Portal Routes */}
-              <Route element={<DeliveryLayout />}>
+              <Route element={
+                <Suspense fallback={<PageLoader />}>
+                  <DeliveryLayout />
+                </Suspense>
+              }>
                 <Route
                   path="/delivery/dashboard"
                   element={
-                    <ProtectedRoute requiredRole="delivery_partner">
-                      <DeliveryDashboard />
-                    </ProtectedRoute>
+                    <Suspense fallback={<PageLoader />}>
+                      <ProtectedRoute requiredRole="delivery_partner">
+                        <DeliveryDashboard />
+                      </ProtectedRoute>
+                    </Suspense>
                   }
                 />
                 <Route
                   path="/delivery/orders"
                   element={
-                    <ProtectedRoute requiredRole="delivery_partner">
-                      <DeliveryOrders />
-                    </ProtectedRoute>
+                    <Suspense fallback={<PageLoader />}>
+                      <ProtectedRoute requiredRole="delivery_partner">
+                        <DeliveryOrders />
+                      </ProtectedRoute>
+                    </Suspense>
                   }
                 />
                 <Route
                   path="/delivery/earnings"
                   element={
-                    <ProtectedRoute requiredRole="delivery_partner">
-                      <DeliveryEarnings />
-                    </ProtectedRoute>
+                    <Suspense fallback={<PageLoader />}>
+                      <ProtectedRoute requiredRole="delivery_partner">
+                        <DeliveryEarnings />
+                      </ProtectedRoute>
+                    </Suspense>
                   }
                 />
               </Route>
 
-              {/* Admin Portal Routes */}
+              {/* Admin Portal Routes - Protected */}
               <Route element={<AdminLayout />}>
-                <Route path="/admin/dashboard" element={<AdminDashboard />} />
-                <Route path="/admin/users" element={<AdminUsers />} />
-                <Route path="/admin/restaurants" element={<AdminRestaurants />} />
-                <Route path="/admin/orders" element={<AdminOrders />} />
-                <Route path="/admin/delivery-partners" element={<AdminDeliveryPartners />} />
-                <Route path="/admin/revenue" element={<AdminRevenue />} />
-                <Route path="/admin/analytics" element={<AdminAnalytics />} />
-                <Route path="/admin/marketing" element={<AdminMarketing />} />
-                <Route path="/admin/logs" element={<AdminLogs />} />
-                <Route path="/admin/launch-checklist" element={<LaunchChecklist />} />
+                <Route
+                  path="/admin/dashboard"
+                  element={
+                    <ProtectedRoute requiredRole="admin">
+                      <AdminDashboard />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/admin/users"
+                  element={
+                    <ProtectedRoute requiredRole="admin">
+                      <AdminUsers />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/admin/restaurants"
+                  element={
+                    <ProtectedRoute requiredRole="admin">
+                      <AdminRestaurants />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/admin/orders"
+                  element={
+                    <ProtectedRoute requiredRole="admin">
+                      <AdminOrders />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/admin/delivery-partners"
+                  element={
+                    <ProtectedRoute requiredRole="admin">
+                      <AdminDeliveryPartners />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/admin/revenue"
+                  element={
+                    <ProtectedRoute requiredRole="admin">
+                      <AdminRevenue />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/admin/analytics"
+                  element={
+                    <ProtectedRoute requiredRole="admin">
+                      <AdminAnalytics />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/admin/marketing"
+                  element={
+                    <ProtectedRoute requiredRole="admin">
+                      <AdminMarketing />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/admin/logs"
+                  element={
+                    <ProtectedRoute requiredRole="admin">
+                      <AdminLogs />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/admin/launch-checklist"
+                  element={
+                    <ProtectedRoute requiredRole="admin">
+                      <LaunchChecklist />
+                    </ProtectedRoute>
+                  }
+                />
               </Route>
 
               {/* Catch-all route */}
@@ -211,10 +327,8 @@ const App = () => (
       <BrowserRouter>
         <NavigationLogger />
         <AuthProvider>
-          <CartProvider>
-            <RestaurantChangeModal />
-            <AppContent />
-          </CartProvider>
+          <RestaurantChangeModal />
+          <AppContent />
         </AuthProvider>
       </BrowserRouter>
     </GlobalErrorBoundary>

@@ -1,4 +1,3 @@
-import { useEffect, useState } from "react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -12,58 +11,41 @@ import {
 import { useCart } from "@/hooks/useCart";
 
 export function RestaurantChangeModal() {
-  const [isOpen, setIsOpen] = useState(false);
-  const [pendingAction, setPendingAction] = useState<(() => void) | null>(null);
-  const { items } = useCart();
-
-  useEffect(() => {
-    // Listen for custom event when user tries to add item from different restaurant
-    const handleRestaurantChange = (event: CustomEvent) => {
-      setPendingAction(() => event.detail.action);
-      setIsOpen(true);
-    };
-
-    window.addEventListener(
-      "restaurant-change-warning" as any,
-      handleRestaurantChange
-    );
-
-    return () => {
-      window.removeEventListener(
-        "restaurant-change-warning" as any,
-        handleRestaurantChange
-      );
-    };
-  }, []);
+  const {
+    items,
+    restaurantName,
+    showRestaurantChangeModal,
+    setShowRestaurantChangeModal,
+    confirmRestaurantChange,
+    pendingItem,
+  } = useCart();
 
   const handleConfirm = () => {
-    if (pendingAction) {
-      pendingAction();
-    }
-    setIsOpen(false);
-    setPendingAction(null);
+    confirmRestaurantChange();
   };
 
   const handleCancel = () => {
-    setIsOpen(false);
-    setPendingAction(null);
+    setShowRestaurantChangeModal(false);
   };
 
-  if (items.length === 0) return null;
+  const currentRestaurant = items.length > 0 ? restaurantName : null;
+  const newRestaurant = pendingItem?.restaurantName;
 
   return (
-    <AlertDialog open={isOpen} onOpenChange={setIsOpen}>
+    <AlertDialog open={showRestaurantChangeModal} onOpenChange={setShowRestaurantChangeModal}>
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>Change Restaurant?</AlertDialogTitle>
           <AlertDialogDescription>
-            Your cart contains items from {items[0]?.restaurantName}. Adding
-            items from a different restaurant will clear your current cart.
+            Your cart contains items from <span className="font-semibold">{currentRestaurant}</span>.
+            Adding items from <span className="font-semibold">{newRestaurant}</span> will clear your current cart.
+            <br /><br />
+            Do you want to continue?
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel onClick={handleCancel}>Cancel</AlertDialogCancel>
-          <AlertDialogAction onClick={handleConfirm}>
+          <AlertDialogAction onClick={handleConfirm} className="bg-primary hover:bg-primary/90">
             Clear Cart & Continue
           </AlertDialogAction>
         </AlertDialogFooter>

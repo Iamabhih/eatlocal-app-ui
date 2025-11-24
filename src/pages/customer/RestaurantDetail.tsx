@@ -7,14 +7,14 @@ import { Separator } from "@/components/ui/separator";
 import Navbar from "@/components/shared/Navbar";
 import { useRestaurant } from "@/hooks/useRestaurants";
 import { useRestaurantMenu } from "@/hooks/useMenuItems";
-import { useCart } from "@/contexts/CartContext";
+import { useCart } from "@/hooks/useCart";
 
 const RestaurantDetail = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { data: restaurant, isLoading: restaurantLoading } = useRestaurant(id!);
   const { data: menu = [], isLoading: menuLoading } = useRestaurantMenu(id!);
-  const { addItem, removeItem, getRestaurantItemQuantity, getCartTotal, getTotalItems } = useCart();
+  const { addItem, removeItem, getItemQuantity, getCartTotal, getTotalItems } = useCart();
 
   if (restaurantLoading || menuLoading) {
     return (
@@ -40,7 +40,6 @@ const RestaurantDetail = () => {
 
   const handleAddToCart = (menuItem: any) => {
     addItem({
-      id: `${restaurant.id}-${menuItem.id}`,
       restaurantId: restaurant.id,
       restaurantName: restaurant.name,
       menuItemId: menuItem.id,
@@ -124,7 +123,7 @@ const RestaurantDetail = () => {
                   )}
                   <div className="space-y-6">
                     {category.items.map((item) => {
-                      const quantity = getRestaurantItemQuantity(item.id);
+                      const quantity = getItemQuantity(item.id);
                       return (
                         <Card key={item.id} className="overflow-hidden hover:shadow-card transition-smooth">
                           <CardContent className="p-0">
