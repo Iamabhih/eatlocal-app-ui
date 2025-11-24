@@ -8,6 +8,7 @@ import { Separator } from "@/components/ui/separator";
 import Navbar from "@/components/shared/Navbar";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
+import { logger } from "@/lib/logger";
 import { toast } from "@/hooks/use-toast";
 
 interface Order {
@@ -99,7 +100,7 @@ const OrderTracking = () => {
 
       setLoading(false);
     } catch (error: any) {
-      console.error('Error fetching order:', error);
+      logger.error('Error fetching order:', error);
       toast({
         title: "Error",
         description: "Failed to load order details",
@@ -124,7 +125,7 @@ const OrderTracking = () => {
           filter: `id=eq.${orderId}`,
         },
         (payload) => {
-          console.log('Order updated:', payload);
+          logger.debug('Order updated:', payload);
           setOrder(payload.new as Order);
         }
       )
@@ -142,7 +143,7 @@ const OrderTracking = () => {
           filter: `order_id=eq.${orderId}`,
         },
         (payload) => {
-          console.log('Location updated:', payload);
+          logger.debug('Location updated:', payload);
           if (payload.new) {
             setDeliveryLocation(payload.new as DeliveryLocation);
           }

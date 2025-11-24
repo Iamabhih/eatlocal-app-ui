@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useEffect } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
+import { logger } from '@/lib/logger';
 
 export function useOrderTracking(orderId: string) {
   const queryClient = useQueryClient();
@@ -60,7 +61,7 @@ export function useOrderTracking(orderId: string) {
           filter: `id=eq.${orderId}`,
         },
         (payload) => {
-          console.log('Order status updated:', payload);
+          logger.debug('Order status updated:', payload);
           queryClient.invalidateQueries({ queryKey: ['order-tracking', orderId] });
         }
       )
@@ -86,7 +87,7 @@ export function useOrderTracking(orderId: string) {
           filter: `order_id=eq.${orderId}`,
         },
         (payload) => {
-          console.log('Delivery location updated:', payload);
+          logger.debug('Delivery location updated:', payload);
           queryClient.invalidateQueries({ queryKey: ['delivery-location', orderId] });
         }
       )

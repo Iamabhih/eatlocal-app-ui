@@ -1,5 +1,6 @@
 import { loggingService } from '@/services/loggingService';
 import { ENV } from './environment';
+import { logger } from './logger';
 
 export interface ErrorContext {
   component?: string;
@@ -63,9 +64,7 @@ export class ErrorReporter {
   }
 
   async reportSuccess(action: string, metadata?: Record<string, any>) {
-    if (ENV.isDevelopment) {
-      console.log(`✅ Success: ${action}`, metadata);
-    }
+    await logger.success(action, metadata);
   }
 }
 

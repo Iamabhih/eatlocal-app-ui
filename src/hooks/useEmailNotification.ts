@@ -1,5 +1,6 @@
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { logger } from "@/lib/logger";
 
 export const useEmailNotification = () => {
   const { toast } = useToast();
@@ -28,10 +29,10 @@ export const useEmailNotification = () => {
       });
 
       if (error) throw error;
-      
-      console.log('Order confirmation email sent');
+
+      logger.success('Order confirmation email sent', { orderNumber: orderData.orderNumber });
     } catch (error: any) {
-      console.error('Failed to send order confirmation email:', error);
+      logger.error('Failed to send order confirmation email:', error);
       // Don't show error to user - email failure shouldn't block order flow
     }
   };
@@ -54,10 +55,10 @@ export const useEmailNotification = () => {
       });
 
       if (error) throw error;
-      
-      console.log('Order status email sent');
+
+      logger.success('Order status email sent', { orderNumber: orderData.orderNumber });
     } catch (error: any) {
-      console.error('Failed to send order status email:', error);
+      logger.error('Failed to send order status email:', error);
     }
   };
 
@@ -83,10 +84,10 @@ export const useEmailNotification = () => {
       });
 
       if (error) throw error;
-      
-      console.log('Restaurant alert email sent');
+
+      logger.success('Restaurant alert email sent', { orderNumber: orderData.orderNumber });
     } catch (error: any) {
-      console.error('Failed to send restaurant alert email:', error);
+      logger.error('Failed to send restaurant alert email:', error);
     }
   };
 
@@ -111,10 +112,10 @@ export const useEmailNotification = () => {
       });
 
       if (error) throw error;
-      
-      console.log('Delivery assignment email sent');
+
+      logger.success('Delivery assignment email sent', { orderNumber: orderData.orderNumber });
     } catch (error: any) {
-      console.error('Failed to send delivery assignment email:', error);
+      logger.error('Failed to send delivery assignment email:', error);
     }
   };
 
