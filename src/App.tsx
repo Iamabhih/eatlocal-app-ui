@@ -5,6 +5,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { GlobalErrorBoundary } from "@/components/errors/GlobalErrorBoundary";
+import { RouteErrorBoundary } from "@/components/errors/RouteErrorBoundary";
 import { NavigationLogger } from "@/components/logging/NavigationLogger";
 import { loggingService } from "@/services/loggingService";
 import { RestaurantChangeModal } from "@/components/customer/RestaurantChangeModal";
@@ -134,27 +135,55 @@ function AppContent() {
               <Route path="/auth" element={<Auth />} />
 
               {/* Customer App Routes */}
-              <Route path="/customer" element={<CustomerHome />} />
-              <Route path="/restaurants" element={<RestaurantList />} />
-              <Route path="/restaurant/:id" element={<RestaurantDetail />} />
-              <Route path="/cart" element={<Cart />} />
-              <Route path="/checkout" element={<Checkout />} />
-              <Route path="/orders/:orderId" element={<OrderTracking />} />
+              <Route path="/customer" element={
+                <RouteErrorBoundary fallbackTitle="Customer Portal Error">
+                  <CustomerHome />
+                </RouteErrorBoundary>
+              } />
+              <Route path="/restaurants" element={
+                <RouteErrorBoundary fallbackTitle="Restaurant List Error">
+                  <RestaurantList />
+                </RouteErrorBoundary>
+              } />
+              <Route path="/restaurant/:id" element={
+                <RouteErrorBoundary fallbackTitle="Restaurant Details Error">
+                  <RestaurantDetail />
+                </RouteErrorBoundary>
+              } />
+              <Route path="/cart" element={
+                <RouteErrorBoundary fallbackTitle="Cart Error">
+                  <Cart />
+                </RouteErrorBoundary>
+              } />
+              <Route path="/checkout" element={
+                <RouteErrorBoundary fallbackTitle="Checkout Error">
+                  <Checkout />
+                </RouteErrorBoundary>
+              } />
+              <Route path="/orders/:orderId" element={
+                <RouteErrorBoundary fallbackTitle="Order Tracking Error">
+                  <OrderTracking />
+                </RouteErrorBoundary>
+              } />
 
               {/* Ride-Sharing Routes */}
               <Route path="/rides/book" element={
-                <Suspense fallback={<PageLoader />}>
-                  <BookRide />
-                </Suspense>
+                <RouteErrorBoundary fallbackTitle="Ride Booking Error">
+                  <Suspense fallback={<PageLoader />}>
+                    <BookRide />
+                  </Suspense>
+                </RouteErrorBoundary>
               } />
               <Route
                 path="/rides/my-rides"
                 element={
-                  <Suspense fallback={<PageLoader />}>
-                    <ProtectedRoute requiredRole="rider">
-                      <MyRides />
-                    </ProtectedRoute>
-                  </Suspense>
+                  <RouteErrorBoundary fallbackTitle="My Rides Error">
+                    <Suspense fallback={<PageLoader />}>
+                      <ProtectedRoute requiredRole="rider">
+                        <MyRides />
+                      </ProtectedRoute>
+                    </Suspense>
+                  </RouteErrorBoundary>
                 }
               />
 
@@ -162,31 +191,37 @@ function AppContent() {
               <Route
                 path="/restaurant/dashboard"
                 element={
-                  <Suspense fallback={<PageLoader />}>
-                    <ProtectedRoute requiredRole="restaurant">
-                      <RestaurantDashboard />
-                    </ProtectedRoute>
-                  </Suspense>
+                  <RouteErrorBoundary fallbackTitle="Restaurant Dashboard Error">
+                    <Suspense fallback={<PageLoader />}>
+                      <ProtectedRoute requiredRole="restaurant">
+                        <RestaurantDashboard />
+                      </ProtectedRoute>
+                    </Suspense>
+                  </RouteErrorBoundary>
                 }
               />
               <Route
                 path="/restaurant/orders"
                 element={
-                  <Suspense fallback={<PageLoader />}>
-                    <ProtectedRoute requiredRole="restaurant">
-                      <RestaurantOrders />
-                    </ProtectedRoute>
-                  </Suspense>
+                  <RouteErrorBoundary fallbackTitle="Restaurant Orders Error">
+                    <Suspense fallback={<PageLoader />}>
+                      <ProtectedRoute requiredRole="restaurant">
+                        <RestaurantOrders />
+                      </ProtectedRoute>
+                    </Suspense>
+                  </RouteErrorBoundary>
                 }
               />
               <Route
                 path="/restaurant/menu"
                 element={
-                  <Suspense fallback={<PageLoader />}>
-                    <ProtectedRoute requiredRole="restaurant">
-                      <RestaurantMenu />
-                    </ProtectedRoute>
-                  </Suspense>
+                  <RouteErrorBoundary fallbackTitle="Restaurant Menu Error">
+                    <Suspense fallback={<PageLoader />}>
+                      <ProtectedRoute requiredRole="restaurant">
+                        <RestaurantMenu />
+                      </ProtectedRoute>
+                    </Suspense>
+                  </RouteErrorBoundary>
                 }
               />
 
@@ -199,31 +234,37 @@ function AppContent() {
                 <Route
                   path="/delivery/dashboard"
                   element={
-                    <Suspense fallback={<PageLoader />}>
-                      <ProtectedRoute requiredRole="delivery_partner">
-                        <DeliveryDashboard />
-                      </ProtectedRoute>
-                    </Suspense>
+                    <RouteErrorBoundary fallbackTitle="Delivery Dashboard Error">
+                      <Suspense fallback={<PageLoader />}>
+                        <ProtectedRoute requiredRole="delivery_partner">
+                          <DeliveryDashboard />
+                        </ProtectedRoute>
+                      </Suspense>
+                    </RouteErrorBoundary>
                   }
                 />
                 <Route
                   path="/delivery/orders"
                   element={
-                    <Suspense fallback={<PageLoader />}>
-                      <ProtectedRoute requiredRole="delivery_partner">
-                        <DeliveryOrders />
-                      </ProtectedRoute>
-                    </Suspense>
+                    <RouteErrorBoundary fallbackTitle="Delivery Orders Error">
+                      <Suspense fallback={<PageLoader />}>
+                        <ProtectedRoute requiredRole="delivery_partner">
+                          <DeliveryOrders />
+                        </ProtectedRoute>
+                      </Suspense>
+                    </RouteErrorBoundary>
                   }
                 />
                 <Route
                   path="/delivery/earnings"
                   element={
-                    <Suspense fallback={<PageLoader />}>
-                      <ProtectedRoute requiredRole="delivery_partner">
-                        <DeliveryEarnings />
-                      </ProtectedRoute>
-                    </Suspense>
+                    <RouteErrorBoundary fallbackTitle="Delivery Earnings Error">
+                      <Suspense fallback={<PageLoader />}>
+                        <ProtectedRoute requiredRole="delivery_partner">
+                          <DeliveryEarnings />
+                        </ProtectedRoute>
+                      </Suspense>
+                    </RouteErrorBoundary>
                   }
                 />
               </Route>
@@ -233,81 +274,101 @@ function AppContent() {
                 <Route
                   path="/admin/dashboard"
                   element={
-                    <ProtectedRoute requiredRole="admin">
-                      <AdminDashboard />
-                    </ProtectedRoute>
+                    <RouteErrorBoundary fallbackTitle="Admin Dashboard Error">
+                      <ProtectedRoute requiredRole="admin">
+                        <AdminDashboard />
+                      </ProtectedRoute>
+                    </RouteErrorBoundary>
                   }
                 />
                 <Route
                   path="/admin/users"
                   element={
-                    <ProtectedRoute requiredRole="admin">
-                      <AdminUsers />
-                    </ProtectedRoute>
+                    <RouteErrorBoundary fallbackTitle="Admin Users Error">
+                      <ProtectedRoute requiredRole="admin">
+                        <AdminUsers />
+                      </ProtectedRoute>
+                    </RouteErrorBoundary>
                   }
                 />
                 <Route
                   path="/admin/restaurants"
                   element={
-                    <ProtectedRoute requiredRole="admin">
-                      <AdminRestaurants />
-                    </ProtectedRoute>
+                    <RouteErrorBoundary fallbackTitle="Admin Restaurants Error">
+                      <ProtectedRoute requiredRole="admin">
+                        <AdminRestaurants />
+                      </ProtectedRoute>
+                    </RouteErrorBoundary>
                   }
                 />
                 <Route
                   path="/admin/orders"
                   element={
-                    <ProtectedRoute requiredRole="admin">
-                      <AdminOrders />
-                    </ProtectedRoute>
+                    <RouteErrorBoundary fallbackTitle="Admin Orders Error">
+                      <ProtectedRoute requiredRole="admin">
+                        <AdminOrders />
+                      </ProtectedRoute>
+                    </RouteErrorBoundary>
                   }
                 />
                 <Route
                   path="/admin/delivery-partners"
                   element={
-                    <ProtectedRoute requiredRole="admin">
-                      <AdminDeliveryPartners />
-                    </ProtectedRoute>
+                    <RouteErrorBoundary fallbackTitle="Admin Delivery Partners Error">
+                      <ProtectedRoute requiredRole="admin">
+                        <AdminDeliveryPartners />
+                      </ProtectedRoute>
+                    </RouteErrorBoundary>
                   }
                 />
                 <Route
                   path="/admin/revenue"
                   element={
-                    <ProtectedRoute requiredRole="admin">
-                      <AdminRevenue />
-                    </ProtectedRoute>
+                    <RouteErrorBoundary fallbackTitle="Admin Revenue Error">
+                      <ProtectedRoute requiredRole="admin">
+                        <AdminRevenue />
+                      </ProtectedRoute>
+                    </RouteErrorBoundary>
                   }
                 />
                 <Route
                   path="/admin/analytics"
                   element={
-                    <ProtectedRoute requiredRole="admin">
-                      <AdminAnalytics />
-                    </ProtectedRoute>
+                    <RouteErrorBoundary fallbackTitle="Admin Analytics Error">
+                      <ProtectedRoute requiredRole="admin">
+                        <AdminAnalytics />
+                      </ProtectedRoute>
+                    </RouteErrorBoundary>
                   }
                 />
                 <Route
                   path="/admin/marketing"
                   element={
-                    <ProtectedRoute requiredRole="admin">
-                      <AdminMarketing />
-                    </ProtectedRoute>
+                    <RouteErrorBoundary fallbackTitle="Admin Marketing Error">
+                      <ProtectedRoute requiredRole="admin">
+                        <AdminMarketing />
+                      </ProtectedRoute>
+                    </RouteErrorBoundary>
                   }
                 />
                 <Route
                   path="/admin/logs"
                   element={
-                    <ProtectedRoute requiredRole="admin">
-                      <AdminLogs />
-                    </ProtectedRoute>
+                    <RouteErrorBoundary fallbackTitle="Admin Logs Error">
+                      <ProtectedRoute requiredRole="admin">
+                        <AdminLogs />
+                      </ProtectedRoute>
+                    </RouteErrorBoundary>
                   }
                 />
                 <Route
                   path="/admin/launch-checklist"
                   element={
-                    <ProtectedRoute requiredRole="admin">
-                      <LaunchChecklist />
-                    </ProtectedRoute>
+                    <RouteErrorBoundary fallbackTitle="Admin Launch Checklist Error">
+                      <ProtectedRoute requiredRole="admin">
+                        <LaunchChecklist />
+                      </ProtectedRoute>
+                    </RouteErrorBoundary>
                   }
                 />
               </Route>

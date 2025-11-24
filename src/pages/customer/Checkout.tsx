@@ -8,10 +8,11 @@
 
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Loader2, ShoppingBag, CreditCard } from "lucide-react";
+import { Loader2, ShoppingBag, CreditCard, AlertCircle, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import Navbar from "@/components/shared/Navbar";
 import { AddressSelector } from "@/components/customer/AddressSelector";
 import { FulfillmentSelector } from "@/components/checkout/FulfillmentSelector";
@@ -19,6 +20,8 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useCart } from "@/hooks/useCart";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
+import { isRestaurantOpen, isWithinDeliveryRadius, formatTime } from "@/lib/distanceUtils";
+import { logger } from "@/lib/logger";
 
 // Move to constants file in production
 const PRICING = {
@@ -33,8 +36,10 @@ const Checkout = () => {
   const [loading, setLoading] = useState(false);
   const [processingPayment, setProcessingPayment] = useState(false);
   const [selectedAddressId, setSelectedAddressId] = useState<string | null>(null);
+  const [selectedAddress, setSelectedAddress] = useState<any>(null);
   const [fulfillmentType, setFulfillmentType] = useState<"delivery" | "pickup">("delivery");
   const [restaurant, setRestaurant] = useState<any>(null);
+  const [validationErrors, setValidationErrors] = useState<string[]>([]);
 
   useEffect(() => {
     if (!user) {
@@ -56,16 +61,56 @@ const Checkout = () => {
 
     const { data, error } = await supabase
       .from("restaurants")
-      .select("id, name, minimum_order, delivery_fee")
+      .select(`
+        id,
+        name,
+        minimum_order,
+        delivery_fee,
+        is_open,
+        opening_time,
+        closing_time,
+        delivery_radius_km,
+        latitude,
+        longitude,
+        supports_pickup,
+        supports_delivery
+      `)
       .eq("id", items[0].restaurantId)
       .single();
 
     if (error) {
-      console.error("Error fetching restaurant:", error);
+      logger.error("Error fetching restaurant:", error);
+      toast({
+        title: "Error",
+        description: "Failed to load restaurant details",
+        variant: "destructive",
+      });
       return;
     }
 
     setRestaurant(data);
+  };
+
+  // Fetch selected address details when address changes
+  useEffect(() => {
+    if (selectedAddressId && fulfillmentType === "delivery") {
+      fetchAddressDetails(selectedAddressId);
+    }
+  }, [selectedAddressId, fulfillmentType]);
+
+  const fetchAddressDetails = async (addressId: string) => {
+    const { data, error } = await supabase
+      .from("customer_addresses")
+      .select("*")
+      .eq("id", addressId)
+      .single();
+
+    if (error) {
+      logger.error("Error fetching address:", error);
+      return;
+    }
+
+    setSelectedAddress(data);
   };
 
   const deliveryFee = fulfillmentType === "delivery" ? restaurant?.delivery_fee || PRICING.DELIVERY_FEE : 0;
@@ -78,8 +123,10 @@ const Checkout = () => {
     return Math.floor(1000 + Math.random() * 9000).toString();
   };
 
-  // Validation function
+  // Comprehensive validation function
   const validateOrder = () => {
+    const errors: string[] = [];
+
     // Check if user is authenticated
     if (!user) {
       toast({
@@ -110,6 +157,20 @@ const Checkout = () => {
       return false;
     }
 
+    // Validate address completeness (delivery only)
+    if (fulfillmentType === "delivery" && selectedAddress) {
+      const { street_address, city, state, zip_code, latitude, longitude } = selectedAddress;
+
+      if (!street_address || !city || !state || !zip_code) {
+        errors.push("Delivery address is incomplete. Please update your address with all required fields.");
+      }
+
+      // Check if address has coordinates for distance calculation
+      if (!latitude || !longitude) {
+        errors.push("Address coordinates are missing. Please add a new address or update the existing one.");
+      }
+    }
+
     // Validate order total is positive
     if (total <= 0) {
       toast({
@@ -130,6 +191,61 @@ const Checkout = () => {
       return false;
     }
 
+    // Check restaurant operating hours
+    if (restaurant && restaurant.opening_time && restaurant.closing_time) {
+      if (!isRestaurantOpen(restaurant.opening_time, restaurant.closing_time)) {
+        errors.push(
+          `${restaurant.name} is currently closed. Operating hours: ${formatTime(
+            restaurant.opening_time
+          )} - ${formatTime(restaurant.closing_time)}`
+        );
+      }
+    }
+
+    // Check if restaurant is marked as open
+    if (restaurant && !restaurant.is_open) {
+      errors.push(`${restaurant.name} is temporarily closed.`);
+    }
+
+    // Validate delivery radius (delivery only)
+    if (
+      fulfillmentType === "delivery" &&
+      restaurant &&
+      selectedAddress &&
+      restaurant.latitude &&
+      restaurant.longitude &&
+      selectedAddress.latitude &&
+      selectedAddress.longitude
+    ) {
+      const radiusCheck = isWithinDeliveryRadius(
+        restaurant.latitude,
+        restaurant.longitude,
+        selectedAddress.latitude,
+        selectedAddress.longitude,
+        restaurant.delivery_radius_km || 10
+      );
+
+      if (!radiusCheck.isWithinRadius) {
+        errors.push(
+          `Delivery address is ${radiusCheck.distance.toFixed(1)}km away. Maximum delivery radius is ${
+            restaurant.delivery_radius_km || 10
+          }km.`
+        );
+      }
+    }
+
+    // If there are validation errors, show them
+    if (errors.length > 0) {
+      setValidationErrors(errors);
+      toast({
+        title: "Validation Failed",
+        description: errors[0],
+        variant: "destructive",
+      });
+      return false;
+    }
+
+    setValidationErrors([]);
     return true;
   };
 
@@ -291,6 +407,47 @@ const Checkout = () => {
 
         <div className="grid md:grid-cols-3 gap-6">
           <div className="md:col-span-2 space-y-6">
+            {/* Validation Errors */}
+            {validationErrors.length > 0 && (
+              <Alert variant="destructive">
+                <AlertCircle className="h-4 w-4" />
+                <AlertDescription>
+                  <div className="font-semibold mb-2">Please resolve the following issues:</div>
+                  <ul className="list-disc list-inside space-y-1">
+                    {validationErrors.map((error, index) => (
+                      <li key={index} className="text-sm">{error}</li>
+                    ))}
+                  </ul>
+                </AlertDescription>
+              </Alert>
+            )}
+
+            {/* Restaurant Status Info */}
+            {restaurant && (
+              <Alert>
+                <Clock className="h-4 w-4" />
+                <AlertDescription className="flex items-center gap-2">
+                  {restaurant.opening_time && restaurant.closing_time && (
+                    <>
+                      <span className="font-semibold">{restaurant.name}</span>
+                      <span>•</span>
+                      <span>
+                        {isRestaurantOpen(restaurant.opening_time, restaurant.closing_time) ? (
+                          <span className="text-green-600 font-medium">Open</span>
+                        ) : (
+                          <span className="text-red-600 font-medium">Closed</span>
+                        )}
+                      </span>
+                      <span>•</span>
+                      <span className="text-sm">
+                        {formatTime(restaurant.opening_time)} - {formatTime(restaurant.closing_time)}
+                      </span>
+                    </>
+                  )}
+                </AlertDescription>
+              </Alert>
+            )}
+
             {/* Fulfillment Type */}
             <Card>
               <CardHeader>
