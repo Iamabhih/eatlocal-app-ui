@@ -1,4 +1,4 @@
-import { Search, SlidersHorizontal, Star, Clock, DollarSign, Heart, ArrowUpDown, Leaf, X } from "lucide-react";
+import { Search, SlidersHorizontal, Star, Clock, DollarSign, Heart, ArrowUpDown, Leaf, X, Sparkles, TrendingUp } from "lucide-react";
 import { useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -219,27 +219,52 @@ const RestaurantList = () => {
     <div className="min-h-screen bg-background">
       <Navbar type="customer" />
 
-      {/* Search and Filters */}
-      <section className="py-8 px-4 border-b">
-        <div className="container mx-auto">
-          <h1 className="text-3xl font-bold mb-6">Restaurants</h1>
+      {/* Hero Section */}
+      <section className="relative py-12 px-4 bg-gradient-mesh overflow-hidden">
+        {/* Decorative Elements */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="decorative-blob w-[400px] h-[400px] -top-32 -left-32 bg-primary/10" />
+          <div className="decorative-blob w-[300px] h-[300px] -bottom-16 -right-16 bg-accent/10" />
+        </div>
 
-          <div className="flex flex-col md:flex-row gap-4 mb-6">
-            {/* Search Input - searches restaurants AND dishes */}
+        <div className="container mx-auto relative z-10">
+          <div className="max-w-2xl animate-slide-up">
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10 border border-primary/20 mb-4">
+              <Sparkles className="w-3.5 h-3.5 text-primary" />
+              <span className="text-xs font-medium text-primary">Discover delicious food near you</span>
+            </div>
+            <h1 className="text-4xl md:text-5xl font-display font-bold text-foreground mb-4">
+              Explore <span className="text-gradient-primary">Restaurants</span>
+            </h1>
+            <p className="text-lg text-muted-foreground">
+              Find your favorite cuisines from top-rated local restaurants
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* Search and Filters */}
+      <section className="sticky top-16 z-40 py-4 px-4 glass-subtle border-b border-border/50">
+        <div className="container mx-auto">
+          <div className="flex flex-col lg:flex-row gap-3">
+            {/* Search Input */}
             <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+              <div className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground">
+                <Search className="h-4 w-4" />
+              </div>
               <Input
                 placeholder="Search restaurants or dishes..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10"
+                className="pl-11 pr-10"
+                variant="premium"
                 aria-label="Search restaurants or dishes"
               />
               {searchQuery && (
                 <Button
                   variant="ghost"
-                  size="sm"
-                  className="absolute right-2 top-1/2 transform -translate-y-1/2 h-6 w-6 p-0"
+                  size="icon"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 h-7 w-7"
                   onClick={() => setSearchQuery("")}
                   aria-label="Clear search"
                 >
@@ -248,201 +273,201 @@ const RestaurantList = () => {
               )}
             </div>
 
-            {/* Category Dropdown */}
-            <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-              <SelectTrigger className="w-full md:w-48" aria-label="Select category">
-                <SelectValue placeholder="Category" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Categories</SelectItem>
-                {CATEGORIES.slice(1).map((category) => (
-                  <SelectItem key={category} value={category.toLowerCase()}>
-                    {category}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <div className="flex flex-wrap gap-2">
+              {/* Category Dropdown */}
+              <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+                <SelectTrigger className="w-full sm:w-44 rounded-xl" aria-label="Select category">
+                  <SelectValue placeholder="Category" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Categories</SelectItem>
+                  {CATEGORIES.slice(1).map((category) => (
+                    <SelectItem key={category} value={category.toLowerCase()}>
+                      {category}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
 
-            {/* Sort Dropdown */}
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="outline" className="w-full md:w-auto">
-                  <ArrowUpDown className="h-4 w-4 mr-2" />
-                  Sort by
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem onClick={() => { setSortBy("rating"); setSortDirection("desc"); }}>
-                  <Star className="h-4 w-4 mr-2" /> Highest Rated
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => { setSortBy("rating"); setSortDirection("asc"); }}>
-                  <Star className="h-4 w-4 mr-2" /> Lowest Rated
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => { setSortBy("deliveryTime"); setSortDirection("asc"); }}>
-                  <Clock className="h-4 w-4 mr-2" /> Fastest Delivery
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => { setSortBy("deliveryTime"); setSortDirection("desc"); }}>
-                  <Clock className="h-4 w-4 mr-2" /> Slowest Delivery
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => { setSortBy("deliveryFee"); setSortDirection("asc"); }}>
-                  <DollarSign className="h-4 w-4 mr-2" /> Lowest Fee
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => { setSortBy("deliveryFee"); setSortDirection("desc"); }}>
-                  <DollarSign className="h-4 w-4 mr-2" /> Highest Fee
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => { setSortBy("name"); setSortDirection("asc"); }}>
-                  A-Z
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => { setSortBy("name"); setSortDirection("desc"); }}>
-                  Z-A
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-
-            {/* Filters Sheet */}
-            <Sheet>
-              <SheetTrigger asChild>
-                <Button variant="outline" className="w-full md:w-auto relative">
-                  <SlidersHorizontal className="h-4 w-4 mr-2" />
-                  Filters
-                  {activeFiltersCount > 0 && (
-                    <Badge className="ml-2 h-5 w-5 p-0 flex items-center justify-center text-xs">
-                      {activeFiltersCount}
-                    </Badge>
-                  )}
-                </Button>
-              </SheetTrigger>
-              <SheetContent className="overflow-y-auto">
-                <SheetHeader>
-                  <SheetTitle>Filter Restaurants</SheetTitle>
-                  <SheetDescription>
-                    Narrow down your search with these filters
-                  </SheetDescription>
-                </SheetHeader>
-
-                <div className="space-y-6 py-6">
-                  {/* Quick Filters */}
-                  <div className="space-y-4">
-                    <h4 className="font-medium">Quick Filters</h4>
-                    <div className="flex items-center space-x-2">
-                      <Checkbox
-                        id="openNow"
-                        checked={filters.openNow}
-                        onCheckedChange={(checked) =>
-                          setFilters(prev => ({ ...prev, openNow: checked === true }))
-                        }
-                      />
-                      <label htmlFor="openNow" className="text-sm cursor-pointer">
-                        Open Now
-                      </label>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <Checkbox
-                        id="freeDelivery"
-                        checked={filters.freeDelivery}
-                        onCheckedChange={(checked) =>
-                          setFilters(prev => ({ ...prev, freeDelivery: checked === true }))
-                        }
-                      />
-                      <label htmlFor="freeDelivery" className="text-sm cursor-pointer">
-                        Free Delivery
-                      </label>
-                    </div>
-                  </div>
-
-                  {/* Minimum Rating */}
-                  <div className="space-y-4">
-                    <h4 className="font-medium">Minimum Rating</h4>
-                    <div className="flex gap-2">
-                      {[0, 3, 3.5, 4, 4.5].map((rating) => (
-                        <Button
-                          key={rating}
-                          variant={filters.minRating === rating ? "default" : "outline"}
-                          size="sm"
-                          onClick={() => setFilters(prev => ({ ...prev, minRating: rating }))}
-                        >
-                          {rating === 0 ? "Any" : `${rating}+`}
-                          {rating > 0 && <Star className="h-3 w-3 ml-1 fill-current" />}
-                        </Button>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Delivery Fee Range */}
-                  <div className="space-y-4">
-                    <h4 className="font-medium">
-                      Delivery Fee: R{filters.priceRange[0]} - R{filters.priceRange[1]}
-                    </h4>
-                    <Slider
-                      value={filters.priceRange}
-                      onValueChange={(value) =>
-                        setFilters(prev => ({ ...prev, priceRange: value as [number, number] }))
-                      }
-                      max={100}
-                      step={5}
-                      className="w-full"
-                    />
-                  </div>
-
-                  {/* Dietary Options */}
-                  <div className="space-y-4">
-                    <h4 className="font-medium flex items-center gap-2">
-                      <Leaf className="h-4 w-4" />
-                      Dietary Options
-                    </h4>
-                    <div className="grid grid-cols-2 gap-2">
-                      {DIETARY_OPTIONS.map((option) => (
-                        <div key={option.id} className="flex items-center space-x-2">
-                          <Checkbox
-                            id={option.id}
-                            checked={filters.dietary.includes(option.id)}
-                            onCheckedChange={() => toggleDietary(option.id)}
-                          />
-                          <label htmlFor={option.id} className="text-sm cursor-pointer">
-                            {option.icon} {option.label}
-                          </label>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-
-                <SheetFooter className="gap-2">
-                  <Button variant="outline" onClick={clearFilters} className="flex-1">
-                    Clear All
+              {/* Sort Dropdown */}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="secondary" className="rounded-xl">
+                    <ArrowUpDown className="h-4 w-4 mr-2" />
+                    Sort
                   </Button>
-                  <SheetTrigger asChild>
-                    <Button className="flex-1">Apply Filters</Button>
-                  </SheetTrigger>
-                </SheetFooter>
-              </SheetContent>
-            </Sheet>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-48">
+                  <DropdownMenuItem onClick={() => { setSortBy("rating"); setSortDirection("desc"); }}>
+                    <Star className="h-4 w-4 mr-2 text-yellow-500" /> Highest Rated
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => { setSortBy("deliveryTime"); setSortDirection("asc"); }}>
+                    <Clock className="h-4 w-4 mr-2 text-primary" /> Fastest Delivery
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => { setSortBy("deliveryFee"); setSortDirection("asc"); }}>
+                    <DollarSign className="h-4 w-4 mr-2 text-emerald-500" /> Lowest Fee
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => { setSortBy("name"); setSortDirection("asc"); }}>
+                    A-Z
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
 
-            {/* Favorites Toggle */}
-            <Button
-              variant={showFavoritesOnly ? "default" : "outline"}
-              className="w-full md:w-auto"
-              onClick={() => setShowFavoritesOnly(!showFavoritesOnly)}
-            >
-              <Heart className={`h-4 w-4 mr-2 ${showFavoritesOnly ? "fill-current" : ""}`} />
-              Favorites
-              {favorites.length > 0 && (
-                <Badge variant="secondary" className="ml-2">
-                  {favorites.length}
-                </Badge>
-              )}
-            </Button>
+              {/* Filters Sheet */}
+              <Sheet>
+                <SheetTrigger asChild>
+                  <Button variant="secondary" className="rounded-xl relative">
+                    <SlidersHorizontal className="h-4 w-4 mr-2" />
+                    Filters
+                    {activeFiltersCount > 0 && (
+                      <Badge className="ml-2 h-5 w-5 p-0 flex items-center justify-center text-[10px]">
+                        {activeFiltersCount}
+                      </Badge>
+                    )}
+                  </Button>
+                </SheetTrigger>
+                <SheetContent className="overflow-y-auto">
+                  <SheetHeader>
+                    <SheetTitle className="font-display">Filter Restaurants</SheetTitle>
+                    <SheetDescription>
+                      Narrow down your search with these filters
+                    </SheetDescription>
+                  </SheetHeader>
+
+                  <div className="space-y-6 py-6">
+                    {/* Quick Filters */}
+                    <div className="space-y-4">
+                      <h4 className="font-semibold text-sm">Quick Filters</h4>
+                      <div className="space-y-3">
+                        <div className="flex items-center space-x-3 p-3 rounded-xl bg-secondary/50 hover:bg-secondary transition-colors">
+                          <Checkbox
+                            id="openNow"
+                            checked={filters.openNow}
+                            onCheckedChange={(checked) =>
+                              setFilters(prev => ({ ...prev, openNow: checked === true }))
+                            }
+                          />
+                          <label htmlFor="openNow" className="text-sm cursor-pointer flex-1">
+                            Open Now
+                          </label>
+                          <Badge variant="success" size="sm">Live</Badge>
+                        </div>
+                        <div className="flex items-center space-x-3 p-3 rounded-xl bg-secondary/50 hover:bg-secondary transition-colors">
+                          <Checkbox
+                            id="freeDelivery"
+                            checked={filters.freeDelivery}
+                            onCheckedChange={(checked) =>
+                              setFilters(prev => ({ ...prev, freeDelivery: checked === true }))
+                            }
+                          />
+                          <label htmlFor="freeDelivery" className="text-sm cursor-pointer flex-1">
+                            Free Delivery
+                          </label>
+                          <Badge variant="accent" size="sm">Save</Badge>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Minimum Rating */}
+                    <div className="space-y-4">
+                      <h4 className="font-semibold text-sm">Minimum Rating</h4>
+                      <div className="flex gap-2 flex-wrap">
+                        {[0, 3, 3.5, 4, 4.5].map((rating) => (
+                          <Button
+                            key={rating}
+                            variant={filters.minRating === rating ? "default" : "secondary"}
+                            size="sm"
+                            className="rounded-lg"
+                            onClick={() => setFilters(prev => ({ ...prev, minRating: rating }))}
+                          >
+                            {rating === 0 ? "Any" : `${rating}+`}
+                            {rating > 0 && <Star className="h-3 w-3 ml-1 fill-yellow-400 text-yellow-400" />}
+                          </Button>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Delivery Fee Range */}
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between">
+                        <h4 className="font-semibold text-sm">Delivery Fee</h4>
+                        <span className="text-sm text-muted-foreground">
+                          R{filters.priceRange[0]} - R{filters.priceRange[1]}
+                        </span>
+                      </div>
+                      <Slider
+                        value={filters.priceRange}
+                        onValueChange={(value) =>
+                          setFilters(prev => ({ ...prev, priceRange: value as [number, number] }))
+                        }
+                        max={100}
+                        step={5}
+                        className="w-full"
+                      />
+                    </div>
+
+                    {/* Dietary Options */}
+                    <div className="space-y-4">
+                      <h4 className="font-semibold text-sm flex items-center gap-2">
+                        <Leaf className="h-4 w-4 text-primary" />
+                        Dietary Options
+                      </h4>
+                      <div className="grid grid-cols-2 gap-2">
+                        {DIETARY_OPTIONS.map((option) => (
+                          <div
+                            key={option.id}
+                            onClick={() => toggleDietary(option.id)}
+                            className={`flex items-center gap-2 p-3 rounded-xl cursor-pointer transition-all ${
+                              filters.dietary.includes(option.id)
+                                ? "bg-primary/10 border-primary/30 border"
+                                : "bg-secondary/50 hover:bg-secondary border border-transparent"
+                            }`}
+                          >
+                            <span className="text-lg">{option.icon}</span>
+                            <span className="text-sm">{option.label}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+
+                  <SheetFooter className="gap-2">
+                    <Button variant="outline" onClick={clearFilters} className="flex-1 rounded-xl">
+                      Clear All
+                    </Button>
+                    <SheetTrigger asChild>
+                      <Button className="flex-1 rounded-xl">Apply Filters</Button>
+                    </SheetTrigger>
+                  </SheetFooter>
+                </SheetContent>
+              </Sheet>
+
+              {/* Favorites Toggle */}
+              <Button
+                variant={showFavoritesOnly ? "default" : "secondary"}
+                className="rounded-xl"
+                onClick={() => setShowFavoritesOnly(!showFavoritesOnly)}
+              >
+                <Heart className={`h-4 w-4 mr-2 ${showFavoritesOnly ? "fill-current" : ""}`} />
+                Favorites
+                {favorites.length > 0 && (
+                  <Badge variant="secondary" className="ml-2 bg-background/20">
+                    {favorites.length}
+                  </Badge>
+                )}
+              </Button>
+            </div>
           </div>
 
-          {/* Category Tags */}
-          <div className="flex flex-wrap gap-2">
+          {/* Category Pills */}
+          <div className="flex gap-2 overflow-x-auto pb-2 mt-4 scrollbar-hide">
             {CATEGORIES.map((category) => (
               <Badge
                 key={category}
                 variant={selectedCategory === category.toLowerCase() ? "default" : "secondary"}
-                className={`cursor-pointer transition-all ${
+                className={`cursor-pointer whitespace-nowrap px-4 py-1.5 transition-all hover:scale-105 ${
                   selectedCategory === category.toLowerCase()
-                    ? "bg-primary hover:bg-primary/90"
+                    ? "shadow-button"
                     : "hover:bg-secondary"
                 }`}
                 onClick={() => setSelectedCategory(category.toLowerCase())}
@@ -454,45 +479,45 @@ const RestaurantList = () => {
 
           {/* Active Filters Display */}
           {(activeFiltersCount > 0 || showFavoritesOnly || searchQuery) && (
-            <div className="flex flex-wrap items-center gap-2 mt-4">
-              <span className="text-sm text-muted-foreground">Active:</span>
+            <div className="flex flex-wrap items-center gap-2 mt-3 animate-fade-in">
+              <span className="text-xs text-muted-foreground">Active filters:</span>
               {searchQuery && (
-                <Badge variant="secondary" className="gap-1">
-                  Search: "{searchQuery}"
-                  <X className="h-3 w-3 cursor-pointer" onClick={() => setSearchQuery("")} />
+                <Badge variant="outline" className="gap-1 rounded-lg">
+                  "{searchQuery}"
+                  <X className="h-3 w-3 cursor-pointer hover:text-destructive" onClick={() => setSearchQuery("")} />
                 </Badge>
               )}
               {filters.openNow && (
-                <Badge variant="secondary" className="gap-1">
+                <Badge variant="outline" className="gap-1 rounded-lg">
                   Open Now
-                  <X className="h-3 w-3 cursor-pointer" onClick={() => setFilters(p => ({ ...p, openNow: false }))} />
+                  <X className="h-3 w-3 cursor-pointer hover:text-destructive" onClick={() => setFilters(p => ({ ...p, openNow: false }))} />
                 </Badge>
               )}
               {filters.freeDelivery && (
-                <Badge variant="secondary" className="gap-1">
+                <Badge variant="outline" className="gap-1 rounded-lg">
                   Free Delivery
-                  <X className="h-3 w-3 cursor-pointer" onClick={() => setFilters(p => ({ ...p, freeDelivery: false }))} />
+                  <X className="h-3 w-3 cursor-pointer hover:text-destructive" onClick={() => setFilters(p => ({ ...p, freeDelivery: false }))} />
                 </Badge>
               )}
               {filters.minRating > 0 && (
-                <Badge variant="secondary" className="gap-1">
+                <Badge variant="outline" className="gap-1 rounded-lg">
                   {filters.minRating}+ Stars
-                  <X className="h-3 w-3 cursor-pointer" onClick={() => setFilters(p => ({ ...p, minRating: 0 }))} />
+                  <X className="h-3 w-3 cursor-pointer hover:text-destructive" onClick={() => setFilters(p => ({ ...p, minRating: 0 }))} />
                 </Badge>
               )}
               {filters.dietary.map(d => (
-                <Badge key={d} variant="secondary" className="gap-1">
+                <Badge key={d} variant="outline" className="gap-1 rounded-lg">
                   {DIETARY_OPTIONS.find(o => o.id === d)?.label}
-                  <X className="h-3 w-3 cursor-pointer" onClick={() => toggleDietary(d)} />
+                  <X className="h-3 w-3 cursor-pointer hover:text-destructive" onClick={() => toggleDietary(d)} />
                 </Badge>
               ))}
               {showFavoritesOnly && (
-                <Badge variant="secondary" className="gap-1">
+                <Badge variant="outline" className="gap-1 rounded-lg">
                   Favorites Only
-                  <X className="h-3 w-3 cursor-pointer" onClick={() => setShowFavoritesOnly(false)} />
+                  <X className="h-3 w-3 cursor-pointer hover:text-destructive" onClick={() => setShowFavoritesOnly(false)} />
                 </Badge>
               )}
-              <Button variant="ghost" size="sm" onClick={clearFilters}>
+              <Button variant="ghost" size="sm" onClick={clearFilters} className="text-xs h-7">
                 Clear All
               </Button>
             </div>
@@ -504,66 +529,74 @@ const RestaurantList = () => {
       <section className="py-8 px-4">
         <div className="container mx-auto">
           <div className="flex items-center justify-between mb-6">
-            <p className="text-muted-foreground">
-              {sortedRestaurants.length} restaurant{sortedRestaurants.length !== 1 ? "s" : ""} found
-              {searchQuery && ` for "${searchQuery}"`}
-            </p>
             <p className="text-sm text-muted-foreground">
-              Sorted by: {sortBy === "rating" ? "Rating" : sortBy === "deliveryTime" ? "Delivery Time" : sortBy === "deliveryFee" ? "Delivery Fee" : "Name"}
-              ({sortDirection === "asc" ? "↑" : "↓"})
+              <span className="font-semibold text-foreground">{sortedRestaurants.length}</span> restaurant{sortedRestaurants.length !== 1 ? "s" : ""} found
+              {searchQuery && <span className="text-primary"> for "{searchQuery}"</span>}
+            </p>
+            <p className="text-xs text-muted-foreground hidden sm:block">
+              Sorted by {sortBy === "rating" ? "Rating" : sortBy === "deliveryTime" ? "Delivery Time" : sortBy === "deliveryFee" ? "Delivery Fee" : "Name"}
+              <span className="ml-1">{sortDirection === "asc" ? "↑" : "↓"}</span>
             </p>
           </div>
 
           {isLoading ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               {[...Array(8)].map((_, i) => (
-                <div key={i} className="space-y-3">
-                  <Skeleton className="h-48 w-full rounded-lg" />
-                  <Skeleton className="h-4 w-3/4" />
-                  <Skeleton className="h-4 w-1/2" />
+                <div key={i} className="space-y-3 animate-pulse">
+                  <Skeleton className="aspect-[16/10] w-full rounded-xl" />
+                  <Skeleton className="h-5 w-3/4 rounded-lg" />
+                  <Skeleton className="h-4 w-1/2 rounded-lg" />
                   <div className="flex gap-2">
-                    <Skeleton className="h-6 w-16" />
-                    <Skeleton className="h-6 w-16" />
+                    <Skeleton className="h-6 w-16 rounded-full" />
+                    <Skeleton className="h-6 w-16 rounded-full" />
                   </div>
                 </div>
               ))}
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {sortedRestaurants.map((restaurant) => (
-                <RestaurantCard
+              {sortedRestaurants.map((restaurant, index) => (
+                <div
                   key={restaurant.id}
-                  id={restaurant.id}
-                  name={restaurant.name}
-                  image={restaurant.image}
-                  rating={restaurant.rating}
-                  deliveryTime={`${restaurant.deliveryTime} min`}
-                  deliveryFee={`R${restaurant.deliveryFee.toFixed(2)}`}
-                  categories={restaurant.categories}
-                  isOpen={restaurant.isOpen}
-                  isFavorite={isFavorite(restaurant.id)}
-                  onFavoriteToggle={() => toggleFavorite(restaurant.id)}
-                  matchedDish={
-                    searchQuery && restaurant.menuItems?.find(m =>
-                      m.name.toLowerCase().includes(searchQuery.toLowerCase())
-                    )?.name
-                  }
-                />
+                  className="animate-slide-up"
+                  style={{ animationDelay: `${index * 50}ms` }}
+                >
+                  <RestaurantCard
+                    id={restaurant.id}
+                    name={restaurant.name}
+                    image={restaurant.image}
+                    rating={restaurant.rating}
+                    deliveryTime={`${restaurant.deliveryTime} min`}
+                    deliveryFee={`R${restaurant.deliveryFee.toFixed(2)}`}
+                    categories={restaurant.categories}
+                    isOpen={restaurant.isOpen}
+                    isFavorite={isFavorite(restaurant.id)}
+                    onFavoriteToggle={() => toggleFavorite(restaurant.id)}
+                    trending={index < 3}
+                    matchedDish={
+                      searchQuery && restaurant.menuItems?.find(m =>
+                        m.name.toLowerCase().includes(searchQuery.toLowerCase())
+                      )?.name
+                    }
+                  />
+                </div>
               ))}
             </div>
           )}
 
           {sortedRestaurants.length === 0 && !isLoading && (
-            <div className="text-center py-12">
-              <div className="text-6xl mb-4">🔍</div>
-              <h3 className="text-2xl font-bold mb-2">No restaurants found</h3>
-              <p className="text-muted-foreground mb-4">
+            <div className="text-center py-16 animate-fade-in">
+              <div className="w-24 h-24 rounded-full bg-secondary/50 flex items-center justify-center mx-auto mb-6">
+                <Search className="w-10 h-10 text-muted-foreground" />
+              </div>
+              <h3 className="text-2xl font-display font-bold mb-2">No restaurants found</h3>
+              <p className="text-muted-foreground mb-6 max-w-md mx-auto">
                 {searchQuery
                   ? `No restaurants or dishes match "${searchQuery}"`
                   : "Try adjusting your filters to find what you're looking for."
                 }
               </p>
-              <Button onClick={clearFilters} variant="outline">
+              <Button onClick={clearFilters} variant="outline" className="rounded-xl">
                 Clear All Filters
               </Button>
             </div>
