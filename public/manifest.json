@@ -1,7 +1,7 @@
 {
-  "name": "EatLocal - Food Delivery Platform",
-  "short_name": "EatLocal",
-  "description": "Order from local restaurants with transparent fees and real-time tracking",
+  "name": "Smash - Food Delivery Platform",
+  "short_name": "Smash",
+  "description": "Smash your cravings with lightning-fast delivery from local restaurants",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",

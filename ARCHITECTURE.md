@@ -1,8 +1,8 @@
-# EatLocal Platform Architecture
+# Smash Platform Architecture
 
 ## System Overview
 
-EatLocal is a multi-role food delivery platform built with a modern stack emphasizing transparency, real-time capabilities, and scalability.
+Smash is a multi-role food delivery platform built with a modern stack emphasizing transparency, real-time capabilities, and scalability.
 
 ## High-Level Architecture
 

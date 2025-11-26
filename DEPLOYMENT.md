@@ -1,6 +1,6 @@
-# EatLocal Deployment Guide
+# Smash Deployment Guide
 
-Complete guide for deploying the EatLocal food delivery platform to production.
+Complete guide for deploying the Smash food delivery platform to production.
 
 ## Table of Contents
 - [Prerequisites](#prerequisites)
@@ -47,7 +47,7 @@ Complete guide for deploying the EatLocal food delivery platform to production.
 ### 1. Clone Repository
 ```bash
 git clone <your-repository-url>
-cd eatlocal-app-ui
+cd smash-app-ui
 ```
 
 ### 2. Install Dependencies
@@ -289,7 +289,7 @@ netlify deploy --prod
 server {
     listen 80;
     server_name your-domain.com;
-    root /var/www/eatlocal/dist;
+    root /var/www/smash/dist;
     index index.html;
 
     location / {
@@ -313,7 +313,7 @@ server {
 npm run build
 
 # Copy to server
-scp -r dist/* user@server:/var/www/eatlocal/dist/
+scp -r dist/* user@server:/var/www/smash/dist/
 
 # Restart Nginx
 sudo systemctl restart nginx
