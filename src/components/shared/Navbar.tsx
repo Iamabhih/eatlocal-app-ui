@@ -39,10 +39,10 @@ const Navbar = ({ type = "customer" }: NavbarProps) => {
           <div className="flex h-16 items-center justify-between">
             <Link to="/restaurant/dashboard" className="flex items-center gap-2">
               <div className="w-10 h-10 rounded-xl bg-gradient-secondary flex items-center justify-center shadow-sm">
-                <span className="text-white font-bold text-lg">E</span>
+                <span className="text-white font-bold text-lg">S</span>
               </div>
               <span className="text-xl font-display font-bold text-foreground hidden sm:block">
-                EatLocal <span className="text-accent font-normal text-sm">Restaurant</span>
+                Smash <span className="text-accent font-normal text-sm">Restaurant</span>
               </span>
             </Link>
             <div className="flex items-center gap-2">
@@ -103,10 +103,10 @@ const Navbar = ({ type = "customer" }: NavbarProps) => {
           <div className="flex h-16 items-center justify-between">
             <Link to="/delivery/dashboard" className="flex items-center gap-2">
               <div className="w-10 h-10 rounded-xl bg-gradient-dark flex items-center justify-center shadow-sm">
-                <span className="text-white font-bold text-lg">E</span>
+                <span className="text-white font-bold text-lg">S</span>
               </div>
               <span className="text-xl font-display font-bold text-foreground hidden sm:block">
-                EatLocal <span className="text-muted-foreground font-normal text-sm">Driver</span>
+                Smash <span className="text-muted-foreground font-normal text-sm">Driver</span>
               </span>
             </Link>
             <div className="flex items-center gap-2">
@@ -168,10 +168,10 @@ const Navbar = ({ type = "customer" }: NavbarProps) => {
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2 flex-shrink-0">
             <div className="w-10 h-10 rounded-xl bg-gradient-primary flex items-center justify-center shadow-button">
-              <span className="text-white font-bold text-lg">E</span>
+              <span className="text-white font-bold text-lg">S</span>
             </div>
             <span className="text-xl font-display font-bold text-gradient-primary hidden sm:block">
-              EatLocal
+              Smash
             </span>
           </Link>
 

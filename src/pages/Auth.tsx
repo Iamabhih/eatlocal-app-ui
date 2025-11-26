@@ -313,7 +313,7 @@ export default function Auth() {
 
       {/* Brand watermark */}
       <div className="absolute bottom-6 left-1/2 -translate-x-1/2 text-sm text-muted-foreground/50">
-        <span className="font-display font-bold text-gradient-primary">EatLocal</span>
+        <span className="font-display font-bold text-gradient-primary">Smash</span>
       </div>
     </div>
   );

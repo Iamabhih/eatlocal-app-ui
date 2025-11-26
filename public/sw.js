@@ -1,8 +1,8 @@
-// EatLocal Service Worker v4 - Production Ready with Caching
-const CACHE_NAME = 'eatlocal-v4';
-const STATIC_CACHE = 'eatlocal-static-v4';
-const DYNAMIC_CACHE = 'eatlocal-dynamic-v4';
-const IMAGE_CACHE = 'eatlocal-images-v4';
+// Smash Service Worker v4 - Production Ready with Caching
+const CACHE_NAME = 'smash-v4';
+const STATIC_CACHE = 'smash-static-v4';
+const DYNAMIC_CACHE = 'smash-dynamic-v4';
+const IMAGE_CACHE = 'smash-images-v4';
 
 // Assets to cache immediately on install
 const STATIC_ASSETS = [
@@ -90,7 +90,7 @@ self.addEventListener('activate', (event) => {
         return Promise.all(
           cacheNames
             .filter((cacheName) => {
-              return cacheName.startsWith('eatlocal-') &&
+              return cacheName.startsWith('smash-') &&
                      cacheName !== STATIC_CACHE &&
                      cacheName !== DYNAMIC_CACHE &&
                      cacheName !== IMAGE_CACHE;
@@ -159,7 +159,7 @@ self.addEventListener('fetch', (event) => {
 self.addEventListener('push', (event) => {
   console.log('[SW] Push notification received');
 
-  let data = { title: 'EatLocal', body: 'You have a new notification' };
+  let data = { title: 'Smash', body: 'You have a new notification' };
 
   if (event.data) {
     try {
@@ -182,7 +182,7 @@ self.addEventListener('push', (event) => {
       { action: 'view', title: 'View' },
       { action: 'dismiss', title: 'Dismiss' },
     ],
-    tag: data.tag || 'eatlocal-notification',
+    tag: data.tag || 'smash-notification',
     renotify: true,
   };
 

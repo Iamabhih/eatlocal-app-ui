@@ -13,7 +13,7 @@ const sendEmail = async (to: string, subject: string, html: string) => {
       "Authorization": `Bearer ${RESEND_API_KEY}`,
     },
     body: JSON.stringify({
-      from: "EatLocal <orders@eatlocal.app>",
+      from: "Smash <orders@smash.delivery>",
       to: [to],
       subject,
       html,
@@ -89,8 +89,8 @@ const getEmailTemplate = (type: string, data: any): string => {
           
           <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #ddd;">
             <p style="color: #666; font-size: 12px;">
-              Thank you for choosing EatLocal!<br>
-              Questions? Contact us at support@eatlocal.app
+              Thank you for choosing Smash!<br>
+              Questions? Contact us at support@smash.delivery
             </p>
           </div>
         </div>

@@ -222,7 +222,7 @@ export const useCart = create<CartState>()(
       },
     }),
     {
-      name: 'eatlocal-cart-storage',
+      name: 'smash-cart-storage',
       version: 2, // Increment version to force migration from old storage
     }
   )

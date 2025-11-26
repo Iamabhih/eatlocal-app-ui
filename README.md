@@ -1,8 +1,8 @@
-# EatLocal - Multi-Role Food Delivery Platform
+# Smash - Multi-Role Food Delivery Platform
 
 ## 🚀 Overview
 
-EatLocal is a comprehensive food delivery platform that connects customers, restaurants, and delivery partners in a transparent and efficient ecosystem. Built with modern web technologies, it provides a seamless experience for all stakeholders while maintaining full transparency on fees and earnings.
+Smash is a comprehensive food delivery platform that connects customers, restaurants, and delivery partners in a transparent and efficient ecosystem. Built with modern web technologies, it provides a seamless experience for all stakeholders while maintaining full transparency on fees and earnings.
 
 ## 🎯 Business Model
 
@@ -199,7 +199,7 @@ cleanup_old_logs() - Automated log retention (90 days)
 1. **Clone the repository:**
 ```bash
 git clone <your-repo-url>
-cd eatlocal-app-ui
+cd smash-app-ui
 ```
 
 2. **Install dependencies:**
@@ -569,7 +569,7 @@ All database operations use Supabase client with:
 ## 📞 Support
 
 For questions or support:
-- **Email**: support@eatlocal.app
+- **Email**: support@smash.delivery
 - **Documentation**: /docs
 - **FAQ**: /help
 
@@ -613,4 +613,4 @@ Proprietary software. All rights reserved.
 
 **Built with ❤️ using Lovable**
 
-For more information: https://eatlocal.app
+For more information: https://smash.app
