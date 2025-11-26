@@ -34,6 +34,9 @@ import Checkout from "./pages/customer/Checkout";
 import OrderTracking from "./pages/customer/OrderTracking";
 import NotFound from "./pages/NotFound";
 
+// Portal Layouts
+import { CustomerLayout } from "./components/customer/CustomerLayout";
+
 // Lazy-loaded: Customer Account Pages
 const OrderHistory = lazy(() => import("./pages/customer/OrderHistory"));
 const Profile = lazy(() => import("./pages/customer/Profile"));
@@ -44,15 +47,16 @@ const BookRide = lazy(() => import("./pages/rider/BookRide"));
 const MyRides = lazy(() => import("./pages/rider/MyRides"));
 
 // Lazy-loaded: Restaurant Portal
+const RestaurantPortalLayout = lazy(() => import("./components/restaurant/RestaurantPortalLayout"));
 const RestaurantDashboard = lazy(() => import("./pages/restaurant/RestaurantDashboard"));
 const RestaurantOrders = lazy(() => import("./pages/restaurant/RestaurantOrders"));
 const RestaurantMenu = lazy(() => import("./pages/restaurant/RestaurantMenu"));
 
 // Lazy-loaded: Delivery Partner Portal
+const DeliveryPortalLayout = lazy(() => import("./components/delivery/DeliveryPortalLayout"));
 const DeliveryDashboard = lazy(() => import("./pages/delivery/DeliveryDashboard"));
 const DeliveryOrders = lazy(() => import("./pages/delivery/DeliveryOrders"));
 const DeliveryEarnings = lazy(() => import("./pages/delivery/DeliveryEarnings"));
-const DeliveryLayout = lazy(() => import("./components/delivery/DeliveryLayout").then(m => ({ default: m.DeliveryLayout })));
 
 // Lazy-loaded: Admin Portal
 const AdminDashboard = lazy(() => import("./pages/admin/AdminDashboard"));
@@ -82,17 +86,13 @@ const queryClient = new QueryClient({
     queries: {
       retry: 1,
       refetchOnWindowFocus: false,
-      staleTime: QUERY_CACHE.STALE_TIME, // 5 minutes
-      gcTime: QUERY_CACHE.GC_TIME, // 10 minutes (renamed from cacheTime in React Query v5)
+      staleTime: QUERY_CACHE.STALE_TIME,
+      gcTime: QUERY_CACHE.GC_TIME,
     },
     mutations: {
       onError: (error: unknown) => {
         const errorMessage = error instanceof Error ? error.message : String(error);
-
-        // Log to console
         logger.error("Mutation error:", error);
-
-        // Log to service
         loggingService.logApiCall({
           endpoint: "Mutation",
           method: "POST",
@@ -109,7 +109,6 @@ function AppContent() {
   const { isOnline } = useNetworkStatus();
 
   useEffect(() => {
-    // Recover any pending orders on app load
     recoverPendingOrders().then(recovered => {
       if (recovered.length > 0) {
         logger.log('Recovered pending orders:', recovered);
@@ -127,284 +126,291 @@ function AppContent() {
         </div>
       )}
       <Routes>
-              {/* Home Page */}
-              <Route path="/" element={<Index />} />
+        {/* ============================================ */}
+        {/* PUBLIC ROUTES - Marketing & Landing Pages */}
+        {/* ============================================ */}
+        <Route path="/" element={<Index />} />
+        <Route path="/customer-info" element={<CustomerLanding />} />
+        <Route path="/restaurant-info" element={<RestaurantLanding />} />
+        <Route path="/shop-info" element={<ShopLanding />} />
+        <Route path="/delivery-info" element={<DeliveryLanding />} />
+        <Route path="/auth" element={<Auth />} />
 
-              {/* Landing Pages */}
-              <Route path="/customer-info" element={<CustomerLanding />} />
-              <Route path="/restaurant-info" element={<RestaurantLanding />} />
-              <Route path="/shop-info" element={<ShopLanding />} />
-              <Route path="/delivery-info" element={<DeliveryLanding />} />
+        {/* ============================================ */}
+        {/* CUSTOMER PORTAL - Food Ordering Experience */}
+        {/* ============================================ */}
+        <Route element={<CustomerLayout />}>
+          <Route path="/customer" element={
+            <RouteErrorBoundary fallbackTitle="Customer Portal Error">
+              <CustomerHome />
+            </RouteErrorBoundary>
+          } />
+          <Route path="/restaurants" element={
+            <RouteErrorBoundary fallbackTitle="Restaurant List Error">
+              <RestaurantList />
+            </RouteErrorBoundary>
+          } />
+          <Route path="/restaurant/:id" element={
+            <RouteErrorBoundary fallbackTitle="Restaurant Details Error">
+              <RestaurantDetail />
+            </RouteErrorBoundary>
+          } />
+          <Route path="/cart" element={
+            <RouteErrorBoundary fallbackTitle="Cart Error">
+              <Cart />
+            </RouteErrorBoundary>
+          } />
+          <Route path="/checkout" element={
+            <RouteErrorBoundary fallbackTitle="Checkout Error">
+              <ProtectedRoute requiredRole="customer">
+                <Checkout />
+              </ProtectedRoute>
+            </RouteErrorBoundary>
+          } />
+          <Route path="/orders/:orderId" element={
+            <RouteErrorBoundary fallbackTitle="Order Tracking Error">
+              <OrderTracking />
+            </RouteErrorBoundary>
+          } />
+          <Route path="/orders" element={
+            <RouteErrorBoundary fallbackTitle="Order History Error">
+              <Suspense fallback={<PageLoader />}>
+                <ProtectedRoute requiredRole="customer">
+                  <OrderHistory />
+                </ProtectedRoute>
+              </Suspense>
+            </RouteErrorBoundary>
+          } />
+          <Route path="/profile" element={
+            <RouteErrorBoundary fallbackTitle="Profile Error">
+              <Suspense fallback={<PageLoader />}>
+                <ProtectedRoute requiredRole="customer">
+                  <Profile />
+                </ProtectedRoute>
+              </Suspense>
+            </RouteErrorBoundary>
+          } />
+          <Route path="/favorites" element={
+            <RouteErrorBoundary fallbackTitle="Favorites Error">
+              <Suspense fallback={<PageLoader />}>
+                <Favorites />
+              </Suspense>
+            </RouteErrorBoundary>
+          } />
+        </Route>
 
-              {/* Auth Routes */}
-              <Route path="/auth" element={<Auth />} />
+        {/* ============================================ */}
+        {/* RIDE-SHARING MODULE */}
+        {/* ============================================ */}
+        <Route path="/rides/book" element={
+          <RouteErrorBoundary fallbackTitle="Ride Booking Error">
+            <Suspense fallback={<PageLoader />}>
+              <BookRide />
+            </Suspense>
+          </RouteErrorBoundary>
+        } />
+        <Route path="/rides/my-rides" element={
+          <RouteErrorBoundary fallbackTitle="My Rides Error">
+            <Suspense fallback={<PageLoader />}>
+              <ProtectedRoute requiredRole="rider">
+                <MyRides />
+              </ProtectedRoute>
+            </Suspense>
+          </RouteErrorBoundary>
+        } />
 
-              {/* Customer App Routes */}
-              <Route path="/customer" element={
-                <RouteErrorBoundary fallbackTitle="Customer Portal Error">
-                  <CustomerHome />
-                </RouteErrorBoundary>
-              } />
-              <Route path="/restaurants" element={
-                <RouteErrorBoundary fallbackTitle="Restaurant List Error">
-                  <RestaurantList />
-                </RouteErrorBoundary>
-              } />
-              <Route path="/restaurant/:id" element={
-                <RouteErrorBoundary fallbackTitle="Restaurant Details Error">
-                  <RestaurantDetail />
-                </RouteErrorBoundary>
-              } />
-              <Route path="/cart" element={
-                <RouteErrorBoundary fallbackTitle="Cart Error">
-                  <Cart />
-                </RouteErrorBoundary>
-              } />
-              <Route path="/checkout" element={
-                <RouteErrorBoundary fallbackTitle="Checkout Error">
-                  <Checkout />
-                </RouteErrorBoundary>
-              } />
-              <Route path="/orders/:orderId" element={
-                <RouteErrorBoundary fallbackTitle="Order Tracking Error">
-                  <OrderTracking />
-                </RouteErrorBoundary>
-              } />
-              <Route path="/orders" element={
-                <RouteErrorBoundary fallbackTitle="Order History Error">
-                  <Suspense fallback={<PageLoader />}>
-                    <ProtectedRoute requiredRole="customer">
-                      <OrderHistory />
-                    </ProtectedRoute>
-                  </Suspense>
-                </RouteErrorBoundary>
-              } />
-              <Route path="/profile" element={
-                <RouteErrorBoundary fallbackTitle="Profile Error">
-                  <Suspense fallback={<PageLoader />}>
-                    <ProtectedRoute requiredRole="customer">
-                      <Profile />
-                    </ProtectedRoute>
-                  </Suspense>
-                </RouteErrorBoundary>
-              } />
-              <Route path="/favorites" element={
-                <RouteErrorBoundary fallbackTitle="Favorites Error">
-                  <Suspense fallback={<PageLoader />}>
-                    <Favorites />
-                  </Suspense>
-                </RouteErrorBoundary>
-              } />
+        {/* ============================================ */}
+        {/* RESTAURANT PORTAL - Business Management */}
+        {/* ============================================ */}
+        <Route element={
+          <Suspense fallback={<PageLoader />}>
+            <RestaurantPortalLayout />
+          </Suspense>
+        }>
+          <Route path="/restaurant/dashboard" element={
+            <RouteErrorBoundary fallbackTitle="Restaurant Dashboard Error">
+              <Suspense fallback={<PageLoader />}>
+                <RestaurantDashboard />
+              </Suspense>
+            </RouteErrorBoundary>
+          } />
+          <Route path="/restaurant/orders" element={
+            <RouteErrorBoundary fallbackTitle="Restaurant Orders Error">
+              <Suspense fallback={<PageLoader />}>
+                <RestaurantOrders />
+              </Suspense>
+            </RouteErrorBoundary>
+          } />
+          <Route path="/restaurant/menu" element={
+            <RouteErrorBoundary fallbackTitle="Restaurant Menu Error">
+              <Suspense fallback={<PageLoader />}>
+                <RestaurantMenu />
+              </Suspense>
+            </RouteErrorBoundary>
+          } />
+          <Route path="/restaurant/analytics" element={
+            <RouteErrorBoundary fallbackTitle="Restaurant Analytics Error">
+              <Suspense fallback={<PageLoader />}>
+                <RestaurantDashboard />
+              </Suspense>
+            </RouteErrorBoundary>
+          } />
+          <Route path="/restaurant/settings" element={
+            <RouteErrorBoundary fallbackTitle="Restaurant Settings Error">
+              <Suspense fallback={<PageLoader />}>
+                <RestaurantDashboard />
+              </Suspense>
+            </RouteErrorBoundary>
+          } />
+        </Route>
 
-              {/* Ride-Sharing Routes */}
-              <Route path="/rides/book" element={
-                <RouteErrorBoundary fallbackTitle="Ride Booking Error">
-                  <Suspense fallback={<PageLoader />}>
-                    <BookRide />
-                  </Suspense>
-                </RouteErrorBoundary>
-              } />
-              <Route
-                path="/rides/my-rides"
-                element={
-                  <RouteErrorBoundary fallbackTitle="My Rides Error">
-                    <Suspense fallback={<PageLoader />}>
-                      <ProtectedRoute requiredRole="rider">
-                        <MyRides />
-                      </ProtectedRoute>
-                    </Suspense>
-                  </RouteErrorBoundary>
-                }
-              />
+        {/* ============================================ */}
+        {/* DELIVERY PARTNER PORTAL - Driver Experience */}
+        {/* ============================================ */}
+        <Route element={
+          <Suspense fallback={<PageLoader />}>
+            <DeliveryPortalLayout />
+          </Suspense>
+        }>
+          <Route path="/delivery/dashboard" element={
+            <RouteErrorBoundary fallbackTitle="Delivery Dashboard Error">
+              <Suspense fallback={<PageLoader />}>
+                <DeliveryDashboard />
+              </Suspense>
+            </RouteErrorBoundary>
+          } />
+          <Route path="/delivery/orders" element={
+            <RouteErrorBoundary fallbackTitle="Delivery Orders Error">
+              <Suspense fallback={<PageLoader />}>
+                <DeliveryOrders />
+              </Suspense>
+            </RouteErrorBoundary>
+          } />
+          <Route path="/delivery/earnings" element={
+            <RouteErrorBoundary fallbackTitle="Delivery Earnings Error">
+              <Suspense fallback={<PageLoader />}>
+                <DeliveryEarnings />
+              </Suspense>
+            </RouteErrorBoundary>
+          } />
+          <Route path="/delivery/map" element={
+            <RouteErrorBoundary fallbackTitle="Delivery Map Error">
+              <Suspense fallback={<PageLoader />}>
+                <DeliveryDashboard />
+              </Suspense>
+            </RouteErrorBoundary>
+          } />
+          <Route path="/delivery/profile" element={
+            <RouteErrorBoundary fallbackTitle="Delivery Profile Error">
+              <Suspense fallback={<PageLoader />}>
+                <DeliveryDashboard />
+              </Suspense>
+            </RouteErrorBoundary>
+          } />
+        </Route>
 
-              {/* Restaurant Portal Routes */}
-              <Route
-                path="/restaurant/dashboard"
-                element={
-                  <RouteErrorBoundary fallbackTitle="Restaurant Dashboard Error">
-                    <Suspense fallback={<PageLoader />}>
-                      <ProtectedRoute requiredRole="restaurant">
-                        <RestaurantDashboard />
-                      </ProtectedRoute>
-                    </Suspense>
-                  </RouteErrorBoundary>
-                }
-              />
-              <Route
-                path="/restaurant/orders"
-                element={
-                  <RouteErrorBoundary fallbackTitle="Restaurant Orders Error">
-                    <Suspense fallback={<PageLoader />}>
-                      <ProtectedRoute requiredRole="restaurant">
-                        <RestaurantOrders />
-                      </ProtectedRoute>
-                    </Suspense>
-                  </RouteErrorBoundary>
-                }
-              />
-              <Route
-                path="/restaurant/menu"
-                element={
-                  <RouteErrorBoundary fallbackTitle="Restaurant Menu Error">
-                    <Suspense fallback={<PageLoader />}>
-                      <ProtectedRoute requiredRole="restaurant">
-                        <RestaurantMenu />
-                      </ProtectedRoute>
-                    </Suspense>
-                  </RouteErrorBoundary>
-                }
-              />
+        {/* ============================================ */}
+        {/* ADMIN PORTAL - Platform Management */}
+        {/* ============================================ */}
+        <Route element={
+          <Suspense fallback={<PageLoader />}>
+            <AdminLayout />
+          </Suspense>
+        }>
+          <Route path="/admin/dashboard" element={
+            <RouteErrorBoundary fallbackTitle="Admin Dashboard Error">
+              <Suspense fallback={<PageLoader />}>
+                <ProtectedRoute requiredRole="admin">
+                  <AdminDashboard />
+                </ProtectedRoute>
+              </Suspense>
+            </RouteErrorBoundary>
+          } />
+          <Route path="/admin/users" element={
+            <RouteErrorBoundary fallbackTitle="Admin Users Error">
+              <Suspense fallback={<PageLoader />}>
+                <ProtectedRoute requiredRole="admin">
+                  <AdminUsers />
+                </ProtectedRoute>
+              </Suspense>
+            </RouteErrorBoundary>
+          } />
+          <Route path="/admin/restaurants" element={
+            <RouteErrorBoundary fallbackTitle="Admin Restaurants Error">
+              <Suspense fallback={<PageLoader />}>
+                <ProtectedRoute requiredRole="admin">
+                  <AdminRestaurants />
+                </ProtectedRoute>
+              </Suspense>
+            </RouteErrorBoundary>
+          } />
+          <Route path="/admin/orders" element={
+            <RouteErrorBoundary fallbackTitle="Admin Orders Error">
+              <Suspense fallback={<PageLoader />}>
+                <ProtectedRoute requiredRole="admin">
+                  <AdminOrders />
+                </ProtectedRoute>
+              </Suspense>
+            </RouteErrorBoundary>
+          } />
+          <Route path="/admin/delivery-partners" element={
+            <RouteErrorBoundary fallbackTitle="Admin Delivery Partners Error">
+              <Suspense fallback={<PageLoader />}>
+                <ProtectedRoute requiredRole="admin">
+                  <AdminDeliveryPartners />
+                </ProtectedRoute>
+              </Suspense>
+            </RouteErrorBoundary>
+          } />
+          <Route path="/admin/revenue" element={
+            <RouteErrorBoundary fallbackTitle="Admin Revenue Error">
+              <Suspense fallback={<PageLoader />}>
+                <ProtectedRoute requiredRole="admin">
+                  <AdminRevenue />
+                </ProtectedRoute>
+              </Suspense>
+            </RouteErrorBoundary>
+          } />
+          <Route path="/admin/analytics" element={
+            <RouteErrorBoundary fallbackTitle="Admin Analytics Error">
+              <Suspense fallback={<PageLoader />}>
+                <ProtectedRoute requiredRole="admin">
+                  <AdminAnalytics />
+                </ProtectedRoute>
+              </Suspense>
+            </RouteErrorBoundary>
+          } />
+          <Route path="/admin/marketing" element={
+            <RouteErrorBoundary fallbackTitle="Admin Marketing Error">
+              <Suspense fallback={<PageLoader />}>
+                <ProtectedRoute requiredRole="admin">
+                  <AdminMarketing />
+                </ProtectedRoute>
+              </Suspense>
+            </RouteErrorBoundary>
+          } />
+          <Route path="/admin/logs" element={
+            <RouteErrorBoundary fallbackTitle="Admin Logs Error">
+              <Suspense fallback={<PageLoader />}>
+                <ProtectedRoute requiredRole="admin">
+                  <AdminLogs />
+                </ProtectedRoute>
+              </Suspense>
+            </RouteErrorBoundary>
+          } />
+          <Route path="/admin/launch-checklist" element={
+            <RouteErrorBoundary fallbackTitle="Admin Launch Checklist Error">
+              <Suspense fallback={<PageLoader />}>
+                <ProtectedRoute requiredRole="admin">
+                  <LaunchChecklist />
+                </ProtectedRoute>
+              </Suspense>
+            </RouteErrorBoundary>
+          } />
+        </Route>
 
-              {/* Delivery Partner Portal Routes */}
-              <Route element={
-                <Suspense fallback={<PageLoader />}>
-                  <DeliveryLayout />
-                </Suspense>
-              }>
-                <Route
-                  path="/delivery/dashboard"
-                  element={
-                    <RouteErrorBoundary fallbackTitle="Delivery Dashboard Error">
-                      <Suspense fallback={<PageLoader />}>
-                        <ProtectedRoute requiredRole="delivery_partner">
-                          <DeliveryDashboard />
-                        </ProtectedRoute>
-                      </Suspense>
-                    </RouteErrorBoundary>
-                  }
-                />
-                <Route
-                  path="/delivery/orders"
-                  element={
-                    <RouteErrorBoundary fallbackTitle="Delivery Orders Error">
-                      <Suspense fallback={<PageLoader />}>
-                        <ProtectedRoute requiredRole="delivery_partner">
-                          <DeliveryOrders />
-                        </ProtectedRoute>
-                      </Suspense>
-                    </RouteErrorBoundary>
-                  }
-                />
-                <Route
-                  path="/delivery/earnings"
-                  element={
-                    <RouteErrorBoundary fallbackTitle="Delivery Earnings Error">
-                      <Suspense fallback={<PageLoader />}>
-                        <ProtectedRoute requiredRole="delivery_partner">
-                          <DeliveryEarnings />
-                        </ProtectedRoute>
-                      </Suspense>
-                    </RouteErrorBoundary>
-                  }
-                />
-              </Route>
-
-              {/* Admin Portal Routes - Protected */}
-              <Route element={<AdminLayout />}>
-                <Route
-                  path="/admin/dashboard"
-                  element={
-                    <RouteErrorBoundary fallbackTitle="Admin Dashboard Error">
-                      <ProtectedRoute requiredRole="admin">
-                        <AdminDashboard />
-                      </ProtectedRoute>
-                    </RouteErrorBoundary>
-                  }
-                />
-                <Route
-                  path="/admin/users"
-                  element={
-                    <RouteErrorBoundary fallbackTitle="Admin Users Error">
-                      <ProtectedRoute requiredRole="admin">
-                        <AdminUsers />
-                      </ProtectedRoute>
-                    </RouteErrorBoundary>
-                  }
-                />
-                <Route
-                  path="/admin/restaurants"
-                  element={
-                    <RouteErrorBoundary fallbackTitle="Admin Restaurants Error">
-                      <ProtectedRoute requiredRole="admin">
-                        <AdminRestaurants />
-                      </ProtectedRoute>
-                    </RouteErrorBoundary>
-                  }
-                />
-                <Route
-                  path="/admin/orders"
-                  element={
-                    <RouteErrorBoundary fallbackTitle="Admin Orders Error">
-                      <ProtectedRoute requiredRole="admin">
-                        <AdminOrders />
-                      </ProtectedRoute>
-                    </RouteErrorBoundary>
-                  }
-                />
-                <Route
-                  path="/admin/delivery-partners"
-                  element={
-                    <RouteErrorBoundary fallbackTitle="Admin Delivery Partners Error">
-                      <ProtectedRoute requiredRole="admin">
-                        <AdminDeliveryPartners />
-                      </ProtectedRoute>
-                    </RouteErrorBoundary>
-                  }
-                />
-                <Route
-                  path="/admin/revenue"
-                  element={
-                    <RouteErrorBoundary fallbackTitle="Admin Revenue Error">
-                      <ProtectedRoute requiredRole="admin">
-                        <AdminRevenue />
-                      </ProtectedRoute>
-                    </RouteErrorBoundary>
-                  }
-                />
-                <Route
-                  path="/admin/analytics"
-                  element={
-                    <RouteErrorBoundary fallbackTitle="Admin Analytics Error">
-                      <ProtectedRoute requiredRole="admin">
-                        <AdminAnalytics />
-                      </ProtectedRoute>
-                    </RouteErrorBoundary>
-                  }
-                />
-                <Route
-                  path="/admin/marketing"
-                  element={
-                    <RouteErrorBoundary fallbackTitle="Admin Marketing Error">
-                      <ProtectedRoute requiredRole="admin">
-                        <AdminMarketing />
-                      </ProtectedRoute>
-                    </RouteErrorBoundary>
-                  }
-                />
-                <Route
-                  path="/admin/logs"
-                  element={
-                    <RouteErrorBoundary fallbackTitle="Admin Logs Error">
-                      <ProtectedRoute requiredRole="admin">
-                        <AdminLogs />
-                      </ProtectedRoute>
-                    </RouteErrorBoundary>
-                  }
-                />
-                <Route
-                  path="/admin/launch-checklist"
-                  element={
-                    <RouteErrorBoundary fallbackTitle="Admin Launch Checklist Error">
-                      <ProtectedRoute requiredRole="admin">
-                        <LaunchChecklist />
-                      </ProtectedRoute>
-                    </RouteErrorBoundary>
-                  }
-                />
-              </Route>
-
-              {/* Catch-all route */}
-              <Route path="*" element={<NotFound />} />
+        {/* Catch-all route */}
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </>
   );
@@ -427,5 +433,3 @@ const App = () => (
 );
 
 export default App;
-
-
