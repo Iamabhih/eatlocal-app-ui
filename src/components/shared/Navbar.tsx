@@ -1,10 +1,19 @@
-import { ShoppingCart, User, MapPin, Menu, X, Search, Bell } from "lucide-react";
-import { Link, useLocation } from "react-router-dom";
+import { ShoppingCart, User, MapPin, Menu, X, Search, Bell, Heart, Package, LogOut } from "lucide-react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/contexts/AuthContext";
+import { useCart } from "@/hooks/useCart";
 
 interface NavbarProps {
   type?: "customer" | "restaurant" | "delivery";
@@ -12,7 +21,16 @@ interface NavbarProps {
 
 const Navbar = ({ type = "customer" }: NavbarProps) => {
   const location = useLocation();
+  const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { user, signOut } = useAuth();
+  const { items } = useCart();
+  const cartCount = items.reduce((sum, item) => sum + item.quantity, 0);
+
+  const handleSignOut = async () => {
+    await signOut();
+    navigate("/");
+  };
 
   if (type === "restaurant") {
     return (
@@ -58,9 +76,19 @@ const Navbar = ({ type = "customer" }: NavbarProps) => {
               <Button variant="outline" size="icon" className="rounded-xl ml-2">
                 <Bell className="h-4 w-4" />
               </Button>
-              <Button variant="secondary" size="icon" className="rounded-xl">
-                <User className="h-4 w-4" />
-              </Button>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="secondary" size="icon" className="rounded-xl">
+                    <User className="h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-48">
+                  <DropdownMenuItem onClick={handleSignOut}>
+                    <LogOut className="h-4 w-4 mr-2" />
+                    Sign Out
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
           </div>
         </div>
@@ -112,9 +140,19 @@ const Navbar = ({ type = "customer" }: NavbarProps) => {
               <Button variant="outline" size="icon" className="rounded-xl ml-2">
                 <Bell className="h-4 w-4" />
               </Button>
-              <Button variant="secondary" size="icon" className="rounded-xl">
-                <User className="h-4 w-4" />
-              </Button>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="secondary" size="icon" className="rounded-xl">
+                    <User className="h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-48">
+                  <DropdownMenuItem onClick={handleSignOut}>
+                    <LogOut className="h-4 w-4 mr-2" />
+                    Sign Out
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
           </div>
         </div>
@@ -163,17 +201,57 @@ const Navbar = ({ type = "customer" }: NavbarProps) => {
                 Browse
               </Button>
             </Link>
+            <Link to="/favorites">
+              <Button variant="ghost" size="icon" className="rounded-xl">
+                <Heart className="h-4 w-4" />
+              </Button>
+            </Link>
             <Link to="/cart">
               <Button variant="outline" size="icon" className="relative rounded-xl">
                 <ShoppingCart className="h-4 w-4" />
-                <Badge className="absolute -top-2 -right-2 h-5 w-5 p-0 flex items-center justify-center text-[10px] bg-primary text-primary-foreground border-2 border-background">
-                  2
-                </Badge>
+                {cartCount > 0 && (
+                  <Badge className="absolute -top-2 -right-2 h-5 w-5 p-0 flex items-center justify-center text-[10px] bg-primary text-primary-foreground border-2 border-background">
+                    {cartCount}
+                  </Badge>
+                )}
               </Button>
             </Link>
-            <Button variant="secondary" size="icon" className="rounded-xl">
-              <User className="h-4 w-4" />
-            </Button>
+
+            {/* User Menu */}
+            {user ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="secondary" size="icon" className="rounded-xl">
+                    <User className="h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-48">
+                  <DropdownMenuItem onClick={() => navigate("/profile")}>
+                    <User className="h-4 w-4 mr-2" />
+                    My Profile
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => navigate("/orders")}>
+                    <Package className="h-4 w-4 mr-2" />
+                    Order History
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => navigate("/favorites")}>
+                    <Heart className="h-4 w-4 mr-2" />
+                    Favorites
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={handleSignOut}>
+                    <LogOut className="h-4 w-4 mr-2" />
+                    Sign Out
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <Link to="/auth?role=customer">
+                <Button variant="secondary" size="sm" className="rounded-xl">
+                  Sign In
+                </Button>
+              </Link>
+            )}
           </div>
 
           {/* Mobile Menu Button */}
@@ -181,9 +259,11 @@ const Navbar = ({ type = "customer" }: NavbarProps) => {
             <Link to="/cart">
               <Button variant="outline" size="icon" className="relative rounded-xl">
                 <ShoppingCart className="h-4 w-4" />
-                <Badge className="absolute -top-2 -right-2 h-5 w-5 p-0 flex items-center justify-center text-[10px] bg-primary text-primary-foreground border-2 border-background">
-                  2
-                </Badge>
+                {cartCount > 0 && (
+                  <Badge className="absolute -top-2 -right-2 h-5 w-5 p-0 flex items-center justify-center text-[10px] bg-primary text-primary-foreground border-2 border-background">
+                    {cartCount}
+                  </Badge>
+                )}
               </Button>
             </Link>
             <Button
@@ -201,7 +281,7 @@ const Navbar = ({ type = "customer" }: NavbarProps) => {
         <div
           className={cn(
             "md:hidden overflow-hidden transition-all duration-300",
-            mobileMenuOpen ? "max-h-96 pb-4" : "max-h-0"
+            mobileMenuOpen ? "max-h-[500px] pb-4" : "max-h-0"
           )}
         >
           <div className="space-y-3 pt-3">
@@ -220,14 +300,50 @@ const Navbar = ({ type = "customer" }: NavbarProps) => {
             <div className="flex flex-col gap-2">
               <Link to="/restaurants" onClick={() => setMobileMenuOpen(false)}>
                 <Button variant="ghost" className="w-full justify-start rounded-xl">
+                  <Search className="h-4 w-4 mr-2" />
                   Browse Restaurants
                 </Button>
               </Link>
-              <Link to="/auth" onClick={() => setMobileMenuOpen(false)}>
-                <Button variant="ghost" className="w-full justify-start rounded-xl">
-                  Sign In / Sign Up
-                </Button>
-              </Link>
+              {user ? (
+                <>
+                  <Link to="/orders" onClick={() => setMobileMenuOpen(false)}>
+                    <Button variant="ghost" className="w-full justify-start rounded-xl">
+                      <Package className="h-4 w-4 mr-2" />
+                      My Orders
+                    </Button>
+                  </Link>
+                  <Link to="/favorites" onClick={() => setMobileMenuOpen(false)}>
+                    <Button variant="ghost" className="w-full justify-start rounded-xl">
+                      <Heart className="h-4 w-4 mr-2" />
+                      Favorites
+                    </Button>
+                  </Link>
+                  <Link to="/profile" onClick={() => setMobileMenuOpen(false)}>
+                    <Button variant="ghost" className="w-full justify-start rounded-xl">
+                      <User className="h-4 w-4 mr-2" />
+                      My Profile
+                    </Button>
+                  </Link>
+                  <Button
+                    variant="ghost"
+                    className="w-full justify-start rounded-xl text-destructive hover:text-destructive"
+                    onClick={() => {
+                      setMobileMenuOpen(false);
+                      handleSignOut();
+                    }}
+                  >
+                    <LogOut className="h-4 w-4 mr-2" />
+                    Sign Out
+                  </Button>
+                </>
+              ) : (
+                <Link to="/auth?role=customer" onClick={() => setMobileMenuOpen(false)}>
+                  <Button variant="ghost" className="w-full justify-start rounded-xl">
+                    <User className="h-4 w-4 mr-2" />
+                    Sign In / Sign Up
+                  </Button>
+                </Link>
+              )}
             </div>
           </div>
         </div>

@@ -34,6 +34,11 @@ import Checkout from "./pages/customer/Checkout";
 import OrderTracking from "./pages/customer/OrderTracking";
 import NotFound from "./pages/NotFound";
 
+// Lazy-loaded: Customer Account Pages
+const OrderHistory = lazy(() => import("./pages/customer/OrderHistory"));
+const Profile = lazy(() => import("./pages/customer/Profile"));
+const Favorites = lazy(() => import("./pages/customer/Favorites"));
+
 // Lazy-loaded: Ride-Sharing App
 const BookRide = lazy(() => import("./pages/rider/BookRide"));
 const MyRides = lazy(() => import("./pages/rider/MyRides"));
@@ -163,6 +168,31 @@ function AppContent() {
               <Route path="/orders/:orderId" element={
                 <RouteErrorBoundary fallbackTitle="Order Tracking Error">
                   <OrderTracking />
+                </RouteErrorBoundary>
+              } />
+              <Route path="/orders" element={
+                <RouteErrorBoundary fallbackTitle="Order History Error">
+                  <Suspense fallback={<PageLoader />}>
+                    <ProtectedRoute requiredRole="customer">
+                      <OrderHistory />
+                    </ProtectedRoute>
+                  </Suspense>
+                </RouteErrorBoundary>
+              } />
+              <Route path="/profile" element={
+                <RouteErrorBoundary fallbackTitle="Profile Error">
+                  <Suspense fallback={<PageLoader />}>
+                    <ProtectedRoute requiredRole="customer">
+                      <Profile />
+                    </ProtectedRoute>
+                  </Suspense>
+                </RouteErrorBoundary>
+              } />
+              <Route path="/favorites" element={
+                <RouteErrorBoundary fallbackTitle="Favorites Error">
+                  <Suspense fallback={<PageLoader />}>
+                    <Favorites />
+                  </Suspense>
                 </RouteErrorBoundary>
               } />
 

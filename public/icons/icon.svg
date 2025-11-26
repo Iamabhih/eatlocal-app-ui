@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#ea384c;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#d62839;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  <!-- Background -->
+  <rect width="512" height="512" rx="96" fill="url(#bg)"/>
+  <!-- Fork -->
+  <path d="M320 120 L320 200 Q320 220 340 220 L340 380 Q340 400 360 400 L360 400 Q380 400 380 380 L380 220 Q400 220 400 200 L400 120"
+        fill="none" stroke="white" stroke-width="24" stroke-linecap="round" stroke-linejoin="round"/>
+  <line x1="340" y1="120" x2="340" y2="180" stroke="white" stroke-width="24" stroke-linecap="round"/>
+  <line x1="360" y1="120" x2="360" y2="180" stroke="white" stroke-width="24" stroke-linecap="round"/>
+  <line x1="380" y1="120" x2="380" y2="180" stroke="white" stroke-width="24" stroke-linecap="round"/>
+  <!-- Knife -->
+  <path d="M160 120 L160 300 Q160 380 140 400 L140 400 Q120 400 140 380 Q160 320 160 300 L160 120 Q180 120 180 140 L180 260 Q180 280 160 300"
+        fill="white" stroke="white" stroke-width="8"/>
+  <!-- Location Pin -->
+  <ellipse cx="256" cy="280" rx="60" ry="80" fill="white" opacity="0.9"/>
+  <circle cx="256" cy="260" r="25" fill="#ea384c"/>
+  <path d="M256 340 L236 300 L276 300 Z" fill="white" opacity="0.9"/>
+</svg>
