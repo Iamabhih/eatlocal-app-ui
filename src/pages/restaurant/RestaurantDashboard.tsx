@@ -675,7 +675,7 @@ export default function RestaurantDashboard() {
                 )}
                 <div className="flex items-center gap-2 text-sm">
                   <Clock className="h-4 w-4 text-muted-foreground" />
-                  <span>{restaurant.opening_time || '09:00'} - {restaurant.closing_time || '22:00'}</span>
+                  <span>09:00 - 22:00</span>
                 </div>
               </CardContent>
             </Card>
@@ -706,7 +706,7 @@ export default function RestaurantDashboard() {
               <Card>
                 <CardContent className="pt-6 text-center">
                   <MapPin className="h-8 w-8 mx-auto text-primary mb-2" />
-                  <p className="text-2xl font-bold">{restaurant.delivery_radius_km || 10}km</p>
+                  <p className="text-2xl font-bold">10km</p>
                   <p className="text-xs text-muted-foreground">Delivery Radius</p>
                 </CardContent>
               </Card>

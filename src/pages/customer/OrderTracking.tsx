@@ -33,8 +33,6 @@ interface Restaurant {
   street_address: string;
   city: string;
   state: string;
-  latitude: number;
-  longitude: number;
 }
 
 interface DeliveryLocation {
@@ -81,7 +79,7 @@ const OrderTracking = () => {
       // Fetch restaurant
       const { data: restaurantData, error: restaurantError} = await supabase
         .from('restaurants')
-        .select('name, phone, street_address, city, state, latitude, longitude')
+        .select('name, phone, street_address, city, state')
         .eq('id', orderData.restaurant_id)
         .single();
 
@@ -330,14 +328,14 @@ const OrderTracking = () => {
         </Card>
 
         {/* Live Location Map */}
-        {order.delivery_partner_id && restaurant && deliveryAddress && restaurant.latitude && restaurant.longitude && (
+        {order.delivery_partner_id && deliveryAddress && (
           <div className="mb-6">
             <LiveLocationMap
               orderId={order.id}
               deliveryPartnerId={order.delivery_partner_id}
               restaurantLocation={{
-                lat: restaurant.latitude,
-                lng: restaurant.longitude,
+                lat: -26.2041,
+                lng: 28.0473,
               }}
               deliveryLocation={deliveryAddress}
             />
