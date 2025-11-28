@@ -8,7 +8,10 @@ import {
   BarChart3,
   Megaphone,
   DollarSign,
-  FileText
+  FileText,
+  ShieldCheck,
+  Settings,
+  Rocket
 } from 'lucide-react';
 import {
   Sidebar,
@@ -22,6 +25,10 @@ import {
   useSidebar,
 } from '@/components/ui/sidebar';
 
+interface AdminSidebarProps {
+  isSuperadmin?: boolean;
+}
+
 const adminItems = [
   { title: 'Dashboard', url: '/admin/dashboard', icon: LayoutDashboard },
   { title: 'Users', url: '/admin/users', icon: Users },
@@ -32,9 +39,15 @@ const adminItems = [
   { title: 'Analytics', url: '/admin/analytics', icon: BarChart3 },
   { title: 'Marketing', url: '/admin/marketing', icon: Megaphone },
   { title: 'System Logs', url: '/admin/logs', icon: FileText },
+  { title: 'Launch Checklist', url: '/admin/launch-checklist', icon: Rocket },
 ];
 
-export function AdminSidebar() {
+const superadminItems = [
+  { title: 'Super Admin', url: '/admin/superadmin', icon: ShieldCheck },
+  { title: 'Platform Settings', url: '/admin/settings', icon: Settings },
+];
+
+export function AdminSidebar({ isSuperadmin = false }: AdminSidebarProps) {
   const { state } = useSidebar();
 
   const getNavCls = ({ isActive }: { isActive: boolean }) =>
@@ -60,6 +73,26 @@ export function AdminSidebar() {
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
+
+        {isSuperadmin && (
+          <SidebarGroup>
+            <SidebarGroupLabel className="text-primary">Super Admin</SidebarGroupLabel>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                {superadminItems.map((item) => (
+                  <SidebarMenuItem key={item.title}>
+                    <SidebarMenuButton asChild>
+                      <NavLink to={item.url} end className={getNavCls}>
+                        <item.icon className="mr-2 h-4 w-4 text-primary" />
+                        {state !== 'collapsed' && <span>{item.title}</span>}
+                      </NavLink>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                ))}
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        )}
       </SidebarContent>
     </Sidebar>
   );

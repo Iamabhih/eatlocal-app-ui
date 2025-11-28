@@ -1,7 +1,7 @@
 {
-  "name": "Smash - Food Delivery Platform",
-  "short_name": "Smash",
-  "description": "Smash your cravings with lightning-fast delivery from local restaurants",
+  "name": "Smash Local - Your Local Everything, Delivered",
+  "short_name": "Smash Local",
+  "description": "Order food from local restaurants, shops, and more with transparent fees and real-time tracking",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",

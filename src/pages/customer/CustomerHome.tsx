@@ -113,7 +113,7 @@ const CustomerHome = () => {
       {/* Portal Links */}
       <section className="py-16 px-4">
         <div className="container mx-auto">
-          <h2 className="text-3xl font-bold text-center mb-12">Join Ekhasi Online</h2>
+          <h2 className="text-3xl font-bold text-center mb-12">Join Smash Local</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
             <Card className="group cursor-pointer hover:shadow-hover transition-all duration-300">
               <Link to="/restaurant/dashboard">
@@ -123,7 +123,7 @@ const CustomerHome = () => {
                     Restaurant Partner
                   </h3>
                   <p className="text-muted-foreground mb-6">
-                    Grow your business and reach new customers by partnering with Ekhasi Online
+                    Grow your business and reach new customers by partnering with Smash Local
                   </p>
                   <Button className="bg-primary hover:bg-primary/90">
                     Get Started
@@ -140,7 +140,7 @@ const CustomerHome = () => {
                     Delivery Partner
                   </h3>
                   <p className="text-muted-foreground mb-6">
-                    Make money on your schedule. Deliver with Ekhasi Online whenever you want
+                    Make money on your schedule. Deliver with Smash Local whenever you want
                   </p>
                   <Button className="bg-primary hover:bg-primary/90">
                     Start Earning

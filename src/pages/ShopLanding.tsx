@@ -35,7 +35,7 @@ const ShopLanding = () => {
       {/* Benefits */}
       <section className="py-16 bg-muted/30">
         <div className="container mx-auto px-4">
-          <h2 className="text-3xl font-bold text-center mb-12">Why List Your Shop on Ekhasi Online?</h2>
+          <h2 className="text-3xl font-bold text-center mb-12">Why List Your Shop on Smash Local?</h2>
           <div className="grid md:grid-cols-4 gap-8">
             <Card className="hover-scale">
               <CardContent className="pt-6 text-center">
@@ -76,7 +76,7 @@ const ShopLanding = () => {
       <section className="py-16">
         <div className="container mx-auto px-4">
           <h2 className="text-3xl font-bold text-center mb-4">What Can You Sell?</h2>
-          <p className="text-center text-muted-foreground mb-12">List a wide range of products on Ekhasi Online</p>
+          <p className="text-center text-muted-foreground mb-12">List a wide range of products on Smash Local</p>
           
           <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
             <Card>
@@ -207,7 +207,7 @@ const ShopLanding = () => {
       <section className="py-16 bg-muted/30">
         <div className="container mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold mb-4">Ready to Go Digital?</h2>
-          <p className="text-muted-foreground mb-8">Join hundreds of successful local shops on Ekhasi Online</p>
+          <p className="text-muted-foreground mb-8">Join hundreds of successful local shops on Smash Local</p>
           <Link to="/auth?role=shop">
             <Button size="lg">Sign Up Now - It's Free</Button>
           </Link>
