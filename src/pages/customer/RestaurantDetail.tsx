@@ -7,6 +7,7 @@ import { Separator } from "@/components/ui/separator";
 import { useRestaurant } from "@/hooks/useRestaurants";
 import { useRestaurantMenu } from "@/hooks/useMenuItems";
 import { useCart } from "@/hooks/useCart";
+import { ReviewsSection } from "@/components/customer/ReviewsSection";
 
 const RestaurantDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -194,7 +195,7 @@ const RestaurantDetail = () => {
                     <ShoppingCart className="h-5 w-5" />
                     Your Order
                   </h3>
-                  
+
                   {totalItems === 0 ? (
                     <p className="text-muted-foreground text-center py-8">
                       Your cart is empty
@@ -202,7 +203,7 @@ const RestaurantDetail = () => {
                   ) : (
                     <>
                       <Separator className="my-4" />
-                      
+
                       <div className="space-y-2 text-sm">
                         <div className="flex justify-between">
                           <span>Subtotal ({totalItems} items)</span>
@@ -217,13 +218,13 @@ const RestaurantDetail = () => {
                           <span>${(cartTotal + deliveryFee).toFixed(2)}</span>
                         </div>
                       </div>
-                      
-                      <Button 
+
+                      <Button
                         className="w-full mt-4 bg-primary hover:bg-primary/90"
                         disabled={cartTotal < minimumOrder}
                         onClick={() => navigate('/cart')}
                       >
-                        {cartTotal < minimumOrder 
+                        {cartTotal < minimumOrder
                           ? `$${(minimumOrder - cartTotal).toFixed(2)} to minimum`
                           : 'View Cart'
                         }
@@ -235,6 +236,13 @@ const RestaurantDetail = () => {
             </div>
           </div>
         </div>
+
+        {/* Reviews Section */}
+        <ReviewsSection
+          restaurantId={restaurant.id}
+          restaurantRating={Number(restaurant.rating) || 0}
+          totalReviews={restaurant.total_reviews || 0}
+        />
       </div>
     </div>
   );
