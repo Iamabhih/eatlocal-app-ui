@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { MapPin, Phone, MessageSquare, Package, Clock, CheckCircle2 } from "lucide-react";
+import { MapPin, Phone, MessageSquare, Package, Clock, CheckCircle2, Star } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -10,6 +10,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { logger } from "@/lib/logger";
 import { toast } from "@/hooks/use-toast";
 import { LiveLocationMap } from "@/components/tracking/LiveLocationMap";
+import { ReviewForm } from "@/components/customer/ReviewForm";
+import { useCanReviewOrder } from "@/hooks/useRatingsReviews";
 
 interface Order {
   id: string;
@@ -49,6 +51,9 @@ const OrderTracking = () => {
   const [deliveryAddress, setDeliveryAddress] = useState<{ lat: number; lng: number } | null>(null);
   const [deliveryLocation, setDeliveryLocation] = useState<DeliveryLocation | null>(null);
   const [loading, setLoading] = useState(true);
+  const [showReviewForm, setShowReviewForm] = useState(false);
+
+  const { data: canReviewData } = useCanReviewOrder(orderId || '');
 
   useEffect(() => {
     if (!user) {
@@ -413,6 +418,60 @@ const OrderTracking = () => {
             </div>
           </CardContent>
         </Card>
+
+        {/* Review Prompt - Show when order is delivered and can be reviewed */}
+        {order.status === 'delivered' && canReviewData?.canReview && !showReviewForm && (
+          <Card className="mt-6 border-primary/20 bg-primary/5">
+            <CardContent className="p-6">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
+                  <Star className="h-6 w-6 text-primary" />
+                </div>
+                <div className="flex-1">
+                  <h3 className="font-semibold">How was your order?</h3>
+                  <p className="text-sm text-muted-foreground">
+                    Share your experience with {restaurant.name}
+                  </p>
+                </div>
+                <Button onClick={() => setShowReviewForm(true)}>
+                  Write a Review
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Review Form */}
+        {showReviewForm && order.status === 'delivered' && (
+          <div className="mt-6">
+            <ReviewForm
+              restaurantId={order.restaurant_id}
+              orderId={order.id}
+              restaurantName={restaurant.name}
+              onSuccess={() => setShowReviewForm(false)}
+              onCancel={() => setShowReviewForm(false)}
+            />
+          </div>
+        )}
+
+        {/* Already Reviewed Message */}
+        {order.status === 'delivered' && canReviewData && !canReviewData.canReview && canReviewData.reason === 'Already reviewed' && (
+          <Card className="mt-6 border-green-500/20 bg-green-500/5">
+            <CardContent className="p-6">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 rounded-full bg-green-500/10 flex items-center justify-center">
+                  <CheckCircle2 className="h-6 w-6 text-green-500" />
+                </div>
+                <div className="flex-1">
+                  <h3 className="font-semibold text-green-700 dark:text-green-400">Thanks for your review!</h3>
+                  <p className="text-sm text-muted-foreground">
+                    Your feedback helps other customers make informed decisions.
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
       </div>
     </div>
   );

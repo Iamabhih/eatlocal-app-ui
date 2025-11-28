@@ -8,13 +8,14 @@
 
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Loader2, ShoppingBag, CreditCard, AlertCircle, Clock } from "lucide-react";
+import { Loader2, ShoppingBag, CreditCard, AlertCircle, Clock, CalendarDays } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AddressSelector } from "@/components/customer/AddressSelector";
 import { FulfillmentSelector } from "@/components/checkout/FulfillmentSelector";
+import { ScheduledOrderSelector } from "@/components/checkout/ScheduledOrderSelector";
 import { useAuth } from "@/contexts/AuthContext";
 import { useCart } from "@/hooks/useCart";
 import { supabase } from "@/integrations/supabase/client";
@@ -39,6 +40,7 @@ const Checkout = () => {
   const [fulfillmentType, setFulfillmentType] = useState<"delivery" | "pickup">("delivery");
   const [restaurant, setRestaurant] = useState<any>(null);
   const [validationErrors, setValidationErrors] = useState<string[]>([]);
+  const [scheduledFor, setScheduledFor] = useState<Date | null>(null);
 
   useEffect(() => {
     if (!user) {
@@ -190,20 +192,20 @@ const Checkout = () => {
       return false;
     }
 
-    // Check restaurant operating hours
-    if (restaurant && restaurant.opening_time && restaurant.closing_time) {
+    // Check restaurant operating hours (skip for scheduled orders)
+    if (!scheduledFor && restaurant && restaurant.opening_time && restaurant.closing_time) {
       if (!isRestaurantOpen(restaurant.opening_time, restaurant.closing_time)) {
         errors.push(
           `${restaurant.name} is currently closed. Operating hours: ${formatTime(
             restaurant.opening_time
-          )} - ${formatTime(restaurant.closing_time)}`
+          )} - ${formatTime(restaurant.closing_time)}. Consider scheduling your order for later.`
         );
       }
     }
 
-    // Check if restaurant is marked as open
-    if (restaurant && !restaurant.is_open) {
-      errors.push(`${restaurant.name} is temporarily closed.`);
+    // Check if restaurant is marked as open (skip for scheduled orders)
+    if (!scheduledFor && restaurant && !restaurant.is_open) {
+      errors.push(`${restaurant.name} is temporarily closed. Consider scheduling your order for later.`);
     }
 
     // Validate delivery radius (delivery only)
@@ -291,7 +293,8 @@ const Checkout = () => {
             delivery_fee: Number(deliveryFee.toFixed(2)),
             tax: 0,
             total: Number(total.toFixed(2)),
-            status: "pending",
+            status: scheduledFor ? "scheduled" : "pending",
+            scheduled_for: scheduledFor ? scheduledFor.toISOString() : null,
           },
         ])
         .select()
@@ -474,6 +477,23 @@ const Checkout = () => {
                 </CardContent>
               </Card>
             )}
+
+            {/* Order Scheduling */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <CalendarDays className="h-5 w-5" />
+                  Delivery Time
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <ScheduledOrderSelector
+                  restaurantOpeningTime={restaurant?.opening_time}
+                  restaurantClosingTime={restaurant?.closing_time}
+                  onScheduleChange={setScheduledFor}
+                />
+              </CardContent>
+            </Card>
           </div>
 
           {/* Order Summary */}
@@ -520,6 +540,26 @@ const Checkout = () => {
                   <span>Total</span>
                   <span>R{total.toFixed(2)}</span>
                 </div>
+
+                {scheduledFor && (
+                  <div className="bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800 rounded-lg p-3 text-sm">
+                    <div className="flex items-center gap-2 text-blue-800 dark:text-blue-200">
+                      <CalendarDays className="h-4 w-4" />
+                      <span className="font-medium">Scheduled Delivery</span>
+                    </div>
+                    <p className="text-blue-700 dark:text-blue-300 mt-1">
+                      {scheduledFor.toLocaleDateString('en-ZA', {
+                        weekday: 'short',
+                        month: 'short',
+                        day: 'numeric',
+                      })} at {scheduledFor.toLocaleTimeString('en-ZA', {
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        hour12: false,
+                      })}
+                    </p>
+                  </div>
+                )}
 
                 {restaurant.minimum_order && subtotal < restaurant.minimum_order && (
                   <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 text-sm text-yellow-800">
