@@ -96,6 +96,7 @@ const LaunchChecklist = lazy(() => import("./pages/admin/LaunchChecklist"));
 const AdminMarketing = lazy(() => import("./pages/admin/AdminMarketing"));
 const AdminLogs = lazy(() => import("./pages/admin/AdminLogs"));
 const SuperAdminDashboard = lazy(() => import("./pages/admin/SuperAdminDashboard"));
+const AdminPlatformConfig = lazy(() => import("./pages/admin/AdminPlatformConfig"));
 const AdminHotels = lazy(() => import("./pages/admin/AdminHotels"));
 const AdminVenues = lazy(() => import("./pages/admin/AdminVenues"));
 const AdminLayout = lazy(() => import("./components/admin/AdminLayout").then(m => ({ default: m.AdminLayout })));
@@ -602,7 +603,7 @@ function AppContent() {
             <RouteErrorBoundary fallbackTitle="Platform Settings Error">
               <Suspense fallback={<PageLoader />}>
                 <ProtectedRoute requiredRole="superadmin">
-                  <SuperAdminDashboard />
+                  <AdminPlatformConfig />
                 </ProtectedRoute>
               </Suspense>
             </RouteErrorBoundary>
