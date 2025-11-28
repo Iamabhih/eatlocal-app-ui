@@ -1,0 +1,314 @@
+{
+  "common": {
+    "appName": "Smash Local",
+    "tagline": "Jou Plaaslike Alles, Afgelewer",
+    "loading": "Laai...",
+    "error": "Iets het verkeerd geloop",
+    "retry": "Probeer Weer",
+    "cancel": "Kanselleer",
+    "save": "Stoor",
+    "delete": "Vee Uit",
+    "edit": "Wysig",
+    "add": "Voeg By",
+    "search": "Soek",
+    "filter": "Filter",
+    "sort": "Sorteer",
+    "clear": "Vee Uit",
+    "apply": "Pas Toe",
+    "close": "Sluit",
+    "back": "Terug",
+    "next": "Volgende",
+    "submit": "Dien In",
+    "confirm": "Bevestig",
+    "yes": "Ja",
+    "no": "Nee",
+    "all": "Alles",
+    "none": "Geen",
+    "more": "Meer",
+    "less": "Minder",
+    "viewAll": "Sien Alles",
+    "seeMore": "Sien Meer",
+    "showLess": "Wys Minder"
+  },
+  "nav": {
+    "home": "Tuis",
+    "browse": "Blaai",
+    "restaurants": "Restaurante",
+    "cart": "Mandjie",
+    "orders": "Bestellings",
+    "favorites": "Gunstelinge",
+    "profile": "Profiel",
+    "signIn": "Meld Aan",
+    "signOut": "Meld Af",
+    "signUp": "Registreer",
+    "dashboard": "Paneelbord",
+    "menu": "Spyskaart",
+    "earnings": "Verdienste",
+    "settings": "Instellings"
+  },
+  "auth": {
+    "welcome": "Welkom",
+    "welcomeBack": "Welkom Terug",
+    "signInTitle": "Meld by jou rekening aan",
+    "signUpTitle": "Skep 'n rekening",
+    "email": "E-pos",
+    "password": "Wagwoord",
+    "confirmPassword": "Bevestig Wagwoord",
+    "forgotPassword": "Wagwoord Vergeet?",
+    "resetPassword": "Herstel Wagwoord",
+    "noAccount": "Het jy nie 'n rekening nie?",
+    "hasAccount": "Het jy reeds 'n rekening?",
+    "orContinueWith": "Of gaan voort met",
+    "google": "Google",
+    "termsAgree": "Deur aan te meld, stem jy in tot ons",
+    "termsOfService": "Diensvoorwaardes",
+    "and": "en",
+    "privacyPolicy": "Privaatheidsbeleid",
+    "selectRole": "Ek wil",
+    "roles": {
+      "customer": "Kos Bestel",
+      "restaurant": "Restaurant Bestuur",
+      "delivery": "Bestellings Aflewer"
+    }
+  },
+  "customer": {
+    "hero": {
+      "title": "Heerlike kos, afgelewer na jou deur",
+      "subtitle": "Bestel by die beste plaaslike restaurante met deursigtige fooie",
+      "searchPlaceholder": "Soek vir restaurante of geregte..."
+    },
+    "categories": {
+      "title": "Blaai per Kategorie",
+      "fastFood": "Kitskos",
+      "pizza": "Pizza",
+      "asian": "Asiaties",
+      "mexican": "Meksikaans",
+      "italian": "Italiaans",
+      "desserts": "Nageregte",
+      "healthy": "Gesond",
+      "coffee": "Koffie"
+    },
+    "restaurants": {
+      "featured": "Uitgesoekte Restaurante",
+      "popular": "Gewild Naby Jou",
+      "new": "Nuwe Aankomelinge",
+      "rating": "Gradering",
+      "deliveryTime": "Aflewertyd",
+      "deliveryFee": "Aflewerfooi",
+      "minOrder": "Min. Bestelling",
+      "open": "Oop",
+      "closed": "Gesluit",
+      "closingSoon": "Sluit Binnekort",
+      "noResults": "Geen restaurante gevind",
+      "tryDifferent": "Probeer jou filters aanpas"
+    },
+    "filters": {
+      "title": "Filters",
+      "cuisine": "Koskultuur",
+      "priceRange": "Prysklas",
+      "dietary": "Dieetopsies",
+      "vegetarian": "Vegetaries",
+      "vegan": "Vegaans",
+      "glutenFree": "Glutenvry",
+      "halal": "Halal",
+      "sortBy": "Sorteer Volgens",
+      "highestRated": "Hoogste Gegradeer",
+      "fastestDelivery": "Vinnigste Aflewering",
+      "lowestFee": "Laagste Fooi",
+      "clearAll": "Vee Alle Filters Uit"
+    },
+    "cart": {
+      "title": "Jou Mandjie",
+      "empty": "Jou mandjie is leeg",
+      "emptyMessage": "Voeg lekker items by vanaf ons restaurante om te begin!",
+      "browseRestaurants": "Blaai Restaurante",
+      "items": "{{count}} item",
+      "items_plural": "{{count}} items",
+      "subtotal": "Subtotaal",
+      "deliveryFee": "Aflewerfooi",
+      "serviceFee": "Diensfooi",
+      "discount": "Afslag",
+      "total": "Totaal",
+      "promoCode": "Promosiekode",
+      "applyCode": "Pas Toe",
+      "checkout": "Gaan Voort na Betaling",
+      "estimatedDelivery": "Geskatte Aflewering"
+    },
+    "checkout": {
+      "title": "Betaal",
+      "deliveryAddress": "Afleweradres",
+      "selectAddress": "Kies Adres",
+      "addAddress": "Voeg Nuwe Adres By",
+      "fulfillmentMethod": "Aflewermetode",
+      "delivery": "Aflewering",
+      "pickup": "Afhaal",
+      "paymentMethod": "Betaalmetode",
+      "orderSummary": "Bestellingopsomming",
+      "placeOrder": "Plaas Bestelling",
+      "processing": "Verwerk...",
+      "securePayment": "Veilige betaling aangedryf deur PayFast"
+    },
+    "orders": {
+      "title": "Bestellingsgeskiedenis",
+      "trackOrder": "Volg Bestelling",
+      "reorder": "Herbestel",
+      "noOrders": "Nog geen bestellings nie",
+      "startOrdering": "Begin bestel by jou gunsteling restaurante!",
+      "status": {
+        "pending": "Hangende",
+        "confirmed": "Bevestig",
+        "preparing": "Word Voorberei",
+        "readyForPickup": "Gereed vir Afhaal",
+        "onTheWay": "Op Pad",
+        "delivered": "Afgelewer",
+        "cancelled": "Gekanselleer"
+      },
+      "tabs": {
+        "all": "Alles",
+        "active": "Aktief",
+        "completed": "Voltooid",
+        "cancelled": "Gekanselleer"
+      }
+    },
+    "favorites": {
+      "title": "My Gunstelinge",
+      "subtitle": "Jou gestoorde restaurante",
+      "empty": "Nog geen gunstelinge nie",
+      "emptyMessage": "Begin ontdek restaurante en stoor jou gunstelinge",
+      "signInRequired": "Meld aan om jou gunstelinge te sien",
+      "signInMessage": "Stoor jou gunsteling restaurante vir vinnige toegang"
+    },
+    "profile": {
+      "title": "Profiel",
+      "accountInfo": "Rekeninginligting",
+      "personalInfo": "Persoonlike Inligting",
+      "fullName": "Volle Naam",
+      "phone": "Telefoonnommer",
+      "addresses": "Gestoorde Adresse",
+      "preferences": "Voorkeure",
+      "notifications": "Kennisgewingvoorkeure",
+      "orderUpdates": "Bestellingsopdaterings",
+      "promoOffers": "Promosie-aanbiedinge",
+      "pushNotifications": "Stootkennisgewings",
+      "security": "Sekuriteit",
+      "changePassword": "Verander Wagwoord",
+      "paymentMethods": "Betaalmetodes",
+      "loyalty": {
+        "title": "Lojaliteitsprogram",
+        "points": "Beskikbare Punte",
+        "tier": "Vlak",
+        "earnMessage": "Verdien 1 punt vir elke R10 spandeer. Ruil punte in vir afslag!"
+      }
+    },
+    "tracking": {
+      "title": "Volg Jou Bestelling",
+      "orderPlaced": "Bestelling Geplaas",
+      "preparing": "Restaurant Berei Voor",
+      "onTheWay": "Uit vir Aflewering",
+      "delivered": "Afgelewer",
+      "estimatedTime": "Geskatte Tyd",
+      "driverLocation": "Bestuurder Ligging",
+      "callDriver": "Bel Bestuurder",
+      "messageDriver": "Stuur Boodskap",
+      "callRestaurant": "Bel Restaurant"
+    }
+  },
+  "restaurant": {
+    "dashboard": {
+      "title": "Restaurant Paneelbord",
+      "todaySales": "Vandag se Verkope",
+      "totalOrders": "Totale Bestellings",
+      "avgOrderValue": "Gem. Bestellingswaarde",
+      "rating": "Gradering",
+      "pendingOrders": "Hangende Bestellings",
+      "recentOrders": "Onlangse Bestellings"
+    },
+    "orders": {
+      "title": "Bestellings",
+      "newOrder": "Nuwe Bestelling",
+      "accept": "Aanvaar",
+      "reject": "Verwerp",
+      "markReady": "Merk as Gereed",
+      "preparing": "Word Voorberei",
+      "ready": "Gereed vir Afhaal"
+    },
+    "menu": {
+      "title": "Spyskaartbestuur",
+      "addItem": "Voeg Spyskaartitem By",
+      "editItem": "Wysig Item",
+      "categories": "Kategorieë",
+      "items": "Items",
+      "available": "Beskikbaar",
+      "unavailable": "Onbeskikbaar",
+      "price": "Prys",
+      "description": "Beskrywing"
+    }
+  },
+  "delivery": {
+    "dashboard": {
+      "title": "Bestuurder Paneelbord",
+      "todayEarnings": "Vandag se Verdienste",
+      "online": "Aanlyn",
+      "offline": "Vanlyn",
+      "goOnline": "Gaan Aanlyn",
+      "goOffline": "Gaan Vanlyn",
+      "availableOrders": "Beskikbare Bestellings",
+      "currentDelivery": "Huidige Aflewering"
+    },
+    "orders": {
+      "accept": "Aanvaar Aflewering",
+      "pickup": "Afgehaal",
+      "deliver": "Merk Afgelewer",
+      "navigate": "Navigeer",
+      "contactCustomer": "Kontak Kliënt"
+    },
+    "earnings": {
+      "title": "Verdienste",
+      "thisWeek": "Hierdie Week",
+      "thisMonth": "Hierdie Maand",
+      "totalDeliveries": "Totale Aflewerings",
+      "averagePerDelivery": "Gem. per Aflewering"
+    }
+  },
+  "admin": {
+    "dashboard": "Admin Paneelbord",
+    "users": "Gebruikers",
+    "restaurants": "Restaurante",
+    "orders": "Bestellings",
+    "deliveryPartners": "Afleweringsvennote",
+    "revenue": "Inkomste",
+    "analytics": "Analitika",
+    "marketing": "Bemarking",
+    "logs": "Stelselloglêers",
+    "settings": "Instellings",
+    "superAdmin": "Super Admin"
+  },
+  "footer": {
+    "about": "Oor Ons",
+    "contact": "Kontak",
+    "help": "Hulpsentrum",
+    "terms": "Diensvoorwaardes",
+    "privacy": "Privaatheidsbeleid",
+    "careers": "Loopbane",
+    "partner": "Vennoot met Ons",
+    "deliver": "Lewer met Ons Af",
+    "madeWith": "Gemaak met ❤️ vir plaaslike gemeenskappe",
+    "copyright": "© {{year}} Smash Local. Alle regte voorbehou."
+  },
+  "errors": {
+    "networkError": "Netwerkfout. Gaan asseblief jou verbinding na.",
+    "serverError": "Bedienerfout. Probeer asseblief later weer.",
+    "notFound": "Bladsy nie gevind nie",
+    "unauthorized": "Jy is nie gemagtig om hierdie bladsy te sien nie",
+    "sessionExpired": "Jou sessie het verval. Meld asseblief weer aan.",
+    "validationError": "Gaan asseblief jou invoer na en probeer weer"
+  },
+  "accessibility": {
+    "skipToMain": "Spring na hoofinhoud",
+    "openMenu": "Maak spyskaart oop",
+    "closeMenu": "Sluit spyskaart",
+    "openCart": "Maak mandjie oop",
+    "language": "Verander taal",
+    "darkMode": "Wissel donker modus"
+  }
+}

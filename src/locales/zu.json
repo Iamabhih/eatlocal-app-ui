@@ -1,0 +1,314 @@
+{
+  "common": {
+    "appName": "Smash Local",
+    "tagline": "Konke Kwasendaweni Yakho, Kulethiwe",
+    "loading": "Iyalayisha...",
+    "error": "Kukhona okungahambanga kahle",
+    "retry": "Zama Futhi",
+    "cancel": "Khansela",
+    "save": "Gcina",
+    "delete": "Susa",
+    "edit": "Hlela",
+    "add": "Engeza",
+    "search": "Sesha",
+    "filter": "Hlunga",
+    "sort": "Hlela",
+    "clear": "Sula",
+    "apply": "Sebenzisa",
+    "close": "Vala",
+    "back": "Emuva",
+    "next": "Okulandelayo",
+    "submit": "Thumela",
+    "confirm": "Qinisekisa",
+    "yes": "Yebo",
+    "no": "Cha",
+    "all": "Konke",
+    "none": "Lutho",
+    "more": "Okwengeziwe",
+    "less": "Okuncane",
+    "viewAll": "Bona Konke",
+    "seeMore": "Bona Okwengeziwe",
+    "showLess": "Khombisa Okuncane"
+  },
+  "nav": {
+    "home": "Ekhaya",
+    "browse": "Bhrawuza",
+    "restaurants": "Izindawo Zokudlela",
+    "cart": "Ibhaskidi",
+    "orders": "Ama-oda",
+    "favorites": "Okuthandwayo",
+    "profile": "Iphrofayili",
+    "signIn": "Ngena",
+    "signOut": "Phuma",
+    "signUp": "Bhalisa",
+    "dashboard": "Ideshbodi",
+    "menu": "Imenyu",
+    "earnings": "Inzuzo",
+    "settings": "Izilungiselelo"
+  },
+  "auth": {
+    "welcome": "Siyakwamukela",
+    "welcomeBack": "Siyajabula Ukubuyela",
+    "signInTitle": "Ngena ku-akhawunti yakho",
+    "signUpTitle": "Dala i-akhawunti",
+    "email": "I-imeyili",
+    "password": "Iphasiwedi",
+    "confirmPassword": "Qinisekisa Iphasiwedi",
+    "forgotPassword": "Ukhohlwe Iphasiwedi?",
+    "resetPassword": "Setha kabusha Iphasiwedi",
+    "noAccount": "Awunayo i-akhawunti?",
+    "hasAccount": "Usuneakhawunti?",
+    "orContinueWith": "Noma qhubeka nge",
+    "google": "Google",
+    "termsAgree": "Ngokubhalisa, uyavuma ku",
+    "termsOfService": "Imigomo Yesevisi",
+    "and": "kanye ne",
+    "privacyPolicy": "Inqubomgomo Yobumfihlo",
+    "selectRole": "Ngifuna uku",
+    "roles": {
+      "customer": "Oda Ukudla",
+      "restaurant": "Phatha Indawo Yokudlela",
+      "delivery": "Letha Ama-oda"
+    }
+  },
+  "customer": {
+    "hero": {
+      "title": "Ukudla okumnandi, kulethwe emnyango wakho",
+      "subtitle": "Oda ezindaweni zokudlela ezinhle zasendaweni ngemali esobala",
+      "searchPlaceholder": "Sesha izindawo zokudlela noma izidlo..."
+    },
+    "categories": {
+      "title": "Bhrawuza Ngohlobo",
+      "fastFood": "Ukudla Okusheshayo",
+      "pizza": "iPizza",
+      "asian": "Oku-Eshiya",
+      "mexican": "OkwaseMexico",
+      "italian": "OkwaseItaly",
+      "desserts": "Izidlo Zokugcina",
+      "healthy": "Okuphilile",
+      "coffee": "Ikhofi"
+    },
+    "restaurants": {
+      "featured": "Izindawo Zokudlela Ezikhethiwe",
+      "popular": "Okuthandwayo Eduze Nawe",
+      "new": "Abasha Abafike",
+      "rating": "Isilinganiso",
+      "deliveryTime": "Isikhathi Sokulethwa",
+      "deliveryFee": "Inkokhelo Yokulethwa",
+      "minOrder": "I-Oda Elincane",
+      "open": "Vulekile",
+      "closed": "Ivaliwe",
+      "closingSoon": "Ivala Maduzane",
+      "noResults": "Azikho izindawo zokudlela ezitholiwe",
+      "tryDifferent": "Zama ukulungisa izihluzi zakho"
+    },
+    "filters": {
+      "title": "Izihluzi",
+      "cuisine": "Uhlobo Lokudla",
+      "priceRange": "Ibanga Lamanani",
+      "dietary": "Izinketho Zokudla",
+      "vegetarian": "Umfino kuphela",
+      "vegan": "Vegani",
+      "glutenFree": "Ngaphandle kweGluteni",
+      "halal": "Halal",
+      "sortBy": "Hlela Nge",
+      "highestRated": "Esilinganiso Esiphezulu",
+      "fastestDelivery": "Ukulethwa Okusheshayo",
+      "lowestFee": "Inkokhelo Ephansi",
+      "clearAll": "Sula Zonke Izihluzi"
+    },
+    "cart": {
+      "title": "Ibhaskidi Yakho",
+      "empty": "Ibhaskidi yakho ayinalutho",
+      "emptyMessage": "Engeza izinto ezimnandi ezindaweni zethu zokudlela ukuze uqale!",
+      "browseRestaurants": "Bhrawuza Izindawo Zokudlela",
+      "items": "into engu-{{count}}",
+      "items_plural": "izinto ezingu-{{count}}",
+      "subtotal": "Inani Elincane",
+      "deliveryFee": "Inkokhelo Yokulethwa",
+      "serviceFee": "Inkokhelo Yesevisi",
+      "discount": "Isaphulelo",
+      "total": "Inani Liphelele",
+      "promoCode": "Ikhodi Yesaphulelo",
+      "applyCode": "Sebenzisa",
+      "checkout": "Qhubeka Nokukhokha",
+      "estimatedDelivery": "Ukulethwa Okulinganiselwe"
+    },
+    "checkout": {
+      "title": "Khokha",
+      "deliveryAddress": "Ikheli Lokulethwa",
+      "selectAddress": "Khetha Ikheli",
+      "addAddress": "Engeza Ikheli Elisha",
+      "fulfillmentMethod": "Indlela Yokufeza",
+      "delivery": "Ukulethwa",
+      "pickup": "Ukuthatha",
+      "paymentMethod": "Indlela Yokukhokha",
+      "orderSummary": "Isifinyezo Se-oda",
+      "placeOrder": "Beka I-oda",
+      "processing": "Kuyacutshungulwa...",
+      "securePayment": "Ukukhokha okuphephile nge-PayFast"
+    },
+    "orders": {
+      "title": "Umlando Wama-oda",
+      "trackOrder": "Landela I-oda",
+      "reorder": "Phinda Oda",
+      "noOrders": "Awekho ama-oda okwamanje",
+      "startOrdering": "Qala ukuoda ezindaweni zakho zokudlela ozithandayo!",
+      "status": {
+        "pending": "Kulindile",
+        "confirmed": "Kuqinisekisiwe",
+        "preparing": "Kuyalungiswa",
+        "readyForPickup": "Kulungele Ukuthathwa",
+        "onTheWay": "Kusendleleni",
+        "delivered": "Kulethiwe",
+        "cancelled": "Kukhanseliwe"
+      },
+      "tabs": {
+        "all": "Konke",
+        "active": "Okusebenzayo",
+        "completed": "Okuqediwe",
+        "cancelled": "Okukhanseliwe"
+      }
+    },
+    "favorites": {
+      "title": "Okuthandwayo Kwami",
+      "subtitle": "Izindawo zakho zokudlela ezigciniwe",
+      "empty": "Akukho okuthandwayo okwamanje",
+      "emptyMessage": "Qala ukuhlola izindawo zokudlela bese ugcina ozithandayo",
+      "signInRequired": "Ngena ukuze ubone okuthandwayo kwakho",
+      "signInMessage": "Gcina izindawo zakho zokudlela ozithandayo ukuze ufinyelele kalula"
+    },
+    "profile": {
+      "title": "Iphrofayili",
+      "accountInfo": "Ulwazi Lwe-akhawunti",
+      "personalInfo": "Ulwazi Lomuntu Siqu",
+      "fullName": "Igama Eliphelele",
+      "phone": "Inombolo Yocingo",
+      "addresses": "Amakheli Agciniwe",
+      "preferences": "Izinketho",
+      "notifications": "Izinketho Zezaziso",
+      "orderUpdates": "Izibuyekezo Zama-oda",
+      "promoOffers": "Iziphakamiso Zesaphulelo",
+      "pushNotifications": "Izaziso Eziphusha",
+      "security": "Ukuphepha",
+      "changePassword": "Shintsha Iphasiwedi",
+      "paymentMethods": "Izindlela Zokukhokha",
+      "loyalty": {
+        "title": "Uhlelo Lwethembeko",
+        "points": "Amaphuzu Atholakalayo",
+        "tier": "Izinga",
+        "earnMessage": "Thola iphuzu eli-1 kuyo yonke i-R10 oyisebenzisayo. Sebenzisa amaphuzu ukuthola izaphulelo!"
+      }
+    },
+    "tracking": {
+      "title": "Landela I-oda Lakho",
+      "orderPlaced": "I-oda Libekiwe",
+      "preparing": "Indawo Yokudlela Iyalungisa",
+      "onTheWay": "Kuphumile Ukulethwa",
+      "delivered": "Kulethiwe",
+      "estimatedTime": "Isikhathi Esilinganiselwe",
+      "driverLocation": "Indawo Yomshayeli",
+      "callDriver": "Shayela Umshayeli",
+      "messageDriver": "Thumela Umlayezo",
+      "callRestaurant": "Shayela Indawo Yokudlela"
+    }
+  },
+  "restaurant": {
+    "dashboard": {
+      "title": "Ideshbodi Yendawo Yokudlela",
+      "todaySales": "Ukuthengisa Kwanamhlanje",
+      "totalOrders": "Ama-oda Ephelele",
+      "avgOrderValue": "Inani Le-oda Elimaphakathi",
+      "rating": "Isilinganiso",
+      "pendingOrders": "Ama-oda Alindile",
+      "recentOrders": "Ama-oda Amuva"
+    },
+    "orders": {
+      "title": "Ama-oda",
+      "newOrder": "I-oda Elisha",
+      "accept": "Yamukela",
+      "reject": "Yenqaba",
+      "markReady": "Phawula Njengokulungile",
+      "preparing": "Kuyalungiswa",
+      "ready": "Kulungele Ukuthathwa"
+    },
+    "menu": {
+      "title": "Ukuphathwa Kwemenyu",
+      "addItem": "Engeza Into Yemenyu",
+      "editItem": "Hlela Into",
+      "categories": "Izigaba",
+      "items": "Izinto",
+      "available": "Iyatholakala",
+      "unavailable": "Ayitholakali",
+      "price": "Inani",
+      "description": "Incazelo"
+    }
+  },
+  "delivery": {
+    "dashboard": {
+      "title": "Ideshbodi Yomshayeli",
+      "todayEarnings": "Inzuzo Yanamhlanje",
+      "online": "Ku-inthanethi",
+      "offline": "Ngaphandle kwe-inthanethi",
+      "goOnline": "Ya Ku-inthanethi",
+      "goOffline": "Phuma Ku-inthanethi",
+      "availableOrders": "Ama-oda Atholakalayo",
+      "currentDelivery": "Ukulethwa Kwamanje"
+    },
+    "orders": {
+      "accept": "Yamukela Ukulethwa",
+      "pickup": "Kuthathiwe",
+      "deliver": "Phawula Njengolethiwe",
+      "navigate": "Zulazula",
+      "contactCustomer": "Xhumana Nekhasimende"
+    },
+    "earnings": {
+      "title": "Inzuzo",
+      "thisWeek": "Leli Viki",
+      "thisMonth": "Leli Nyanga",
+      "totalDeliveries": "Ukulethwa Okuphelele",
+      "averagePerDelivery": "Ephakathi Ngokulethwa Ngakunye"
+    }
+  },
+  "admin": {
+    "dashboard": "Ideshbodi ka-Admin",
+    "users": "Abasebenzisi",
+    "restaurants": "Izindawo Zokudlela",
+    "orders": "Ama-oda",
+    "deliveryPartners": "Abalingani Bokulethwa",
+    "revenue": "Imali Engenayo",
+    "analytics": "Ukuhlaziywa",
+    "marketing": "Ukumaketha",
+    "logs": "Amalogfile Esistimu",
+    "settings": "Izilungiselelo",
+    "superAdmin": "Super Admin"
+  },
+  "footer": {
+    "about": "Mayelana Nathi",
+    "contact": "Xhumana",
+    "help": "Isikhungo Sosizo",
+    "terms": "Imigomo Yesevisi",
+    "privacy": "Inqubomgomo Yobumfihlo",
+    "careers": "Imisebenzi",
+    "partner": "Lingana Nathi",
+    "deliver": "Letha Nathi",
+    "madeWith": "Yenziwe ngo-❤️ yemiphakathi yasendaweni",
+    "copyright": "© {{year}} Smash Local. Wonke amalungelo agodliwe."
+  },
+  "errors": {
+    "networkError": "Iphutha lenethiwekhi. Sicela uhlole ukuxhumana kwakho.",
+    "serverError": "Iphutha leseva. Sicela uzame futhi kamuva.",
+    "notFound": "Ikhasi alitholakali",
+    "unauthorized": "Awugunyaziwe ukubuka leli khasi",
+    "sessionExpired": "Iseshini yakho iphelelwe. Sicela ungene futhi.",
+    "validationError": "Sicela uhlole okufakile bese uzama futhi"
+  },
+  "accessibility": {
+    "skipToMain": "Yeqa uye kokuqukethwe okukhulu",
+    "openMenu": "Vula imenyu",
+    "closeMenu": "Vala imenyu",
+    "openCart": "Vula ibhaskidi",
+    "language": "Shintsha ulimi",
+    "darkMode": "Shintshela kumodi emnyama"
+  }
+}

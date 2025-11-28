@@ -2,11 +2,13 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { ThemeProvider } from "next-themes";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { GlobalErrorBoundary } from "@/components/errors/GlobalErrorBoundary";
 import { RouteErrorBoundary } from "@/components/errors/RouteErrorBoundary";
 import { NavigationLogger } from "@/components/logging/NavigationLogger";
+import { SkipLink } from "@/components/shared/SkipLink";
 import { loggingService } from "@/services/loggingService";
 import { RestaurantChangeModal } from "@/components/customer/RestaurantChangeModal";
 import { QUERY_CACHE } from "@/lib/constants";
@@ -437,17 +439,27 @@ function AppContent() {
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <GlobalErrorBoundary>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <NavigationLogger />
-        <AuthProvider>
-          <RestaurantChangeModal />
-          <AppContent />
-        </AuthProvider>
-      </BrowserRouter>
-    </GlobalErrorBoundary>
+    <ThemeProvider
+      attribute="class"
+      defaultTheme="system"
+      enableSystem
+      disableTransitionOnChange
+    >
+      <GlobalErrorBoundary>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <SkipLink />
+          <NavigationLogger />
+          <AuthProvider>
+            <RestaurantChangeModal />
+            <main id="main-content">
+              <AppContent />
+            </main>
+          </AuthProvider>
+        </BrowserRouter>
+      </GlobalErrorBoundary>
+    </ThemeProvider>
   </QueryClientProvider>
 );
 
