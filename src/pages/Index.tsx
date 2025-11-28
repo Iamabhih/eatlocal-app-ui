@@ -424,7 +424,7 @@ export default function Index() {
               Ready to Experience the <span className="text-gradient-primary">Difference</span>?
             </h2>
             <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-              Join thousands of satisfied customers who have made Smash their go-to food delivery app.
+              Join thousands of satisfied customers who have made Smash Local their go-to food delivery app.
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
               <Button
@@ -453,10 +453,10 @@ export default function Index() {
         <div className="container mx-auto px-4">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
             <div className="text-2xl font-display font-bold text-gradient-primary">
-              Smash
+              Smash Local
             </div>
             <p className="text-sm text-muted-foreground">
-              © 2024 Smash. All rights reserved.
+              © {new Date().getFullYear()} Smash Local. All rights reserved.
             </p>
           </div>
         </div>

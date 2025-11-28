@@ -42,7 +42,7 @@ const Navbar = ({ type = "customer" }: NavbarProps) => {
                 <span className="text-white font-bold text-lg">S</span>
               </div>
               <span className="text-xl font-display font-bold text-foreground hidden sm:block">
-                Smash <span className="text-accent font-normal text-sm">Restaurant</span>
+                Smash Local <span className="text-accent font-normal text-sm">Restaurant</span>
               </span>
             </Link>
             <div className="flex items-center gap-2">
@@ -106,7 +106,7 @@ const Navbar = ({ type = "customer" }: NavbarProps) => {
                 <span className="text-white font-bold text-lg">S</span>
               </div>
               <span className="text-xl font-display font-bold text-foreground hidden sm:block">
-                Smash <span className="text-muted-foreground font-normal text-sm">Driver</span>
+                Smash Local <span className="text-muted-foreground font-normal text-sm">Driver</span>
               </span>
             </Link>
             <div className="flex items-center gap-2">
@@ -171,7 +171,7 @@ const Navbar = ({ type = "customer" }: NavbarProps) => {
               <span className="text-white font-bold text-lg">S</span>
             </div>
             <span className="text-xl font-display font-bold text-gradient-primary hidden sm:block">
-              Smash
+              Smash Local
             </span>
           </Link>
 

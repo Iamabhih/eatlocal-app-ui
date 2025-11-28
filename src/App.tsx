@@ -69,6 +69,7 @@ const AdminAnalytics = lazy(() => import("./pages/admin/AdminAnalytics"));
 const LaunchChecklist = lazy(() => import("./pages/admin/LaunchChecklist"));
 const AdminMarketing = lazy(() => import("./pages/admin/AdminMarketing"));
 const AdminLogs = lazy(() => import("./pages/admin/AdminLogs"));
+const SuperAdminDashboard = lazy(() => import("./pages/admin/SuperAdminDashboard"));
 const AdminLayout = lazy(() => import("./components/admin/AdminLayout").then(m => ({ default: m.AdminLayout })));
 
 // Loading component for lazy-loaded routes
@@ -403,6 +404,24 @@ function AppContent() {
               <Suspense fallback={<PageLoader />}>
                 <ProtectedRoute requiredRole="admin">
                   <LaunchChecklist />
+                </ProtectedRoute>
+              </Suspense>
+            </RouteErrorBoundary>
+          } />
+          <Route path="/admin/superadmin" element={
+            <RouteErrorBoundary fallbackTitle="Super Admin Dashboard Error">
+              <Suspense fallback={<PageLoader />}>
+                <ProtectedRoute requiredRole="superadmin">
+                  <SuperAdminDashboard />
+                </ProtectedRoute>
+              </Suspense>
+            </RouteErrorBoundary>
+          } />
+          <Route path="/admin/settings" element={
+            <RouteErrorBoundary fallbackTitle="Platform Settings Error">
+              <Suspense fallback={<PageLoader />}>
+                <ProtectedRoute requiredRole="superadmin">
+                  <SuperAdminDashboard />
                 </ProtectedRoute>
               </Suspense>
             </RouteErrorBoundary>
