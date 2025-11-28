@@ -228,7 +228,7 @@ export default function AdminAnalytics() {
                     </CardHeader>
                     <CardContent>
                       <div className="text-2xl font-bold">
-                        ${analytics?.totalRevenue.toFixed(2)}
+                        R{analytics?.totalRevenue.toFixed(2)}
                       </div>
                     </CardContent>
                   </Card>
@@ -240,7 +240,7 @@ export default function AdminAnalytics() {
                     </CardHeader>
                     <CardContent>
                       <div className="text-2xl font-bold">
-                        ${analytics?.avgOrderValue.toFixed(2)}
+                        R{analytics?.avgOrderValue.toFixed(2)}
                       </div>
                     </CardContent>
                   </Card>
@@ -278,7 +278,7 @@ export default function AdminAnalytics() {
                           <YAxis />
                           <Tooltip />
                           <Legend />
-                          <Bar dataKey="revenue" fill="hsl(var(--primary))" name="Revenue ($)" />
+                          <Bar dataKey="revenue" fill="hsl(var(--primary))" name="Revenue (R)" />
                         </BarChart>
                       </ResponsiveContainer>
                     </CardContent>
@@ -324,13 +324,13 @@ export default function AdminAnalytics() {
                         <div>
                           <p className="text-sm text-muted-foreground mb-1">Revenue</p>
                           <p className="text-3xl font-bold">
-                            ${analytics?.monthlyRevenue.toFixed(2)}
+                            R{analytics?.monthlyRevenue.toFixed(2)}
                           </p>
                         </div>
                         <div>
                           <p className="text-sm text-muted-foreground mb-1">Avg Order Value</p>
                           <p className="text-3xl font-bold">
-                            ${analytics?.monthlyOrders > 0 ? (analytics.monthlyRevenue / analytics.monthlyOrders).toFixed(2) : '0.00'}
+                            R{analytics?.monthlyOrders > 0 ? (analytics.monthlyRevenue / analytics.monthlyOrders).toFixed(2) : '0.00'}
                           </p>
                         </div>
                       </div>
@@ -363,7 +363,7 @@ export default function AdminAnalytics() {
                           </div>
                           <div className="text-right">
                             <p className="text-lg font-bold">
-                              ${restaurant.revenue.toFixed(2)}
+                              R{restaurant.revenue.toFixed(2)}
                             </p>
                           </div>
                         </div>

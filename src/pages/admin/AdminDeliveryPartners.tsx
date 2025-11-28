@@ -100,7 +100,7 @@ export default function AdminDeliveryPartners() {
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold">
-                    ${deliveryPartners?.reduce((sum, p) => sum + p.totalEarnings, 0).toFixed(2) || '0.00'}
+                    R{deliveryPartners?.reduce((sum, p) => sum + p.totalEarnings, 0).toFixed(2) || '0.00'}
                   </div>
                 </CardContent>
               </Card>
@@ -111,7 +111,7 @@ export default function AdminDeliveryPartners() {
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold">
-                    ${deliveryPartners?.reduce((sum, p) => sum + p.totalFees, 0).toFixed(2) || '0.00'}
+                    R{deliveryPartners?.reduce((sum, p) => sum + p.totalFees, 0).toFixed(2) || '0.00'}
                   </div>
                 </CardContent>
               </Card>
@@ -122,7 +122,7 @@ export default function AdminDeliveryPartners() {
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold">
-                    ${deliveryPartners?.reduce((sum, p) => sum + p.unpaidEarnings, 0).toFixed(2) || '0.00'}
+                    R{deliveryPartners?.reduce((sum, p) => sum + p.unpaidEarnings, 0).toFixed(2) || '0.00'}
                   </div>
                 </CardContent>
               </Card>
@@ -163,11 +163,11 @@ export default function AdminDeliveryPartners() {
                               </Badge>
                             )}
                           </TableCell>
-                          <TableCell>${partner.totalEarnings.toFixed(2)}</TableCell>
-                          <TableCell>${partner.totalFees.toFixed(2)}</TableCell>
-                          <TableCell>${partner.netPayout.toFixed(2)}</TableCell>
+                          <TableCell>R{partner.totalEarnings.toFixed(2)}</TableCell>
+                          <TableCell>R{partner.totalFees.toFixed(2)}</TableCell>
+                          <TableCell>R{partner.netPayout.toFixed(2)}</TableCell>
                           <TableCell className="font-semibold">
-                            ${partner.unpaidEarnings.toFixed(2)}
+                            R{partner.unpaidEarnings.toFixed(2)}
                           </TableCell>
                           <TableCell>
                             {partner.activeDeliveries > 0 ? (

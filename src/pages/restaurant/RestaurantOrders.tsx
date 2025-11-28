@@ -56,7 +56,7 @@ const RestaurantOrders = () => {
             </p>
           </div>
           <div className="text-right">
-            <p className="font-bold text-xl">${Number(order.total).toFixed(2)}</p>
+            <p className="font-bold text-xl">R{Number(order.total).toFixed(2)}</p>
           </div>
         </div>
 
@@ -179,7 +179,7 @@ const RestaurantOrders = () => {
                       <div key={item.id} className="border-b pb-2 mb-2 last:border-b-0">
                         <div className="flex justify-between">
                           <span>{item.quantity}x {item.menu_item?.name}</span>
-                          <span>${Number(item.subtotal).toFixed(2)}</span>
+                          <span>R{Number(item.subtotal).toFixed(2)}</span>
                         </div>
                         {item.special_instructions && (
                           <p className="text-xs text-muted-foreground mt-1">
@@ -190,7 +190,7 @@ const RestaurantOrders = () => {
                     ))}
                     <div className="flex justify-between font-bold pt-2 border-t">
                       <span>Total</span>
-                      <span>${Number(order.total).toFixed(2)}</span>
+                      <span>R{Number(order.total).toFixed(2)}</span>
                     </div>
                   </div>
                 </div>

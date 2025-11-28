@@ -151,7 +151,7 @@ const DeliveryDashboard = () => {
                       </p>
                     </div>
                     <div className="text-right">
-                      <p className="font-bold text-lg text-primary">${Number(currentDelivery.total).toFixed(2)}</p>
+                      <p className="font-bold text-lg text-primary">R{Number(currentDelivery.total).toFixed(2)}</p>
                     </div>
                   </div>
 
@@ -206,7 +206,7 @@ const DeliveryDashboard = () => {
                         </div>
                       </div>
                       <div className="text-right">
-                        <p className="font-bold text-primary">${Number(order.delivery_fee).toFixed(2)}</p>
+                        <p className="font-bold text-primary">R{Number(order.delivery_fee).toFixed(2)}</p>
                         <Button 
                           size="sm" 
                           className="mt-2 bg-primary hover:bg-primary/90"

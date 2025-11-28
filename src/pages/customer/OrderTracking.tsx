@@ -402,20 +402,20 @@ const OrderTracking = () => {
             <div className="space-y-2">
               <div className="flex justify-between">
                 <span>Subtotal</span>
-                <span>${order.subtotal.toFixed(2)}</span>
+                <span>R{order.subtotal.toFixed(2)}</span>
               </div>
               <div className="flex justify-between">
                 <span>Delivery Fee</span>
-                <span>${order.delivery_fee.toFixed(2)}</span>
+                <span>R{order.delivery_fee.toFixed(2)}</span>
               </div>
               <div className="flex justify-between">
                 <span>Tax</span>
-                <span>${order.tax.toFixed(2)}</span>
+                <span>R{order.tax.toFixed(2)}</span>
               </div>
               <Separator className="my-2" />
               <div className="flex justify-between font-bold text-lg">
                 <span>Total</span>
-                <span>${order.total.toFixed(2)}</span>
+                <span>R{order.total.toFixed(2)}</span>
               </div>
             </div>
           </CardContent>

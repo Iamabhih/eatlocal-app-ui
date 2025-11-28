@@ -56,7 +56,7 @@ export default function AdminOrders() {
                             <Badge variant="secondary">{order.status}</Badge>
                           </TableCell>
                           <TableCell>{order.order_items?.length || 0}</TableCell>
-                          <TableCell>${Number(order.total).toFixed(2)}</TableCell>
+                          <TableCell>R{Number(order.total).toFixed(2)}</TableCell>
                           <TableCell>
                             {new Date(order.created_at).toLocaleDateString()}
                           </TableCell>

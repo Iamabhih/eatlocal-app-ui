@@ -81,7 +81,7 @@ const RestaurantDetail = () => {
               </div>
               <div className="flex items-center gap-1">
                 <DollarSign className="h-4 w-4" />
-                ${restaurant.delivery_fee} delivery fee
+                R{restaurant.delivery_fee} delivery fee
               </div>
             </div>
           </div>
@@ -97,7 +97,7 @@ const RestaurantDetail = () => {
             )}
           </div>
           <p className="text-muted-foreground">
-            Minimum order: ${restaurant.minimum_order} • Delivery fee: ${restaurant.delivery_fee}
+            Minimum order: R{restaurant.minimum_order} • Delivery fee: R{restaurant.delivery_fee}
           </p>
         </div>
       </section>
@@ -142,7 +142,7 @@ const RestaurantDetail = () => {
                                   <p className="text-xs text-muted-foreground mb-2">{item.calories} cal</p>
                                 )}
                                 <div className="flex items-center justify-between">
-                                  <span className="text-lg font-bold">${Number(item.price).toFixed(2)}</span>
+                                  <span className="text-lg font-bold">R{Number(item.price).toFixed(2)}</span>
                                   <div className="flex items-center gap-2">
                                     {quantity > 0 && (
                                       <>
@@ -207,15 +207,15 @@ const RestaurantDetail = () => {
                       <div className="space-y-2 text-sm">
                         <div className="flex justify-between">
                           <span>Subtotal ({totalItems} items)</span>
-                          <span>${cartTotal.toFixed(2)}</span>
+                          <span>R{cartTotal.toFixed(2)}</span>
                         </div>
                         <div className="flex justify-between">
                           <span>Delivery fee</span>
-                          <span>${deliveryFee.toFixed(2)}</span>
+                          <span>R{deliveryFee.toFixed(2)}</span>
                         </div>
                         <div className="flex justify-between font-bold text-base pt-2 border-t">
                           <span>Total</span>
-                          <span>${(cartTotal + deliveryFee).toFixed(2)}</span>
+                          <span>R{(cartTotal + deliveryFee).toFixed(2)}</span>
                         </div>
                       </div>
 
@@ -225,7 +225,7 @@ const RestaurantDetail = () => {
                         onClick={() => navigate('/cart')}
                       >
                         {cartTotal < minimumOrder
-                          ? `$${(minimumOrder - cartTotal).toFixed(2)} to minimum`
+                          ? `R${(minimumOrder - cartTotal).toFixed(2)} to minimum`
                           : 'View Cart'
                         }
                       </Button>
