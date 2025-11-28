@@ -5,7 +5,6 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
-import Navbar from "@/components/shared/Navbar";
 import { useCart } from "@/hooks/useCart";
 import { useState, useEffect } from "react";
 
@@ -47,8 +46,7 @@ const Cart = () => {
 
   if (items.length === 0) {
     return (
-      <div className="min-h-screen bg-background">
-        <Navbar type="customer" />
+      <div className="bg-background">
         <div className="container mx-auto px-4 py-16">
           <div className="text-center max-w-md mx-auto">
             <div className="text-8xl mb-6">🛒</div>
@@ -68,9 +66,7 @@ const Cart = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <Navbar type="customer" />
-      
+    <div className="bg-background">
       <div className="container mx-auto px-4 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Cart Items */}

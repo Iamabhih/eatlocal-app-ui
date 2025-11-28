@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import Navbar from "@/components/shared/Navbar";
 import { useRestaurant } from "@/hooks/useRestaurants";
 import { useRestaurantMenu } from "@/hooks/useMenuItems";
 import { useCart } from "@/hooks/useCart";
@@ -18,8 +17,7 @@ const RestaurantDetail = () => {
 
   if (restaurantLoading || menuLoading) {
     return (
-      <div className="min-h-screen bg-background">
-        <Navbar type="customer" />
+      <div className="bg-background">
         <div className="container mx-auto px-4 py-16">
           <p className="text-center text-muted-foreground">Loading restaurant...</p>
         </div>
@@ -29,8 +27,7 @@ const RestaurantDetail = () => {
 
   if (!restaurant) {
     return (
-      <div className="min-h-screen bg-background">
-        <Navbar type="customer" />
+      <div className="bg-background">
         <div className="container mx-auto px-4 py-16">
           <p className="text-center text-muted-foreground">Restaurant not found</p>
         </div>
@@ -59,9 +56,7 @@ const RestaurantDetail = () => {
   const minimumOrder = Number(restaurant.minimum_order);
 
   return (
-    <div className="min-h-screen bg-background">
-      <Navbar type="customer" />
-      
+    <div className="bg-background">
       {/* Restaurant Header */}
       <section className="relative">
         <img 

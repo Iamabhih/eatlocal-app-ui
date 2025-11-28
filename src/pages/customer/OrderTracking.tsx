@@ -5,7 +5,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import Navbar from "@/components/shared/Navbar";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { logger } from "@/lib/logger";
@@ -222,8 +221,7 @@ const OrderTracking = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background">
-        <Navbar type="customer" />
+      <div className="bg-background">
         <div className="container mx-auto px-4 py-8">
           <div className="flex items-center justify-center h-64">
             <div className="text-center">
@@ -238,8 +236,7 @@ const OrderTracking = () => {
 
   if (!order || !restaurant) {
     return (
-      <div className="min-h-screen bg-background">
-        <Navbar type="customer" />
+      <div className="bg-background">
         <div className="container mx-auto px-4 py-8">
           <div className="text-center">
             <h2 className="text-2xl font-bold mb-4">Order Not Found</h2>
@@ -251,9 +248,7 @@ const OrderTracking = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <Navbar type="customer" />
-      
+    <div className="bg-background">
       <div className="container mx-auto px-4 py-8 max-w-4xl">
         {/* Header */}
         <div className="mb-6">

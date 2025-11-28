@@ -13,7 +13,6 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import Navbar from "@/components/shared/Navbar";
 import { AddressSelector } from "@/components/customer/AddressSelector";
 import { FulfillmentSelector } from "@/components/checkout/FulfillmentSelector";
 import { useAuth } from "@/contexts/AuthContext";
@@ -400,8 +399,7 @@ const Checkout = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <Navbar />
+    <div className="bg-gray-50">
       <div className="container mx-auto px-4 py-8 max-w-4xl">
         <h1 className="text-3xl font-bold mb-6">Checkout</h1>
 
