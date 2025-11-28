@@ -27,6 +27,15 @@ interface LocationUpdate {
   heading?: number;
 }
 
+interface DeliveryPartnerLocation {
+  latitude: number;
+  longitude: number;
+  updated_at: string;
+  speed?: number;
+  heading?: number;
+  is_active?: boolean;
+}
+
 const mapContainerStyle = {
   width: '100%',
   height: '400px',
@@ -73,17 +82,18 @@ export function LiveLocationMap({
         (payload) => {
           logger.log('Location update received:', payload);
 
-          if (payload.new) {
+          if (payload.new && typeof payload.new === 'object') {
+            const newData = payload.new as DeliveryPartnerLocation;
             const location: LocationUpdate = {
-              latitude: payload.new.latitude,
-              longitude: payload.new.longitude,
-              timestamp: payload.new.updated_at,
-              speed: payload.new.speed,
-              heading: payload.new.heading,
+              latitude: newData.latitude,
+              longitude: newData.longitude,
+              timestamp: newData.updated_at,
+              speed: newData.speed,
+              heading: newData.heading,
             };
 
             setCurrentLocation(location);
-            setIsActive(payload.new.is_active);
+            setIsActive(newData.is_active ?? false);
 
             // Calculate ETA based on distance and average speed
             if (location.speed && location.speed > 0) {
@@ -140,10 +150,12 @@ export function LiveLocationMap({
         latitude: data.latitude,
         longitude: data.longitude,
         timestamp: data.updated_at,
-        speed: data.speed,
-        heading: data.heading,
+        speed: data.speed ?? undefined,
+        heading: data.heading ?? undefined,
       });
-      setIsActive(data.is_active);
+      // Cast data to access is_active if it exists
+      const locationData = data as typeof data & { is_active?: boolean };
+      setIsActive(locationData.is_active ?? false);
     }
   };
 

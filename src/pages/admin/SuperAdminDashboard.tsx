@@ -61,16 +61,16 @@ export default function SuperAdminDashboard() {
 
       if (error) throw error;
 
-      // Get user emails
+      // Get user profiles (full_name instead of email since profiles doesn't have email)
       const userIds = roles?.map(r => r.user_id) || [];
       const { data: profiles } = await supabase
         .from('profiles')
-        .select('id, email')
+        .select('id, full_name')
         .in('id', userIds);
 
       return (roles || []).map(role => ({
         ...role,
-        user_email: profiles?.find(p => p.id === role.user_id)?.email || 'Unknown'
+        user_email: profiles?.find(p => p.id === role.user_id)?.full_name || 'Unknown User'
       })) as AdminUser[];
     },
   });
@@ -78,22 +78,28 @@ export default function SuperAdminDashboard() {
   // Add admin mutation
   const addAdminMutation = useMutation({
     mutationFn: async ({ email, role }: { email: string; role: 'admin' | 'superadmin' }) => {
-      // First find the user by email
-      const { data: profile, error: profileError } = await supabase
+      // Note: Since profiles doesn't have email, we need to search auth.users
+      // For now, we'll need to have the user ID directly or use a different approach
+      // This is a simplified version - in production, you'd use an edge function to look up by email
+      
+      // Try to find user by looking up profiles with matching full_name (workaround)
+      const { data: profiles, error: profileError } = await supabase
         .from('profiles')
-        .select('id')
-        .eq('email', email)
-        .single();
+        .select('id, full_name')
+        .ilike('full_name', `%${email}%`)
+        .limit(1);
 
-      if (profileError || !profile) {
-        throw new Error('User not found with that email');
+      if (profileError || !profiles || profiles.length === 0) {
+        throw new Error('User not found. Please enter the user\'s name or ensure they have a profile.');
       }
+
+      const userId = profiles[0].id;
 
       // Check if already has role
       const { data: existingRole } = await supabase
         .from('user_roles')
         .select('id')
-        .eq('user_id', profile.id)
+        .eq('user_id', userId)
         .eq('role', role)
         .single();
 
@@ -104,7 +110,7 @@ export default function SuperAdminDashboard() {
       // Add the role
       const { error } = await supabase
         .from('user_roles')
-        .insert({ user_id: profile.id, role });
+        .insert({ user_id: userId, role });
 
       if (error) throw error;
     },
@@ -259,15 +265,15 @@ export default function SuperAdminDashboard() {
                     <DialogHeader>
                       <DialogTitle>Add New Admin</DialogTitle>
                       <DialogDescription>
-                        Grant admin privileges to an existing user
+                        Grant admin privileges to an existing user by their name
                       </DialogDescription>
                     </DialogHeader>
                     <div className="space-y-4 py-4">
                       <div className="space-y-2">
-                        <Label htmlFor="email">User Email</Label>
+                        <Label htmlFor="email">User Name</Label>
                         <Input
                           id="email"
-                          placeholder="user@example.com"
+                          placeholder="Enter user's name"
                           value={newAdminEmail}
                           onChange={(e) => setNewAdminEmail(e.target.value)}
                         />
@@ -306,7 +312,7 @@ export default function SuperAdminDashboard() {
                   <Table>
                     <TableHeader>
                       <TableRow>
-                        <TableHead>Email</TableHead>
+                        <TableHead>Name</TableHead>
                         <TableHead>Role</TableHead>
                         <TableHead>Added</TableHead>
                         <TableHead className="w-24">Actions</TableHead>

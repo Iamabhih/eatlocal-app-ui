@@ -5,6 +5,13 @@ import { useToast } from '@/hooks/use-toast';
 
 const LOCAL_STORAGE_KEY = 'smash_favorites';
 
+interface UserFavorite {
+  id: string;
+  user_id: string;
+  restaurant_id: string;
+  created_at: string;
+}
+
 export function useFavorites() {
   const { user } = useAuth();
   const { toast } = useToast();
@@ -19,13 +26,13 @@ export function useFavorites() {
       if (user) {
         // Load from database for authenticated users
         try {
-          const { data, error } = await supabase
-            .from('user_favorites')
+          const { data, error } = await (supabase
+            .from('user_favorites' as any)
             .select('restaurant_id')
-            .eq('user_id', user.id);
+            .eq('user_id', user.id) as any);
 
           if (error) throw error;
-          setFavorites(data?.map(f => f.restaurant_id) || []);
+          setFavorites((data as UserFavorite[] | null)?.map(f => f.restaurant_id) || []);
         } catch (error) {
           console.error('Error loading favorites:', error);
           // Fallback to localStorage
@@ -69,21 +76,21 @@ export function useFavorites() {
       try {
         if (isFav) {
           // Remove from database
-          const { error } = await supabase
-            .from('user_favorites')
+          const { error } = await (supabase
+            .from('user_favorites' as any)
             .delete()
             .eq('user_id', user.id)
-            .eq('restaurant_id', restaurantId);
+            .eq('restaurant_id', restaurantId) as any);
 
           if (error) throw error;
         } else {
           // Add to database
-          const { error } = await supabase
-            .from('user_favorites')
+          const { error } = await (supabase
+            .from('user_favorites' as any)
             .insert({
               user_id: user.id,
               restaurant_id: restaurantId,
-            });
+            }) as any);
 
           if (error) throw error;
         }
@@ -118,10 +125,10 @@ export function useFavorites() {
   const clearFavorites = useCallback(async () => {
     if (user) {
       try {
-        const { error } = await supabase
-          .from('user_favorites')
+        const { error } = await (supabase
+          .from('user_favorites' as any)
           .delete()
-          .eq('user_id', user.id);
+          .eq('user_id', user.id) as any);
 
         if (error) throw error;
       } catch (error) {

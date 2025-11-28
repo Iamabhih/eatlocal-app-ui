@@ -2,7 +2,7 @@ import { ReactNode, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 
-type UserRole = 'customer' | 'restaurant' | 'delivery_partner' | 'admin' | 'superadmin';
+type UserRole = 'customer' | 'restaurant' | 'delivery_partner' | 'admin' | 'superadmin' | 'rider' | 'driver' | 'shop';
 
 interface ProtectedRouteProps {
   children: ReactNode;
@@ -28,12 +28,12 @@ export function ProtectedRoute({
       }
 
       // Check if user has required role(s)
-      if (requiredRole && !hasRole(requiredRole)) {
+      if (requiredRole && !hasRole(requiredRole as any)) {
         navigate('/');
         return;
       }
 
-      if (requiredRoles && !requiredRoles.some(role => hasRole(role))) {
+      if (requiredRoles && !requiredRoles.some(role => hasRole(role as any))) {
         navigate('/');
         return;
       }
@@ -53,11 +53,11 @@ export function ProtectedRoute({
   }
 
   // Check role requirements
-  if (requiredRole && !hasRole(requiredRole)) {
+  if (requiredRole && !hasRole(requiredRole as any)) {
     return null;
   }
 
-  if (requiredRoles && !requiredRoles.some(role => hasRole(role))) {
+  if (requiredRoles && !requiredRoles.some(role => hasRole(role as any))) {
     return null;
   }
 

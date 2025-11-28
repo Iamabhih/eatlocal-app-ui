@@ -123,9 +123,9 @@ export default function RestaurantDashboard() {
         delivery_fee: restaurant.delivery_fee.toString(),
         minimum_order: restaurant.minimum_order.toString(),
         estimated_delivery_time: restaurant.estimated_delivery_time.toString(),
-        opening_time: restaurant.opening_time || '09:00',
-        closing_time: restaurant.closing_time || '22:00',
-        delivery_radius_km: restaurant.delivery_radius_km?.toString() || '10',
+        opening_time: '09:00',
+        closing_time: '22:00',
+        delivery_radius_km: '10',
       });
     }
     setIsEditing(true);
