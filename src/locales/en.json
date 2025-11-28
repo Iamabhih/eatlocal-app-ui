@@ -1,0 +1,314 @@
+{
+  "common": {
+    "appName": "Smash Local",
+    "tagline": "Your Local Everything, Delivered",
+    "loading": "Loading...",
+    "error": "Something went wrong",
+    "retry": "Try Again",
+    "cancel": "Cancel",
+    "save": "Save",
+    "delete": "Delete",
+    "edit": "Edit",
+    "add": "Add",
+    "search": "Search",
+    "filter": "Filter",
+    "sort": "Sort",
+    "clear": "Clear",
+    "apply": "Apply",
+    "close": "Close",
+    "back": "Back",
+    "next": "Next",
+    "submit": "Submit",
+    "confirm": "Confirm",
+    "yes": "Yes",
+    "no": "No",
+    "all": "All",
+    "none": "None",
+    "more": "More",
+    "less": "Less",
+    "viewAll": "View All",
+    "seeMore": "See More",
+    "showLess": "Show Less"
+  },
+  "nav": {
+    "home": "Home",
+    "browse": "Browse",
+    "restaurants": "Restaurants",
+    "cart": "Cart",
+    "orders": "Orders",
+    "favorites": "Favorites",
+    "profile": "Profile",
+    "signIn": "Sign In",
+    "signOut": "Sign Out",
+    "signUp": "Sign Up",
+    "dashboard": "Dashboard",
+    "menu": "Menu",
+    "earnings": "Earnings",
+    "settings": "Settings"
+  },
+  "auth": {
+    "welcome": "Welcome",
+    "welcomeBack": "Welcome Back",
+    "signInTitle": "Sign in to your account",
+    "signUpTitle": "Create an account",
+    "email": "Email",
+    "password": "Password",
+    "confirmPassword": "Confirm Password",
+    "forgotPassword": "Forgot Password?",
+    "resetPassword": "Reset Password",
+    "noAccount": "Don't have an account?",
+    "hasAccount": "Already have an account?",
+    "orContinueWith": "Or continue with",
+    "google": "Google",
+    "termsAgree": "By signing up, you agree to our",
+    "termsOfService": "Terms of Service",
+    "and": "and",
+    "privacyPolicy": "Privacy Policy",
+    "selectRole": "I want to",
+    "roles": {
+      "customer": "Order Food",
+      "restaurant": "Manage Restaurant",
+      "delivery": "Deliver Orders"
+    }
+  },
+  "customer": {
+    "hero": {
+      "title": "Delicious food, delivered to your door",
+      "subtitle": "Order from the best local restaurants with transparent fees",
+      "searchPlaceholder": "Search for restaurants or dishes..."
+    },
+    "categories": {
+      "title": "Browse by Category",
+      "fastFood": "Fast Food",
+      "pizza": "Pizza",
+      "asian": "Asian",
+      "mexican": "Mexican",
+      "italian": "Italian",
+      "desserts": "Desserts",
+      "healthy": "Healthy",
+      "coffee": "Coffee"
+    },
+    "restaurants": {
+      "featured": "Featured Restaurants",
+      "popular": "Popular Near You",
+      "new": "New Arrivals",
+      "rating": "Rating",
+      "deliveryTime": "Delivery Time",
+      "deliveryFee": "Delivery Fee",
+      "minOrder": "Min. Order",
+      "open": "Open",
+      "closed": "Closed",
+      "closingSoon": "Closing Soon",
+      "noResults": "No restaurants found",
+      "tryDifferent": "Try adjusting your filters"
+    },
+    "filters": {
+      "title": "Filters",
+      "cuisine": "Cuisine Type",
+      "priceRange": "Price Range",
+      "dietary": "Dietary Options",
+      "vegetarian": "Vegetarian",
+      "vegan": "Vegan",
+      "glutenFree": "Gluten Free",
+      "halal": "Halal",
+      "sortBy": "Sort By",
+      "highestRated": "Highest Rated",
+      "fastestDelivery": "Fastest Delivery",
+      "lowestFee": "Lowest Fee",
+      "clearAll": "Clear All Filters"
+    },
+    "cart": {
+      "title": "Your Cart",
+      "empty": "Your cart is empty",
+      "emptyMessage": "Add some delicious items from our restaurants to get started!",
+      "browseRestaurants": "Browse Restaurants",
+      "items": "{{count}} item",
+      "items_plural": "{{count}} items",
+      "subtotal": "Subtotal",
+      "deliveryFee": "Delivery Fee",
+      "serviceFee": "Service Fee",
+      "discount": "Discount",
+      "total": "Total",
+      "promoCode": "Promo Code",
+      "applyCode": "Apply",
+      "checkout": "Proceed to Checkout",
+      "estimatedDelivery": "Estimated Delivery"
+    },
+    "checkout": {
+      "title": "Checkout",
+      "deliveryAddress": "Delivery Address",
+      "selectAddress": "Select Address",
+      "addAddress": "Add New Address",
+      "fulfillmentMethod": "Fulfillment Method",
+      "delivery": "Delivery",
+      "pickup": "Pickup",
+      "paymentMethod": "Payment Method",
+      "orderSummary": "Order Summary",
+      "placeOrder": "Place Order",
+      "processing": "Processing...",
+      "securePayment": "Secure payment powered by PayFast"
+    },
+    "orders": {
+      "title": "Order History",
+      "trackOrder": "Track Order",
+      "reorder": "Reorder",
+      "noOrders": "No orders yet",
+      "startOrdering": "Start ordering from your favorite restaurants!",
+      "status": {
+        "pending": "Pending",
+        "confirmed": "Confirmed",
+        "preparing": "Preparing",
+        "readyForPickup": "Ready for Pickup",
+        "onTheWay": "On the Way",
+        "delivered": "Delivered",
+        "cancelled": "Cancelled"
+      },
+      "tabs": {
+        "all": "All",
+        "active": "Active",
+        "completed": "Completed",
+        "cancelled": "Cancelled"
+      }
+    },
+    "favorites": {
+      "title": "My Favorites",
+      "subtitle": "Your saved restaurants",
+      "empty": "No favorites yet",
+      "emptyMessage": "Start exploring restaurants and save your favorites",
+      "signInRequired": "Sign in to see your favorites",
+      "signInMessage": "Save your favorite restaurants for quick access"
+    },
+    "profile": {
+      "title": "Profile",
+      "accountInfo": "Account Information",
+      "personalInfo": "Personal Information",
+      "fullName": "Full Name",
+      "phone": "Phone Number",
+      "addresses": "Saved Addresses",
+      "preferences": "Preferences",
+      "notifications": "Notification Preferences",
+      "orderUpdates": "Order Updates",
+      "promoOffers": "Promotional Offers",
+      "pushNotifications": "Push Notifications",
+      "security": "Security",
+      "changePassword": "Change Password",
+      "paymentMethods": "Payment Methods",
+      "loyalty": {
+        "title": "Loyalty Program",
+        "points": "Available Points",
+        "tier": "Tier",
+        "earnMessage": "Earn 1 point for every R10 spent. Redeem points for discounts!"
+      }
+    },
+    "tracking": {
+      "title": "Track Your Order",
+      "orderPlaced": "Order Placed",
+      "preparing": "Restaurant Preparing",
+      "onTheWay": "Out for Delivery",
+      "delivered": "Delivered",
+      "estimatedTime": "Estimated",
+      "driverLocation": "Driver Location",
+      "callDriver": "Call Driver",
+      "messageDriver": "Message Driver",
+      "callRestaurant": "Call Restaurant"
+    }
+  },
+  "restaurant": {
+    "dashboard": {
+      "title": "Restaurant Dashboard",
+      "todaySales": "Today's Sales",
+      "totalOrders": "Total Orders",
+      "avgOrderValue": "Avg. Order Value",
+      "rating": "Rating",
+      "pendingOrders": "Pending Orders",
+      "recentOrders": "Recent Orders"
+    },
+    "orders": {
+      "title": "Orders",
+      "newOrder": "New Order",
+      "accept": "Accept",
+      "reject": "Reject",
+      "markReady": "Mark as Ready",
+      "preparing": "Preparing",
+      "ready": "Ready for Pickup"
+    },
+    "menu": {
+      "title": "Menu Management",
+      "addItem": "Add Menu Item",
+      "editItem": "Edit Item",
+      "categories": "Categories",
+      "items": "Items",
+      "available": "Available",
+      "unavailable": "Unavailable",
+      "price": "Price",
+      "description": "Description"
+    }
+  },
+  "delivery": {
+    "dashboard": {
+      "title": "Driver Dashboard",
+      "todayEarnings": "Today's Earnings",
+      "online": "Online",
+      "offline": "Offline",
+      "goOnline": "Go Online",
+      "goOffline": "Go Offline",
+      "availableOrders": "Available Orders",
+      "currentDelivery": "Current Delivery"
+    },
+    "orders": {
+      "accept": "Accept Delivery",
+      "pickup": "Picked Up",
+      "deliver": "Mark Delivered",
+      "navigate": "Navigate",
+      "contactCustomer": "Contact Customer"
+    },
+    "earnings": {
+      "title": "Earnings",
+      "thisWeek": "This Week",
+      "thisMonth": "This Month",
+      "totalDeliveries": "Total Deliveries",
+      "averagePerDelivery": "Avg. per Delivery"
+    }
+  },
+  "admin": {
+    "dashboard": "Admin Dashboard",
+    "users": "Users",
+    "restaurants": "Restaurants",
+    "orders": "Orders",
+    "deliveryPartners": "Delivery Partners",
+    "revenue": "Revenue",
+    "analytics": "Analytics",
+    "marketing": "Marketing",
+    "logs": "System Logs",
+    "settings": "Settings",
+    "superAdmin": "Super Admin"
+  },
+  "footer": {
+    "about": "About Us",
+    "contact": "Contact",
+    "help": "Help Center",
+    "terms": "Terms of Service",
+    "privacy": "Privacy Policy",
+    "careers": "Careers",
+    "partner": "Partner with Us",
+    "deliver": "Deliver with Us",
+    "madeWith": "Made with ❤️ for local communities",
+    "copyright": "© {{year}} Smash Local. All rights reserved."
+  },
+  "errors": {
+    "networkError": "Network error. Please check your connection.",
+    "serverError": "Server error. Please try again later.",
+    "notFound": "Page not found",
+    "unauthorized": "You are not authorized to view this page",
+    "sessionExpired": "Your session has expired. Please sign in again.",
+    "validationError": "Please check your input and try again"
+  },
+  "accessibility": {
+    "skipToMain": "Skip to main content",
+    "openMenu": "Open menu",
+    "closeMenu": "Close menu",
+    "openCart": "Open cart",
+    "language": "Change language",
+    "darkMode": "Toggle dark mode"
+  }
+}

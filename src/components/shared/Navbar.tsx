@@ -1,5 +1,6 @@
 import { ShoppingCart, User, MapPin, Menu, X, Search, Bell, Heart, Package, LogOut } from "lucide-react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -14,6 +15,8 @@ import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/contexts/AuthContext";
 import { useCart } from "@/hooks/useCart";
+import { LanguageSelector } from "./LanguageSelector";
+import { ThemeToggle } from "./ThemeToggle";
 
 interface NavbarProps {
   type?: "customer" | "restaurant" | "delivery";
@@ -22,6 +25,7 @@ interface NavbarProps {
 const Navbar = ({ type = "customer" }: NavbarProps) => {
   const location = useLocation();
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { user, signOut } = useAuth();
   const { items } = useCart();
@@ -73,6 +77,8 @@ const Navbar = ({ type = "customer" }: NavbarProps) => {
                   Menu
                 </Button>
               </Link>
+              <LanguageSelector />
+              <ThemeToggle />
               <Button variant="outline" size="icon" className="rounded-xl ml-2">
                 <Bell className="h-4 w-4" />
               </Button>
@@ -85,7 +91,7 @@ const Navbar = ({ type = "customer" }: NavbarProps) => {
                 <DropdownMenuContent align="end" className="w-48">
                   <DropdownMenuItem onClick={handleSignOut}>
                     <LogOut className="h-4 w-4 mr-2" />
-                    Sign Out
+                    {t('nav.signOut')}
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
@@ -137,6 +143,8 @@ const Navbar = ({ type = "customer" }: NavbarProps) => {
                   Earnings
                 </Button>
               </Link>
+              <LanguageSelector />
+              <ThemeToggle />
               <Button variant="outline" size="icon" className="rounded-xl ml-2">
                 <Bell className="h-4 w-4" />
               </Button>
@@ -149,7 +157,7 @@ const Navbar = ({ type = "customer" }: NavbarProps) => {
                 <DropdownMenuContent align="end" className="w-48">
                   <DropdownMenuItem onClick={handleSignOut}>
                     <LogOut className="h-4 w-4 mr-2" />
-                    Sign Out
+                    {t('nav.signOut')}
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
@@ -198,7 +206,7 @@ const Navbar = ({ type = "customer" }: NavbarProps) => {
           <div className="hidden md:flex items-center gap-3">
             <Link to="/restaurants">
               <Button variant="ghost" className="rounded-xl">
-                Browse
+                {t('nav.browse')}
               </Button>
             </Link>
             <Link to="/favorites">
@@ -217,6 +225,9 @@ const Navbar = ({ type = "customer" }: NavbarProps) => {
               </Button>
             </Link>
 
+            <LanguageSelector />
+            <ThemeToggle />
+
             {/* User Menu */}
             {user ? (
               <DropdownMenu>
@@ -228,27 +239,27 @@ const Navbar = ({ type = "customer" }: NavbarProps) => {
                 <DropdownMenuContent align="end" className="w-48">
                   <DropdownMenuItem onClick={() => navigate("/profile")}>
                     <User className="h-4 w-4 mr-2" />
-                    My Profile
+                    {t('customer.profile.title')}
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={() => navigate("/orders")}>
                     <Package className="h-4 w-4 mr-2" />
-                    Order History
+                    {t('customer.orders.title')}
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={() => navigate("/favorites")}>
                     <Heart className="h-4 w-4 mr-2" />
-                    Favorites
+                    {t('customer.favorites.title')}
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={handleSignOut}>
                     <LogOut className="h-4 w-4 mr-2" />
-                    Sign Out
+                    {t('nav.signOut')}
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
             ) : (
               <Link to="/auth?role=customer">
                 <Button variant="secondary" size="sm" className="rounded-xl">
-                  Sign In
+                  {t('nav.signIn')}
                 </Button>
               </Link>
             )}
