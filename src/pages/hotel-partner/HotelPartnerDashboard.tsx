@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import {
   Building2,
   Bed,
@@ -16,6 +17,9 @@ import {
   CheckCircle,
   XCircle,
   Clock,
+  Home,
+  LogOut,
+  ChevronDown,
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -33,18 +37,26 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { useAuth } from '@/contexts/AuthContext';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
 export default function HotelPartnerDashboard() {
-  const { user } = useAuth();
+  const { user, signOut } = useAuth();
+  const navigate = useNavigate();
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [selectedTab, setSelectedTab] = useState('overview');
+
+  const handleSignOut = async () => {
+    await signOut();
+    navigate('/');
+  };
 
   // Fetch owner's hotels
   const { data: hotels = [], isLoading: hotelsLoading } = useQuery({
@@ -134,20 +146,70 @@ export default function HotelPartnerDashboard() {
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="border-b bg-card">
-        <div className="container mx-auto px-4 py-4">
+      <header className="border-b bg-card sticky top-0 z-40">
+        <div className="container mx-auto px-4 py-3">
           <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-2xl font-bold flex items-center gap-2">
-                <Building2 className="h-6 w-6" />
-                Hotel Partner Dashboard
-              </h1>
-              <p className="text-muted-foreground">Manage your properties and bookings</p>
+            <div className="flex items-center gap-4">
+              {/* Logo/Home Link */}
+              <Link
+                to="/"
+                className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors"
+              >
+                <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center">
+                  <span className="text-white font-bold text-sm">S</span>
+                </div>
+                <span className="font-display font-bold hidden sm:inline">Smash</span>
+              </Link>
+              <div className="h-6 w-px bg-border hidden sm:block" />
+              <div>
+                <h1 className="text-lg sm:text-xl font-bold flex items-center gap-2">
+                  <Building2 className="h-5 w-5 text-primary" />
+                  Hotel Partner
+                </h1>
+                <p className="text-xs text-muted-foreground hidden sm:block">Manage your properties</p>
+              </div>
             </div>
-            <Button className="gap-2">
-              <Plus className="h-4 w-4" />
-              Add Property
-            </Button>
+            <div className="flex items-center gap-3">
+              <Button size="sm" className="gap-2 hidden sm:flex">
+                <Plus className="h-4 w-4" />
+                Add Property
+              </Button>
+              <Button size="icon" variant="outline" className="sm:hidden">
+                <Plus className="h-4 w-4" />
+              </Button>
+              {/* User Menu */}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="sm" className="gap-2">
+                    <Avatar className="h-7 w-7">
+                      <AvatarFallback className="bg-primary/10 text-primary text-xs">
+                        {user?.email?.charAt(0).toUpperCase() || 'H'}
+                      </AvatarFallback>
+                    </Avatar>
+                    <ChevronDown className="h-4 w-4 hidden sm:block" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-48">
+                  <DropdownMenuItem asChild>
+                    <Link to="/" className="cursor-pointer">
+                      <Home className="h-4 w-4 mr-2" />
+                      Go to Home
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link to="/account" className="cursor-pointer">
+                      <Settings className="h-4 w-4 mr-2" />
+                      Account Settings
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={handleSignOut} className="text-destructive cursor-pointer">
+                    <LogOut className="h-4 w-4 mr-2" />
+                    Sign Out
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
           </div>
         </div>
       </header>

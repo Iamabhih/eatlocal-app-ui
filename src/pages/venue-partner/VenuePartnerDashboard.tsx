@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   Building2,
@@ -17,6 +17,10 @@ import {
   Sparkles,
   MapPin,
   TrendingUp,
+  Home,
+  LogOut,
+  ChevronDown,
+  Settings,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -35,8 +39,10 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import {
   Dialog,
   DialogContent,
@@ -69,13 +75,18 @@ import {
 
 export default function VenuePartnerDashboard() {
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, signOut } = useAuth();
   const queryClient = useQueryClient();
   const [activeTab, setActiveTab] = useState('overview');
   const [showVenueDialog, setShowVenueDialog] = useState(false);
   const [showExperienceDialog, setShowExperienceDialog] = useState(false);
   const [selectedVenue, setSelectedVenue] = useState<Venue | null>(null);
   const [selectedExperience, setSelectedExperience] = useState<Experience | null>(null);
+
+  const handleSignOut = async () => {
+    await signOut();
+    navigate('/');
+  };
 
   // Fetch owner's venues
   const { data: venues = [], isLoading: venuesLoading } = useQuery({
@@ -176,27 +187,73 @@ export default function VenuePartnerDashboard() {
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="border-b bg-gradient-to-r from-purple-600/10 to-pink-500/10">
-        <div className="container mx-auto px-4 py-6">
+      <header className="border-b bg-gradient-to-r from-purple-600/10 to-pink-500/10 sticky top-0 z-40">
+        <div className="container mx-auto px-4 py-3">
           <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-3xl font-bold flex items-center gap-2">
-                <Sparkles className="h-8 w-8 text-purple-600" />
-                Venue Partner Portal
-              </h1>
-              <p className="text-muted-foreground mt-1">
-                Manage your venues and experiences
-              </p>
+            <div className="flex items-center gap-4">
+              {/* Logo/Home Link */}
+              <Link
+                to="/"
+                className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors"
+              >
+                <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-purple-600 to-pink-500 flex items-center justify-center">
+                  <span className="text-white font-bold text-sm">S</span>
+                </div>
+                <span className="font-display font-bold hidden sm:inline">Smash</span>
+              </Link>
+              <div className="h-6 w-px bg-border hidden sm:block" />
+              <div>
+                <h1 className="text-lg sm:text-xl font-bold flex items-center gap-2">
+                  <Sparkles className="h-5 w-5 text-purple-600" />
+                  Venue Partner
+                </h1>
+                <p className="text-xs text-muted-foreground hidden sm:block">Manage your venues & experiences</p>
+              </div>
             </div>
-            <div className="flex gap-3">
-              <Button variant="outline" onClick={() => setShowVenueDialog(true)}>
+            <div className="flex items-center gap-2 sm:gap-3">
+              <Button variant="outline" size="sm" onClick={() => setShowVenueDialog(true)} className="hidden sm:flex">
                 <Plus className="h-4 w-4 mr-2" />
                 Add Venue
               </Button>
-              <Button onClick={() => setShowExperienceDialog(true)}>
+              <Button size="sm" onClick={() => setShowExperienceDialog(true)} className="hidden sm:flex">
                 <Plus className="h-4 w-4 mr-2" />
                 Add Experience
               </Button>
+              <Button size="icon" variant="outline" className="sm:hidden" onClick={() => setShowVenueDialog(true)}>
+                <Plus className="h-4 w-4" />
+              </Button>
+              {/* User Menu */}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="sm" className="gap-2">
+                    <Avatar className="h-7 w-7">
+                      <AvatarFallback className="bg-purple-100 text-purple-600 text-xs">
+                        {user?.email?.charAt(0).toUpperCase() || 'V'}
+                      </AvatarFallback>
+                    </Avatar>
+                    <ChevronDown className="h-4 w-4 hidden sm:block" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-48">
+                  <DropdownMenuItem asChild>
+                    <Link to="/" className="cursor-pointer">
+                      <Home className="h-4 w-4 mr-2" />
+                      Go to Home
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link to="/account" className="cursor-pointer">
+                      <Settings className="h-4 w-4 mr-2" />
+                      Account Settings
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={handleSignOut} className="text-destructive cursor-pointer">
+                    <LogOut className="h-4 w-4 mr-2" />
+                    Sign Out
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
           </div>
         </div>
