@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import Navbar from "@/components/shared/Navbar";
 import RestaurantCard from "@/components/shared/RestaurantCard";
 import heroImage from "@/assets/hero-delivery.jpg";
 import { useRestaurants } from "@/hooks/useRestaurants";
@@ -34,9 +33,7 @@ const CustomerHome = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-background">
-      <Navbar type="customer" />
-      
+    <div className="bg-background">
       {/* Hero Section */}
       <section className="relative h-96 bg-gradient-hero flex items-center justify-center text-white overflow-hidden">
         <img 

@@ -28,7 +28,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import Navbar from "@/components/shared/Navbar";
 import RestaurantCard from "@/components/shared/RestaurantCard";
 import { useRestaurantsWithMenu } from "@/hooks/useRestaurants";
 import { useFavorites } from "@/hooks/useFavorites";
@@ -216,9 +215,7 @@ const RestaurantList = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      <Navbar type="customer" />
-
+    <div className="bg-background">
       {/* Hero Section */}
       <section className="relative py-12 px-4 bg-gradient-mesh overflow-hidden">
         {/* Decorative Elements */}
