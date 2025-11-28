@@ -7,7 +7,7 @@ import { useOutletContext, Navigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { AlertTriangle, Shield, ShieldCheck, Users, Settings, Database, Activity, Trash2, UserPlus } from 'lucide-react';
+import { AlertTriangle, Shield, ShieldCheck, Users, Settings, Database, Activity, Trash2, UserPlus, Hotel, Building2, Sparkles, MapPin, Calendar, TrendingUp, Store } from 'lucide-react';
 import { toast } from 'sonner';
 import { useState } from 'react';
 import {
@@ -152,12 +152,22 @@ export default function SuperAdminDashboard() {
         { count: totalUsers },
         { count: totalOrders },
         { count: totalRestaurants },
-        { count: pendingOrders }
+        { count: pendingOrders },
+        { count: totalHotels },
+        { count: totalVenues },
+        { count: totalExperiences },
+        { count: hotelBookings },
+        { count: experienceBookings },
       ] = await Promise.all([
         supabase.from('profiles').select('*', { count: 'exact', head: true }),
         supabase.from('orders').select('*', { count: 'exact', head: true }),
         supabase.from('restaurants').select('*', { count: 'exact', head: true }),
         supabase.from('orders').select('*', { count: 'exact', head: true }).eq('status', 'pending'),
+        supabase.from('hotels').select('*', { count: 'exact', head: true }),
+        supabase.from('venues').select('*', { count: 'exact', head: true }),
+        supabase.from('experiences').select('*', { count: 'exact', head: true }),
+        supabase.from('hotel_bookings').select('*', { count: 'exact', head: true }),
+        supabase.from('experience_bookings').select('*', { count: 'exact', head: true }),
       ]);
 
       return {
@@ -165,6 +175,11 @@ export default function SuperAdminDashboard() {
         totalOrders: totalOrders || 0,
         totalRestaurants: totalRestaurants || 0,
         pendingOrders: pendingOrders || 0,
+        totalHotels: totalHotels || 0,
+        totalVenues: totalVenues || 0,
+        totalExperiences: totalExperiences || 0,
+        hotelBookings: hotelBookings || 0,
+        experienceBookings: experienceBookings || 0,
       };
     },
   });
@@ -215,17 +230,18 @@ export default function SuperAdminDashboard() {
               </Card>
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between pb-2">
-                  <CardTitle className="text-sm font-medium">Total Orders</CardTitle>
+                  <CardTitle className="text-sm font-medium">Food Orders</CardTitle>
                   <Activity className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold">{systemStats?.totalOrders || 0}</div>
+                  <p className="text-xs text-muted-foreground">{systemStats?.pendingOrders || 0} pending</p>
                 </CardContent>
               </Card>
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between pb-2">
                   <CardTitle className="text-sm font-medium">Restaurants</CardTitle>
-                  <Database className="h-4 w-4 text-muted-foreground" />
+                  <Store className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold">{systemStats?.totalRestaurants || 0}</div>
@@ -233,11 +249,57 @@ export default function SuperAdminDashboard() {
               </Card>
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between pb-2">
-                  <CardTitle className="text-sm font-medium">Pending Orders</CardTitle>
-                  <Settings className="h-4 w-4 text-muted-foreground" />
+                  <CardTitle className="text-sm font-medium">Hotels</CardTitle>
+                  <Hotel className="h-4 w-4 text-blue-500" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold text-orange-600">{systemStats?.pendingOrders || 0}</div>
+                  <div className="text-2xl font-bold text-blue-600">{systemStats?.totalHotels || 0}</div>
+                  <p className="text-xs text-muted-foreground">{systemStats?.hotelBookings || 0} bookings</p>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Extended Stats */}
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between pb-2">
+                  <CardTitle className="text-sm font-medium">Venues</CardTitle>
+                  <Building2 className="h-4 w-4 text-purple-500" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold text-purple-600">{systemStats?.totalVenues || 0}</div>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between pb-2">
+                  <CardTitle className="text-sm font-medium">Experiences</CardTitle>
+                  <Sparkles className="h-4 w-4 text-pink-500" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold text-pink-600">{systemStats?.totalExperiences || 0}</div>
+                  <p className="text-xs text-muted-foreground">{systemStats?.experienceBookings || 0} bookings</p>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between pb-2">
+                  <CardTitle className="text-sm font-medium">Total Bookings</CardTitle>
+                  <Calendar className="h-4 w-4 text-green-500" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold text-green-600">
+                    {(systemStats?.hotelBookings || 0) + (systemStats?.experienceBookings || 0)}
+                  </div>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between pb-2">
+                  <CardTitle className="text-sm font-medium">Platform Status</CardTitle>
+                  <TrendingUp className="h-4 w-4 text-green-500" />
+                </CardHeader>
+                <CardContent>
+                  <Badge className="bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400">
+                    All Systems Operational
+                  </Badge>
                 </CardContent>
               </Card>
             </div>
