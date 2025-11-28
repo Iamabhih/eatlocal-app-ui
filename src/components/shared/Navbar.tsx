@@ -1,4 +1,4 @@
-import { ShoppingCart, User, MapPin, Menu, X, Search, Bell, Heart, Package, LogOut } from "lucide-react";
+import { ShoppingCart, User, MapPin, Menu, X, Search, Bell, Heart, Package, LogOut, Building2 } from "lucide-react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
@@ -207,6 +207,12 @@ const Navbar = ({ type = "customer" }: NavbarProps) => {
             <Link to="/restaurants">
               <Button variant="ghost" className="rounded-xl">
                 {t('nav.browse')}
+              </Button>
+            </Link>
+            <Link to="/hotels">
+              <Button variant="ghost" className="rounded-xl gap-2">
+                <Building2 className="h-4 w-4" />
+                Hotels
               </Button>
             </Link>
             <Link to="/favorites">

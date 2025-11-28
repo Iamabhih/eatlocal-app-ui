@@ -48,6 +48,10 @@ const Favorites = lazy(() => import("./pages/customer/Favorites"));
 const BookRide = lazy(() => import("./pages/rider/BookRide"));
 const MyRides = lazy(() => import("./pages/rider/MyRides"));
 
+// Lazy-loaded: Hotels Module
+const HotelSearch = lazy(() => import("./pages/hotels/HotelSearch"));
+const HotelDetail = lazy(() => import("./pages/hotels/HotelDetail"));
+
 // Lazy-loaded: Restaurant Portal
 const RestaurantPortalLayout = lazy(() => import("./components/restaurant/RestaurantPortalLayout"));
 const RestaurantDashboard = lazy(() => import("./pages/restaurant/RestaurantDashboard"));
@@ -218,6 +222,24 @@ function AppContent() {
               <ProtectedRoute requiredRole="rider">
                 <MyRides />
               </ProtectedRoute>
+            </Suspense>
+          </RouteErrorBoundary>
+        } />
+
+        {/* ============================================ */}
+        {/* HOTELS MODULE - Accommodation Booking */}
+        {/* ============================================ */}
+        <Route path="/hotels" element={
+          <RouteErrorBoundary fallbackTitle="Hotel Search Error">
+            <Suspense fallback={<PageLoader />}>
+              <HotelSearch />
+            </Suspense>
+          </RouteErrorBoundary>
+        } />
+        <Route path="/hotels/:id" element={
+          <RouteErrorBoundary fallbackTitle="Hotel Details Error">
+            <Suspense fallback={<PageLoader />}>
+              <HotelDetail />
             </Suspense>
           </RouteErrorBoundary>
         } />
