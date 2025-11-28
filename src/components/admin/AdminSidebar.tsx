@@ -11,7 +11,9 @@ import {
   FileText,
   ShieldCheck,
   Settings,
-  Rocket
+  Rocket,
+  Hotel,
+  Building2,
 } from 'lucide-react';
 import {
   Sidebar,
@@ -33,6 +35,8 @@ const adminItems = [
   { title: 'Dashboard', url: '/admin/dashboard', icon: LayoutDashboard },
   { title: 'Users', url: '/admin/users', icon: Users },
   { title: 'Restaurants', url: '/admin/restaurants', icon: Store },
+  { title: 'Hotels', url: '/admin/hotels', icon: Hotel },
+  { title: 'Venues', url: '/admin/venues', icon: Building2 },
   { title: 'Orders', url: '/admin/orders', icon: Package },
   { title: 'Delivery Partners', url: '/admin/delivery-partners', icon: Truck },
   { title: 'Revenue', url: '/admin/revenue', icon: DollarSign },
