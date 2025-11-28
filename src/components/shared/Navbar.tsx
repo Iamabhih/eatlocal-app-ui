@@ -1,4 +1,4 @@
-import { ShoppingCart, User, MapPin, Menu, X, Search, Bell, Heart, Package, LogOut, Building2 } from "lucide-react";
+import { ShoppingCart, User, MapPin, Menu, X, Search, Bell, Heart, Package, LogOut, Building2, Hotel, Sparkles, Car, Map, Utensils, ChevronDown } from "lucide-react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
@@ -203,16 +203,60 @@ const Navbar = ({ type = "customer" }: NavbarProps) => {
           </div>
 
           {/* Right Section - Desktop */}
-          <div className="hidden md:flex items-center gap-3">
+          <div className="hidden md:flex items-center gap-2">
+            {/* Services Dropdown */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="rounded-xl gap-1">
+                  Services
+                  <ChevronDown className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start" className="w-56">
+                <DropdownMenuItem onClick={() => navigate("/restaurants")}>
+                  <Utensils className="h-4 w-4 mr-2 text-orange-500" />
+                  Food Delivery
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => navigate("/hotels")}>
+                  <Hotel className="h-4 w-4 mr-2 text-blue-500" />
+                  Hotels & Stays
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => navigate("/venues")}>
+                  <Building2 className="h-4 w-4 mr-2 text-purple-500" />
+                  Venues
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => navigate("/experiences")}>
+                  <Sparkles className="h-4 w-4 mr-2 text-pink-500" />
+                  Experiences
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => navigate("/rides/book")}>
+                  <Car className="h-4 w-4 mr-2 text-green-500" />
+                  Rides
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => navigate("/map")}>
+                  <Map className="h-4 w-4 mr-2 text-teal-500" />
+                  Explore Map
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+
             <Link to="/restaurants">
-              <Button variant="ghost" className="rounded-xl">
-                {t('nav.browse')}
+              <Button variant="ghost" size="sm" className="rounded-xl gap-1">
+                <Utensils className="h-4 w-4" />
+                Food
               </Button>
             </Link>
             <Link to="/hotels">
-              <Button variant="ghost" className="rounded-xl gap-2">
-                <Building2 className="h-4 w-4" />
+              <Button variant="ghost" size="sm" className="rounded-xl gap-1">
+                <Hotel className="h-4 w-4" />
                 Hotels
+              </Button>
+            </Link>
+            <Link to="/experiences">
+              <Button variant="ghost" size="sm" className="rounded-xl gap-1">
+                <Sparkles className="h-4 w-4" />
+                Experiences
               </Button>
             </Link>
             <Link to="/favorites">
@@ -317,8 +361,38 @@ const Navbar = ({ type = "customer" }: NavbarProps) => {
             <div className="flex flex-col gap-2">
               <Link to="/restaurants" onClick={() => setMobileMenuOpen(false)}>
                 <Button variant="ghost" className="w-full justify-start rounded-xl">
-                  <Search className="h-4 w-4 mr-2" />
-                  Browse Restaurants
+                  <Utensils className="h-4 w-4 mr-2 text-orange-500" />
+                  Food Delivery
+                </Button>
+              </Link>
+              <Link to="/hotels" onClick={() => setMobileMenuOpen(false)}>
+                <Button variant="ghost" className="w-full justify-start rounded-xl">
+                  <Hotel className="h-4 w-4 mr-2 text-blue-500" />
+                  Hotels & Stays
+                </Button>
+              </Link>
+              <Link to="/venues" onClick={() => setMobileMenuOpen(false)}>
+                <Button variant="ghost" className="w-full justify-start rounded-xl">
+                  <Building2 className="h-4 w-4 mr-2 text-purple-500" />
+                  Venues
+                </Button>
+              </Link>
+              <Link to="/experiences" onClick={() => setMobileMenuOpen(false)}>
+                <Button variant="ghost" className="w-full justify-start rounded-xl">
+                  <Sparkles className="h-4 w-4 mr-2 text-pink-500" />
+                  Experiences
+                </Button>
+              </Link>
+              <Link to="/rides/book" onClick={() => setMobileMenuOpen(false)}>
+                <Button variant="ghost" className="w-full justify-start rounded-xl">
+                  <Car className="h-4 w-4 mr-2 text-green-500" />
+                  Rides
+                </Button>
+              </Link>
+              <Link to="/map" onClick={() => setMobileMenuOpen(false)}>
+                <Button variant="ghost" className="w-full justify-start rounded-xl">
+                  <Map className="h-4 w-4 mr-2 text-teal-500" />
+                  Explore Map
                 </Button>
               </Link>
               {user ? (

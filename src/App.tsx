@@ -11,6 +11,7 @@ import { NavigationLogger } from "@/components/logging/NavigationLogger";
 import { SkipLink } from "@/components/shared/SkipLink";
 import { loggingService } from "@/services/loggingService";
 import { RestaurantChangeModal } from "@/components/customer/RestaurantChangeModal";
+import { PanicButton } from "@/components/shared/PanicButton";
 import { QUERY_CACHE } from "@/lib/constants";
 import { logger } from "@/lib/logger";
 import { useNetworkStatus } from "@/hooks/useNetworkStatus";
@@ -27,8 +28,16 @@ import RestaurantLanding from "./pages/RestaurantLanding";
 import DeliveryLanding from "./pages/DeliveryLanding";
 import ShopLanding from "./pages/ShopLanding";
 
+// Lazy-loaded: Provider Signup Pages
+const ProviderSignupRestaurant = lazy(() => import("./pages/providers/ProviderSignupRestaurant"));
+const ProviderSignupHotel = lazy(() => import("./pages/providers/ProviderSignupHotel"));
+const ProviderSignupVenue = lazy(() => import("./pages/providers/ProviderSignupVenue"));
+const ProviderSignupDelivery = lazy(() => import("./pages/providers/ProviderSignupDelivery"));
+const ProviderSignupSecurity = lazy(() => import("./pages/providers/ProviderSignupSecurity"));
+
 // Customer App (loaded immediately - main user flow)
 import CustomerHome from "./pages/customer/CustomerHome";
+const CustomerDashboard = lazy(() => import("./pages/customer/CustomerDashboard"));
 import RestaurantList from "./pages/customer/RestaurantList";
 import RestaurantDetail from "./pages/customer/RestaurantDetail";
 import Cart from "./pages/customer/Cart";
@@ -157,12 +166,60 @@ function AppContent() {
         <Route path="/auth" element={<Auth />} />
 
         {/* ============================================ */}
+        {/* PROVIDER SIGNUP PAGES */}
+        {/* ============================================ */}
+        <Route path="/partner/restaurant" element={
+          <RouteErrorBoundary fallbackTitle="Provider Signup Error">
+            <Suspense fallback={<PageLoader />}>
+              <ProviderSignupRestaurant />
+            </Suspense>
+          </RouteErrorBoundary>
+        } />
+        <Route path="/partner/hotel" element={
+          <RouteErrorBoundary fallbackTitle="Provider Signup Error">
+            <Suspense fallback={<PageLoader />}>
+              <ProviderSignupHotel />
+            </Suspense>
+          </RouteErrorBoundary>
+        } />
+        <Route path="/partner/venue" element={
+          <RouteErrorBoundary fallbackTitle="Provider Signup Error">
+            <Suspense fallback={<PageLoader />}>
+              <ProviderSignupVenue />
+            </Suspense>
+          </RouteErrorBoundary>
+        } />
+        <Route path="/partner/delivery" element={
+          <RouteErrorBoundary fallbackTitle="Provider Signup Error">
+            <Suspense fallback={<PageLoader />}>
+              <ProviderSignupDelivery />
+            </Suspense>
+          </RouteErrorBoundary>
+        } />
+        <Route path="/partner/security" element={
+          <RouteErrorBoundary fallbackTitle="Provider Signup Error">
+            <Suspense fallback={<PageLoader />}>
+              <ProviderSignupSecurity />
+            </Suspense>
+          </RouteErrorBoundary>
+        } />
+
+        {/* ============================================ */}
         {/* CUSTOMER PORTAL - Food Ordering Experience */}
         {/* ============================================ */}
         <Route element={<CustomerLayout />}>
           <Route path="/customer" element={
             <RouteErrorBoundary fallbackTitle="Customer Portal Error">
               <CustomerHome />
+            </RouteErrorBoundary>
+          } />
+          <Route path="/dashboard" element={
+            <RouteErrorBoundary fallbackTitle="Customer Dashboard Error">
+              <Suspense fallback={<PageLoader />}>
+                <ProtectedRoute requiredRole="customer">
+                  <CustomerDashboard />
+                </ProtectedRoute>
+              </Suspense>
             </RouteErrorBoundary>
           } />
           <Route path="/restaurants" element={
@@ -575,6 +632,7 @@ const App = () => (
           <NavigationLogger />
           <AuthProvider>
             <RestaurantChangeModal />
+            <PanicButton variant="floating" size="md" />
             <main id="main-content">
               <AppContent />
             </main>
