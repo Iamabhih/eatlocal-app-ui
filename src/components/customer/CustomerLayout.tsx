@@ -1,23 +1,32 @@
 import { Outlet, useLocation } from "react-router-dom";
-import { Home, Search, ShoppingBag, Heart, User } from "lucide-react";
+import { Home, Search, ShoppingBag, Heart, User, LayoutDashboard } from "lucide-react";
 import { Link } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { useCart } from "@/hooks/useCart";
+import { useAuth } from "@/contexts/AuthContext";
 import { Badge } from "@/components/ui/badge";
 import Navbar from "@/components/shared/Navbar";
-
-const bottomNavItems = [
-  { path: "/customer", icon: Home, label: "Home" },
-  { path: "/restaurants", icon: Search, label: "Browse" },
-  { path: "/cart", icon: ShoppingBag, label: "Cart", showBadge: true },
-  { path: "/favorites", icon: Heart, label: "Favorites" },
-  { path: "/profile", icon: User, label: "Profile" },
-];
 
 export function CustomerLayout() {
   const location = useLocation();
   const { items } = useCart();
+  const { user } = useAuth();
   const cartCount = items.reduce((sum, item) => sum + item.quantity, 0);
+
+  // Dynamic bottom nav based on auth state
+  const bottomNavItems = user ? [
+    { path: "/customer", icon: Home, label: "Home" },
+    { path: "/restaurants", icon: Search, label: "Browse" },
+    { path: "/dashboard", icon: LayoutDashboard, label: "Dashboard" },
+    { path: "/cart", icon: ShoppingBag, label: "Cart", showBadge: true },
+    { path: "/profile", icon: User, label: "Profile" },
+  ] : [
+    { path: "/customer", icon: Home, label: "Home" },
+    { path: "/restaurants", icon: Search, label: "Browse" },
+    { path: "/cart", icon: ShoppingBag, label: "Cart", showBadge: true },
+    { path: "/favorites", icon: Heart, label: "Favorites" },
+    { path: "/auth", icon: User, label: "Sign In" },
+  ];
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
