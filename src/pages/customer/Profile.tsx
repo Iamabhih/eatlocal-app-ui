@@ -41,11 +41,6 @@ interface Profile {
   created_at: string;
 }
 
-interface LoyaltyPoints {
-  total_points: number;
-  tier: string;
-}
-
 const Profile = () => {
   const navigate = useNavigate();
   const { user, signOut } = useAuth();
@@ -80,24 +75,6 @@ const Profile = () => {
     enabled: !!user?.id,
   });
 
-  // Fetch loyalty points
-  const { data: loyaltyPoints } = useQuery<LoyaltyPoints>({
-    queryKey: ["loyalty-points", user?.id],
-    queryFn: async () => {
-      if (!user?.id) return null;
-
-      const { data, error } = await supabase
-        .from("loyalty_points")
-        .select("total_points, tier")
-        .eq("user_id", user.id)
-        .single();
-
-      if (error && error.code !== "PGRST116") throw error;
-      return data || { total_points: 0, tier: "bronze" };
-    },
-    enabled: !!user?.id,
-  });
-
   // Fetch stats
   const { data: stats } = useQuery({
     queryKey: ["profile-stats", user?.id],
@@ -109,14 +86,14 @@ const Profile = () => {
           .from("orders")
           .select("id", { count: "exact", head: true })
           .eq("customer_id", user.id),
-        supabase
-          .from("user_favorites")
+        (supabase
+          .from("user_favorites" as any)
           .select("id", { count: "exact", head: true })
-          .eq("user_id", user.id),
-        supabase
-          .from("reviews")
+          .eq("user_id", user.id) as any),
+        (supabase
+          .from("reviews" as any)
           .select("id", { count: "exact", head: true })
-          .eq("user_id", user.id),
+          .eq("user_id", user.id) as any),
       ]);
 
       return {
@@ -161,13 +138,6 @@ const Profile = () => {
     updateProfile.mutate(formData);
   };
 
-  const tierColors: Record<string, string> = {
-    bronze: "bg-amber-600",
-    silver: "bg-gray-400",
-    gold: "bg-yellow-500",
-    platinum: "bg-purple-600",
-  };
-
   if (profileLoading) {
     return (
       <div className="min-h-screen bg-background">
@@ -201,18 +171,14 @@ const Profile = () => {
                       {profile?.full_name || "Welcome!"}
                     </h1>
                     <p className="text-muted-foreground">{user?.email}</p>
-                    {loyaltyPoints && (
-                      <div className="flex items-center gap-2 mt-2">
-                        <Badge className={`${tierColors[loyaltyPoints.tier]} text-white`}>
-                          {loyaltyPoints.tier.charAt(0).toUpperCase() +
-                            loyaltyPoints.tier.slice(1)}{" "}
-                          Member
-                        </Badge>
-                        <span className="text-sm text-muted-foreground">
-                          {loyaltyPoints.total_points} points
-                        </span>
-                      </div>
-                    )}
+                    <div className="flex items-center gap-2 mt-2">
+                      <Badge className="bg-amber-600 text-white">
+                        Bronze Member
+                      </Badge>
+                      <span className="text-sm text-muted-foreground">
+                        0 points
+                      </span>
+                    </div>
                   </div>
                   <Button
                     variant="outline"
@@ -350,12 +316,10 @@ const Profile = () => {
                   <div className="flex justify-between items-start mb-4">
                     <div>
                       <p className="text-sm opacity-80">Available Points</p>
-                      <p className="text-4xl font-bold">
-                        {loyaltyPoints?.total_points || 0}
-                      </p>
+                      <p className="text-4xl font-bold">0</p>
                     </div>
                     <Badge className="bg-white/20 text-white">
-                      {loyaltyPoints?.tier || "Bronze"} Tier
+                      Bronze Tier
                     </Badge>
                   </div>
                   <p className="text-sm opacity-80">

@@ -35,7 +35,7 @@ export interface MenuItem {
   description: string | null;
   price: number;
   image_url: string | null;
-  category: string | null;
+  category_id: string | null;
   is_available: boolean;
   dietary_info?: string[];
 }
@@ -94,7 +94,7 @@ export function useRestaurantsWithMenu() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('menu_items')
-        .select('id, restaurant_id, name, description, price, image_url, category, is_available')
+        .select('id, restaurant_id, name, description, price, image_url, category_id, is_available')
         .eq('is_available', true);
 
       if (error) throw error;

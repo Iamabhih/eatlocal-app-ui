@@ -7,16 +7,34 @@ import { Badge } from "@/components/ui/badge";
 import Navbar from "@/components/shared/Navbar";
 import { useAuth } from "@/contexts/AuthContext";
 import { useFavorites } from "@/hooks/useFavorites";
-import { useState } from "react";
+import { useRestaurants } from "@/hooks/useRestaurants";
+import { useState, useMemo } from "react";
 
 const Favorites = () => {
   const { user } = useAuth();
-  const { favorites, isLoading, removeFavorite, isRemoving } = useFavorites();
+  const { favorites, isLoading, toggleFavorite } = useFavorites();
+  const { data: restaurants = [], isLoading: restaurantsLoading } = useRestaurants();
   const [searchQuery, setSearchQuery] = useState("");
+  const [removingId, setRemovingId] = useState<string | null>(null);
 
-  const filteredFavorites = favorites?.filter((fav) =>
-    fav.restaurant?.name?.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  // Get restaurant details for each favorite
+  const favoriteRestaurants = useMemo(() => {
+    return favorites
+      .map(favId => restaurants.find(r => r.id === favId))
+      .filter(Boolean);
+  }, [favorites, restaurants]);
+
+  const filteredFavorites = useMemo(() => {
+    return favoriteRestaurants.filter((restaurant) =>
+      restaurant?.name?.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  }, [favoriteRestaurants, searchQuery]);
+
+  const handleRemoveFavorite = async (restaurantId: string) => {
+    setRemovingId(restaurantId);
+    await toggleFavorite(restaurantId);
+    setRemovingId(null);
+  };
 
   if (!user) {
     return (
@@ -36,7 +54,7 @@ const Favorites = () => {
     );
   }
 
-  if (isLoading) {
+  if (isLoading || restaurantsLoading) {
     return (
       <div className="min-h-screen bg-background">
         <Navbar />
@@ -62,12 +80,12 @@ const Favorites = () => {
             </p>
           </div>
           <Badge variant="secondary" className="text-lg px-4 py-2">
-            {favorites?.length || 0} Saved
+            {favorites.length} Saved
           </Badge>
         </div>
 
         {/* Search */}
-        {favorites && favorites.length > 0 && (
+        {favorites.length > 0 && (
           <div className="relative mb-6">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
@@ -80,7 +98,7 @@ const Favorites = () => {
         )}
 
         {/* Favorites Grid */}
-        {filteredFavorites?.length === 0 ? (
+        {filteredFavorites.length === 0 ? (
           <Card>
             <CardContent className="py-16 text-center">
               <Heart className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
@@ -99,24 +117,24 @@ const Favorites = () => {
           </Card>
         ) : (
           <div className="grid gap-4 md:grid-cols-2">
-            {filteredFavorites?.map((favorite) => (
+            {filteredFavorites.map((restaurant) => restaurant && (
               <Card
-                key={favorite.id}
+                key={restaurant.id}
                 className="overflow-hidden hover:shadow-lg transition-shadow"
               >
                 <div className="relative">
-                  <Link to={`/restaurant/${favorite.restaurant_id}`}>
+                  <Link to={`/restaurant/${restaurant.id}`}>
                     <div className="aspect-video relative overflow-hidden">
-                      {favorite.restaurant?.image_url ? (
+                      {restaurant.image_url ? (
                         <img
-                          src={favorite.restaurant.image_url}
-                          alt={favorite.restaurant.name}
+                          src={restaurant.image_url}
+                          alt={restaurant.name}
                           className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
                         />
                       ) : (
                         <div className="w-full h-full bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center">
                           <span className="text-4xl font-bold text-primary/40">
-                            {favorite.restaurant?.name?.charAt(0)}
+                            {restaurant.name?.charAt(0)}
                           </span>
                         </div>
                       )}
@@ -126,7 +144,7 @@ const Favorites = () => {
                       <div className="absolute bottom-3 left-3 flex items-center gap-1 px-2 py-1 rounded-lg bg-white/90 dark:bg-black/80">
                         <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
                         <span className="text-sm font-semibold">
-                          {favorite.restaurant?.rating?.toFixed(1) || "New"}
+                          {restaurant.rating?.toFixed(1) || "New"}
                         </span>
                       </div>
                     </div>
@@ -137,36 +155,36 @@ const Favorites = () => {
                     variant="ghost"
                     size="icon"
                     className="absolute top-3 right-3 h-9 w-9 rounded-full bg-white/90 hover:bg-white dark:bg-black/50 dark:hover:bg-black/70"
-                    onClick={() => removeFavorite(favorite.restaurant_id)}
-                    disabled={isRemoving}
+                    onClick={() => handleRemoveFavorite(restaurant.id)}
+                    disabled={removingId === restaurant.id}
                   >
                     <Heart className="h-5 w-5 fill-red-500 text-red-500" />
                   </Button>
                 </div>
 
                 <CardContent className="p-4">
-                  <Link to={`/restaurant/${favorite.restaurant_id}`}>
+                  <Link to={`/restaurant/${restaurant.id}`}>
                     <h3 className="font-semibold text-lg mb-2 hover:text-primary transition-colors">
-                      {favorite.restaurant?.name}
+                      {restaurant.name}
                     </h3>
                   </Link>
 
                   <div className="flex items-center gap-4 text-sm text-muted-foreground mb-3">
                     <span className="flex items-center gap-1">
                       <Clock className="h-4 w-4" />
-                      {favorite.restaurant?.estimated_delivery_time || "25-35"} min
+                      {restaurant.estimated_delivery_time || "25-35"} min
                     </span>
                     <span className="flex items-center gap-1">
                       <MapPin className="h-4 w-4" />
-                      R{favorite.restaurant?.delivery_fee?.toFixed(2) || "0.00"} delivery
+                      R{restaurant.delivery_fee?.toFixed(2) || "0.00"} delivery
                     </span>
                   </div>
 
                   {/* Categories */}
                   <div className="flex flex-wrap gap-1">
-                    {favorite.restaurant?.cuisine_type && (
+                    {restaurant.cuisine_type && (
                       <Badge variant="secondary" className="text-xs">
-                        {favorite.restaurant.cuisine_type}
+                        {restaurant.cuisine_type}
                       </Badge>
                     )}
                   </div>

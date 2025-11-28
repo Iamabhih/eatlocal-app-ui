@@ -203,6 +203,7 @@ export type Database = {
           delivery_partner_id: string
           heading: number | null
           id: string
+          is_active: boolean | null
           latitude: number
           longitude: number
           order_id: string | null
@@ -215,6 +216,7 @@ export type Database = {
           delivery_partner_id: string
           heading?: number | null
           id?: string
+          is_active?: boolean | null
           latitude: number
           longitude: number
           order_id?: string | null
@@ -227,6 +229,7 @@ export type Database = {
           delivery_partner_id?: string
           heading?: number | null
           id?: string
+          is_active?: boolean | null
           latitude?: number
           longitude?: number
           order_id?: string | null
@@ -1125,6 +1128,36 @@ export type Database = {
         }
         Relationships: []
       }
+      push_subscriptions: {
+        Row: {
+          auth: string | null
+          created_at: string
+          endpoint: string
+          id: string
+          p256dh: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          auth?: string | null
+          created_at?: string
+          endpoint: string
+          id?: string
+          p256dh?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          auth?: string | null
+          created_at?: string
+          endpoint?: string
+          id?: string
+          p256dh?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       rate_limits: {
         Row: {
           count: number
@@ -1148,6 +1181,9 @@ export type Database = {
       }
       restaurants: {
         Row: {
+          approval_notes: string | null
+          approval_status: string | null
+          approved_at: string | null
           business_type: string | null
           city: string
           commission_rate: number
@@ -1177,6 +1213,9 @@ export type Database = {
           zip_code: string
         }
         Insert: {
+          approval_notes?: string | null
+          approval_status?: string | null
+          approved_at?: string | null
           business_type?: string | null
           city: string
           commission_rate?: number
@@ -1206,6 +1245,9 @@ export type Database = {
           zip_code: string
         }
         Update: {
+          approval_notes?: string | null
+          approval_status?: string | null
+          approved_at?: string | null
           business_type?: string | null
           city?: string
           commission_rate?: number
@@ -1235,6 +1277,72 @@ export type Database = {
           zip_code?: string
         }
         Relationships: []
+      }
+      reviews: {
+        Row: {
+          created_at: string
+          delivery_rating: number
+          food_rating: number
+          helpful_count: number | null
+          id: string
+          images: string[] | null
+          is_anonymous: boolean | null
+          order_id: string
+          rating: number
+          response_date: string | null
+          response_text: string | null
+          restaurant_id: string
+          review_text: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          delivery_rating: number
+          food_rating: number
+          helpful_count?: number | null
+          id?: string
+          images?: string[] | null
+          is_anonymous?: boolean | null
+          order_id: string
+          rating: number
+          response_date?: string | null
+          response_text?: string | null
+          restaurant_id: string
+          review_text?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          delivery_rating?: number
+          food_rating?: number
+          helpful_count?: number | null
+          id?: string
+          images?: string[] | null
+          is_anonymous?: boolean | null
+          order_id?: string
+          rating?: number
+          response_date?: string | null
+          response_text?: string | null
+          restaurant_id?: string
+          review_text?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reviews_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reviews_restaurant_id_fkey"
+            columns: ["restaurant_id"]
+            isOneToOne: false
+            referencedRelation: "restaurants"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       ride_emergencies: {
         Row: {
@@ -1755,6 +1863,35 @@ export type Database = {
         }
         Relationships: []
       }
+      user_favorites: {
+        Row: {
+          created_at: string
+          id: string
+          restaurant_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          restaurant_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          restaurant_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_favorites_restaurant_id_fkey"
+            columns: ["restaurant_id"]
+            isOneToOne: false
+            referencedRelation: "restaurants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_interaction_logs: {
         Row: {
           created_at: string
@@ -2138,6 +2275,10 @@ export type Database = {
           _user_id: string
         }
         Returns: boolean
+      }
+      increment_helpful_count: {
+        Args: { review_id: string }
+        Returns: undefined
       }
       longtransactionsenabled: { Args: never; Returns: boolean }
       populate_geometry_columns:
