@@ -16,7 +16,7 @@ const CustomerHome = () => {
     image: r.image_url || "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=500",
     rating: r.rating,
     deliveryTime: `${r.estimated_delivery_time} min`,
-    deliveryFee: `$${r.delivery_fee.toFixed(2)}`,
+    deliveryFee: `R${r.delivery_fee.toFixed(2)}`,
     categories: r.cuisine_type ? [r.cuisine_type] : [],
     promoted: false
   }));

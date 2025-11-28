@@ -63,7 +63,7 @@ const DeliveryOrders = () => {
             </p>
           </div>
           <div className="text-right">
-            <p className="font-bold text-2xl text-primary">${Number(order.total).toFixed(2)}</p>
+            <p className="font-bold text-2xl text-primary">R{Number(order.total).toFixed(2)}</p>
           </div>
         </div>
 

@@ -165,7 +165,7 @@ const Cart = () => {
                               <Plus className="h-4 w-4" />
                             </Button>
                           </div>
-                          <span className="font-bold">${(item.price * item.quantity).toFixed(2)}</span>
+                          <span className="font-bold">R{(item.price * item.quantity).toFixed(2)}</span>
                         </div>
                       </div>
                     </div>
@@ -219,20 +219,20 @@ const Cart = () => {
                   <div className="space-y-3 mb-4">
                     <div className="flex justify-between">
                       <span>Subtotal ({totalItems} items)</span>
-                      <span>${subtotal.toFixed(2)}</span>
+                      <span>R{subtotal.toFixed(2)}</span>
                     </div>
                     <div className="flex justify-between">
                       <span>Delivery fee</span>
-                      <span>${deliveryFee.toFixed(2)}</span>
+                      <span>R{deliveryFee.toFixed(2)}</span>
                     </div>
                     <div className="flex justify-between">
                       <span>Service fee</span>
-                      <span>${serviceFee.toFixed(2)}</span>
+                      <span>R{serviceFee.toFixed(2)}</span>
                     </div>
                     {appliedPromo && discount > 0 && (
                       <div className="flex justify-between text-primary">
                         <span>Discount ({appliedPromo})</span>
-                        <span>-${discount.toFixed(2)}</span>
+                        <span>-R{discount.toFixed(2)}</span>
                       </div>
                     )}
                   </div>
@@ -241,7 +241,7 @@ const Cart = () => {
                   
                   <div className="flex justify-between font-bold text-lg mb-6">
                     <span>Total</span>
-                    <span>${total.toFixed(2)}</span>
+                    <span>R{total.toFixed(2)}</span>
                   </div>
 
                   <div className="flex items-center gap-2 mb-6 p-3 bg-muted rounded-lg">

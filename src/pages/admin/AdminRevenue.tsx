@@ -121,7 +121,7 @@ export default function AdminRevenue() {
       t.order_number,
       new Date(t.created_at).toLocaleDateString(),
       t.restaurants?.name || 'N/A',
-      `$${Number(t.platform_commission || 0).toFixed(2)}`,
+      `R${Number(t.platform_commission || 0).toFixed(2)}`,
       t.status,
     ]);
 
@@ -164,7 +164,7 @@ export default function AdminRevenue() {
                     </CardHeader>
                     <CardContent>
                       <div className="text-2xl font-bold">
-                        ${revenueStats?.totalRevenue.toFixed(2)}
+                        R{revenueStats?.totalRevenue.toFixed(2)}
                       </div>
                     </CardContent>
                   </Card>
@@ -176,7 +176,7 @@ export default function AdminRevenue() {
                     </CardHeader>
                     <CardContent>
                       <div className="text-2xl font-bold">
-                        ${revenueStats?.monthlyRevenue.toFixed(2)}
+                        R{revenueStats?.monthlyRevenue.toFixed(2)}
                       </div>
                     </CardContent>
                   </Card>
@@ -188,7 +188,7 @@ export default function AdminRevenue() {
                     </CardHeader>
                     <CardContent>
                       <div className="text-2xl font-bold">
-                        ${revenueStats?.totalOrderCommission.toFixed(2)}
+                        R{revenueStats?.totalOrderCommission.toFixed(2)}
                       </div>
                     </CardContent>
                   </Card>
@@ -200,7 +200,7 @@ export default function AdminRevenue() {
                     </CardHeader>
                     <CardContent>
                       <div className="text-2xl font-bold">
-                        ${revenueStats?.totalDeliveryFees.toFixed(2)}
+                        R{revenueStats?.totalDeliveryFees.toFixed(2)}
                       </div>
                     </CardContent>
                   </Card>
@@ -228,7 +228,7 @@ export default function AdminRevenue() {
                             </div>
                             <div className="text-right">
                               <p className="text-lg font-bold">
-                                ${restaurant.totalCommission.toFixed(2)}
+                                R{restaurant.totalCommission.toFixed(2)}
                               </p>
                             </div>
                           </div>
@@ -282,7 +282,7 @@ export default function AdminRevenue() {
                                   </TableCell>
                                   <TableCell>{transaction.restaurants?.name}</TableCell>
                                   <TableCell className="font-semibold">
-                                    ${Number(transaction.platform_commission || 0).toFixed(2)}
+                                    R{Number(transaction.platform_commission || 0).toFixed(2)}
                                   </TableCell>
                                 </TableRow>
                               ))}

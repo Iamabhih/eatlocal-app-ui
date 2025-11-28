@@ -50,7 +50,7 @@ const DeliveryEarnings = () => {
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-sm text-muted-foreground">Total Earnings</p>
-                      <p className="text-3xl font-bold text-primary">${totalToday.toFixed(2)}</p>
+                      <p className="text-3xl font-bold text-primary">R{totalToday.toFixed(2)}</p>
                     </div>
                     <DollarSign className="h-8 w-8 text-primary" />
                   </div>
@@ -74,7 +74,7 @@ const DeliveryEarnings = () => {
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-sm text-muted-foreground">Tips</p>
-                      <p className="text-3xl font-bold">${totalTips.toFixed(2)}</p>
+                      <p className="text-3xl font-bold">R{totalTips.toFixed(2)}</p>
                     </div>
                     <TrendingUp className="h-8 w-8 text-primary" />
                   </div>
@@ -96,23 +96,23 @@ const DeliveryEarnings = () => {
                       <div className="flex justify-between items-center">
                         <span>Base Fees ({deliveriesToday} deliveries)</span>
                         <span className="font-bold">
-                          ${todayEarnings.reduce((sum, e) => sum + Number(e.base_fee), 0).toFixed(2)}
+                          R{todayEarnings.reduce((sum, e) => sum + Number(e.base_fee), 0).toFixed(2)}
                         </span>
                       </div>
                       <div className="flex justify-between items-center">
                         <span>Tips</span>
-                        <span className="font-bold text-primary">${totalTips.toFixed(2)}</span>
+                        <span className="font-bold text-primary">R{totalTips.toFixed(2)}</span>
                       </div>
                       <div className="flex justify-between items-center">
                         <span>Bonuses</span>
                         <span className="font-bold">
-                          ${todayEarnings.reduce((sum, e) => sum + Number(e.bonus || 0), 0).toFixed(2)}
+                          R{todayEarnings.reduce((sum, e) => sum + Number(e.bonus || 0), 0).toFixed(2)}
                         </span>
                       </div>
                       <div className="border-t pt-4">
                         <div className="flex justify-between items-center text-lg">
                           <span className="font-bold">Total</span>
-                          <span className="font-bold text-primary">${totalToday.toFixed(2)}</span>
+                          <span className="font-bold text-primary">R{totalToday.toFixed(2)}</span>
                         </div>
                       </div>
                     </div>
@@ -148,11 +148,11 @@ const DeliveryEarnings = () => {
                           </p>
                         </div>
                         <div className="text-right">
-                          <p className="font-bold text-lg text-primary">${Number(earning.total_earnings).toFixed(2)}</p>
+                          <p className="font-bold text-lg text-primary">R{Number(earning.total_earnings).toFixed(2)}</p>
                           <div className="text-xs text-muted-foreground">
-                            <span>Base: ${Number(earning.base_fee).toFixed(2)}</span>
-                            {Number(earning.tip || 0) > 0 && <span> • Tip: ${Number(earning.tip).toFixed(2)}</span>}
-                            {Number(earning.bonus || 0) > 0 && <span> • Bonus: ${Number(earning.bonus).toFixed(2)}</span>}
+                            <span>Base: R{Number(earning.base_fee).toFixed(2)}</span>
+                            {Number(earning.tip || 0) > 0 && <span> • Tip: R{Number(earning.tip).toFixed(2)}</span>}
+                            {Number(earning.bonus || 0) > 0 && <span> • Bonus: R{Number(earning.bonus).toFixed(2)}</span>}
                           </div>
                         </div>
                       </div>
