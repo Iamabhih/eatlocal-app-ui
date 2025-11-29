@@ -76,12 +76,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const fetchSuspensionStatus = async (userId: string) => {
     const { data } = await supabase
       .from('profiles')
-      .select('is_suspended')
+      .select('is_suspended' as any)
       .eq('id', userId)
       .single();
 
     if (data) {
-      setIsSuspended(data.is_suspended || false);
+      setIsSuspended((data as any).is_suspended || false);
     }
   };
 

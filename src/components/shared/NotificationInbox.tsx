@@ -49,15 +49,15 @@ export function NotificationInbox() {
     queryFn: async () => {
       if (!user) return [];
 
-      const { data, error } = await supabase
-        .from('notifications')
+      const { data, error } = await (supabase
+        .from('notifications' as any)
         .select('*')
         .eq('user_id', user.id)
         .order('created_at', { ascending: false })
-        .limit(20);
+        .limit(20) as any);
 
       if (error) throw error;
-      return data as Notification[];
+      return (data || []) as Notification[];
     },
     enabled: !!user,
     refetchInterval: 30000, // Refetch every 30 seconds
@@ -66,10 +66,10 @@ export function NotificationInbox() {
   // Mark as read mutation
   const markAsRead = useMutation({
     mutationFn: async (notificationId: string) => {
-      const { error } = await supabase
-        .from('notifications')
+      const { error } = await (supabase
+        .from('notifications' as any)
         .update({ is_read: true })
-        .eq('id', notificationId);
+        .eq('id', notificationId) as any);
 
       if (error) throw error;
     },
@@ -83,11 +83,11 @@ export function NotificationInbox() {
     mutationFn: async () => {
       if (!user) return;
 
-      const { error } = await supabase
-        .from('notifications')
+      const { error } = await (supabase
+        .from('notifications' as any)
         .update({ is_read: true })
         .eq('user_id', user.id)
-        .eq('is_read', false);
+        .eq('is_read', false) as any);
 
       if (error) throw error;
     },

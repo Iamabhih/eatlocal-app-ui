@@ -121,152 +121,72 @@ export interface VenueSearchParams {
   radiusKm?: number;
 }
 
-// Venue type labels
 export const venueTypeLabels: Record<string, string> = {
-  restaurant: 'Restaurant',
-  bar: 'Bar',
-  club: 'Nightclub',
-  cafe: 'Café',
-  brewery: 'Brewery',
-  winery: 'Winery',
-  museum: 'Museum',
-  gallery: 'Art Gallery',
-  theater: 'Theater',
-  cinema: 'Cinema',
-  park: 'Park',
-  beach: 'Beach',
-  nature_reserve: 'Nature Reserve',
-  hiking_trail: 'Hiking Trail',
-  spa: 'Spa',
-  gym: 'Gym',
-  sports_facility: 'Sports Facility',
-  adventure_park: 'Adventure Park',
-  tour_operator: 'Tour Operator',
-  event_space: 'Event Space',
-  conference_center: 'Conference Center',
-  market: 'Market',
-  shopping: 'Shopping',
-  entertainment: 'Entertainment',
-  other: 'Other',
+  restaurant: 'Restaurant', bar: 'Bar', club: 'Nightclub', cafe: 'Café',
+  brewery: 'Brewery', winery: 'Winery', museum: 'Museum', gallery: 'Art Gallery',
+  theater: 'Theater', cinema: 'Cinema', park: 'Park', beach: 'Beach',
+  nature_reserve: 'Nature Reserve', hiking_trail: 'Hiking Trail', spa: 'Spa',
+  gym: 'Gym', sports_facility: 'Sports Facility', adventure_park: 'Adventure Park',
+  tour_operator: 'Tour Operator', event_space: 'Event Space',
+  conference_center: 'Conference Center', market: 'Market', shopping: 'Shopping',
+  entertainment: 'Entertainment', other: 'Other',
 };
 
-// Experience type labels
 export const experienceTypeLabels: Record<string, string> = {
-  tour: 'Tour',
-  activity: 'Activity',
-  class: 'Class',
-  workshop: 'Workshop',
-  tasting: 'Tasting',
-  adventure: 'Adventure',
-  wellness: 'Wellness',
-  sports: 'Sports',
-  entertainment: 'Entertainment',
-  food_experience: 'Food Experience',
-  cultural: 'Cultural',
-  nature: 'Nature',
-  nightlife: 'Nightlife',
-  event: 'Event',
-  private_event: 'Private Event',
+  tour: 'Tour', activity: 'Activity', class: 'Class', workshop: 'Workshop',
+  tasting: 'Tasting', adventure: 'Adventure', wellness: 'Wellness', sports: 'Sports',
+  entertainment: 'Entertainment', food_experience: 'Food Experience', cultural: 'Cultural',
+  nature: 'Nature', nightlife: 'Nightlife', event: 'Event', private_event: 'Private Event',
   other: 'Other',
 };
 
-// Hook to search venues
 export function useVenueSearch(params: VenueSearchParams) {
   return useQuery({
     queryKey: ['venues', 'search', params],
     queryFn: async () => {
-      let query = supabase
-        .from('venues')
-        .select('*')
-        .eq('is_active', true)
-        .eq('verification_status', 'verified');
-
-      if (params.city) {
-        query = query.ilike('city', `%${params.city}%`);
-      }
-
-      if (params.venueType) {
-        query = query.eq('venue_type', params.venueType);
-      }
-
-      if (params.categories && params.categories.length > 0) {
-        query = query.contains('categories', params.categories);
-      }
-
-      if (params.priceLevel) {
-        query = query.lte('price_level', params.priceLevel);
-      }
-
-      if (params.minRating) {
-        query = query.gte('rating', params.minRating);
-      }
-
-      const { data, error } = await query
-        .order('is_featured', { ascending: false })
-        .order('rating', { ascending: false });
-
+      let query = (supabase.from('venues' as any).select('*').eq('is_active', true).eq('verification_status', 'verified') as any);
+      if (params.city) query = query.ilike('city', `%${params.city}%`);
+      if (params.venueType) query = query.eq('venue_type', params.venueType);
+      if (params.categories?.length) query = query.contains('categories', params.categories);
+      if (params.priceLevel) query = query.lte('price_level', params.priceLevel);
+      if (params.minRating) query = query.gte('rating', params.minRating);
+      const { data, error } = await query.order('is_featured', { ascending: false }).order('rating', { ascending: false });
       if (error) throw error;
-      return data as Venue[];
+      return (data || []) as Venue[];
     },
   });
 }
 
-// Hook to get venues near location
 export function useNearbyVenues(latitude: number, longitude: number, radiusKm = 10) {
   return useQuery({
     queryKey: ['venues', 'nearby', latitude, longitude, radiusKm],
     queryFn: async () => {
-      // Simple bounding box query (for more accuracy, use PostGIS)
-      const latDelta = radiusKm / 111; // ~111km per degree
+      const latDelta = radiusKm / 111;
       const lngDelta = radiusKm / (111 * Math.cos(latitude * Math.PI / 180));
-
-      const { data, error } = await supabase
-        .from('venues')
-        .select('*')
-        .eq('is_active', true)
-        .eq('verification_status', 'verified')
-        .gte('latitude', latitude - latDelta)
-        .lte('latitude', latitude + latDelta)
-        .gte('longitude', longitude - lngDelta)
-        .lte('longitude', longitude + lngDelta);
-
+      const { data, error } = await (supabase.from('venues' as any).select('*').eq('is_active', true).eq('verification_status', 'verified').gte('latitude', latitude - latDelta).lte('latitude', latitude + latDelta).gte('longitude', longitude - lngDelta).lte('longitude', longitude + lngDelta) as any);
       if (error) throw error;
-      return data as Venue[];
+      return (data || []) as Venue[];
     },
     enabled: !!latitude && !!longitude,
   });
 }
 
-// Hook to get featured venues
 export function useFeaturedVenues(limit = 6) {
   return useQuery({
     queryKey: ['venues', 'featured', limit],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from('venues')
-        .select('*')
-        .eq('is_active', true)
-        .eq('is_featured', true)
-        .order('rating', { ascending: false })
-        .limit(limit);
-
+      const { data, error } = await (supabase.from('venues' as any).select('*').eq('is_active', true).eq('is_featured', true).order('rating', { ascending: false }).limit(limit) as any);
       if (error) throw error;
-      return data as Venue[];
+      return (data || []) as Venue[];
     },
   });
 }
 
-// Hook to get venue by ID
 export function useVenue(venueId: string) {
   return useQuery({
     queryKey: ['venue', venueId],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from('venues')
-        .select('*')
-        .eq('id', venueId)
-        .single();
-
+      const { data, error } = await (supabase.from('venues' as any).select('*').eq('id', venueId).single() as any);
       if (error) throw error;
       return data as Venue;
     },
@@ -274,90 +194,40 @@ export function useVenue(venueId: string) {
   });
 }
 
-// Hook to get experiences for a venue
 export function useVenueExperiences(venueId: string) {
   return useQuery({
     queryKey: ['venue-experiences', venueId],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from('experiences')
-        .select('*')
-        .eq('venue_id', venueId)
-        .eq('is_active', true)
-        .order('is_featured', { ascending: false })
-        .order('base_price', { ascending: true });
-
+      const { data, error } = await (supabase.from('experiences' as any).select('*').eq('venue_id', venueId).eq('is_active', true).order('is_featured', { ascending: false }).order('base_price', { ascending: true }) as any);
       if (error) throw error;
-      return data as Experience[];
+      return (data || []) as Experience[];
     },
     enabled: !!venueId,
   });
 }
 
-// Hook to search experiences
-export function useExperienceSearch(params: {
-  city?: string;
-  experienceType?: string;
-  minPrice?: number;
-  maxPrice?: number;
-  date?: string;
-}) {
+export function useExperienceSearch(params: { city?: string; experienceType?: string; minPrice?: number; maxPrice?: number; date?: string }) {
   return useQuery({
     queryKey: ['experiences', 'search', params],
     queryFn: async () => {
-      let query = supabase
-        .from('experiences')
-        .select(`
-          *,
-          venue:venues(id, name, city, main_image, rating)
-        `)
-        .eq('is_active', true);
-
-      if (params.experienceType) {
-        query = query.eq('experience_type', params.experienceType);
-      }
-
-      if (params.minPrice) {
-        query = query.gte('base_price', params.minPrice);
-      }
-
-      if (params.maxPrice) {
-        query = query.lte('base_price', params.maxPrice);
-      }
-
-      const { data, error } = await query
-        .order('is_featured', { ascending: false })
-        .order('rating', { ascending: false });
-
+      let query = (supabase.from('experiences' as any).select(`*, venue:venues(id, name, city, main_image, rating)`).eq('is_active', true) as any);
+      if (params.experienceType) query = query.eq('experience_type', params.experienceType);
+      if (params.minPrice) query = query.gte('base_price', params.minPrice);
+      if (params.maxPrice) query = query.lte('base_price', params.maxPrice);
+      const { data, error } = await query.order('is_featured', { ascending: false }).order('rating', { ascending: false });
       if (error) throw error;
-
-      // Filter by city if venue data available
-      let results = data as Experience[];
-      if (params.city) {
-        results = results.filter(exp =>
-          exp.venue?.city?.toLowerCase().includes(params.city!.toLowerCase())
-        );
-      }
-
+      let results = (data || []) as Experience[];
+      if (params.city) results = results.filter(exp => exp.venue?.city?.toLowerCase().includes(params.city!.toLowerCase()));
       return results;
     },
   });
 }
 
-// Hook to get experience by ID
 export function useExperience(experienceId: string) {
   return useQuery({
     queryKey: ['experience', experienceId],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from('experiences')
-        .select(`
-          *,
-          venue:venues(*)
-        `)
-        .eq('id', experienceId)
-        .single();
-
+      const { data, error } = await (supabase.from('experiences' as any).select(`*, venue:venues(*)`).eq('id', experienceId).single() as any);
       if (error) throw error;
       return data as Experience;
     },
@@ -365,129 +235,50 @@ export function useExperience(experienceId: string) {
   });
 }
 
-// Hook to create experience booking
 export function useCreateExperienceBooking() {
   const { user } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (booking: {
-      experience_id: string;
-      customer_name: string;
-      customer_email: string;
-      customer_phone?: string;
-      booking_date: string;
-      start_time: string;
-      num_adults: number;
-      num_children?: number;
-      is_private?: boolean;
-      unit_price: number;
-      adult_total: number;
-      child_total?: number;
-      subtotal: number;
-      taxes: number;
-      fees: number;
-      total: number;
-      special_requests?: string;
-    }) => {
-      const { data, error } = await supabase
-        .from('experience_bookings')
-        .insert({
-          ...booking,
-          customer_id: user?.id,
-          num_children: booking.num_children || 0,
-          child_total: booking.child_total || 0,
-          is_private: booking.is_private || false,
-          status: 'pending',
-          payment_status: 'pending',
-        })
-        .select()
-        .single();
-
+    mutationFn: async (booking: { experience_id: string; customer_name: string; customer_email: string; customer_phone?: string; booking_date: string; start_time: string; num_adults: number; num_children?: number; is_private?: boolean; unit_price: number; adult_total: number; child_total?: number; subtotal: number; taxes: number; fees: number; total: number; special_requests?: string }) => {
+      const { data, error } = await (supabase.from('experience_bookings' as any).insert({ ...booking, customer_id: user?.id, num_children: booking.num_children || 0, child_total: booking.child_total || 0, is_private: booking.is_private || false, status: 'pending', payment_status: 'pending' }).select().single() as any);
       if (error) throw error;
       return data as ExperienceBooking;
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['my-experience-bookings'] });
-      toast({
-        title: 'Booking Created',
-        description: 'Your experience booking has been submitted.',
-      });
-    },
-    onError: (error: Error) => {
-      toast({
-        title: 'Booking Failed',
-        description: error.message,
-        variant: 'destructive',
-      });
-    },
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['my-experience-bookings'] }); toast({ title: 'Booking Created', description: 'Your experience booking has been submitted.' }); },
+    onError: (error: Error) => { toast({ title: 'Booking Failed', description: error.message, variant: 'destructive' }); },
   });
 }
 
-// Hook to get user's experience bookings
 export function useMyExperienceBookings() {
   const { user } = useAuth();
-
   return useQuery({
     queryKey: ['my-experience-bookings', user?.id],
     queryFn: async () => {
       if (!user) return [];
-
-      const { data, error } = await supabase
-        .from('experience_bookings')
-        .select(`
-          *,
-          experience:experiences(*, venue:venues(*))
-        `)
-        .eq('customer_id', user.id)
-        .order('created_at', { ascending: false });
-
+      const { data, error } = await (supabase.from('experience_bookings' as any).select(`*, experience:experiences(*, venue:venues(*))`).eq('customer_id', user.id).order('created_at', { ascending: false }) as any);
       if (error) throw error;
-      return data as ExperienceBooking[];
+      return (data || []) as ExperienceBooking[];
     },
     enabled: !!user,
   });
 }
 
-// Calculate booking total
-export function calculateExperienceBookingTotal(
-  unitPrice: number,
-  numAdults: number,
-  numChildren: number,
-  childPrice: number | null,
-  isPrivate: boolean,
-  privateMultiplier: number,
-  taxRate = 0.15
-): { adultTotal: number; childTotal: number; subtotal: number; taxes: number; fees: number; total: number } {
+export function calculateExperienceBookingTotal(unitPrice: number, numAdults: number, numChildren: number, childPrice: number | null, isPrivate: boolean, privateMultiplier: number, taxRate = 0.15) {
   let adultTotal = unitPrice * numAdults;
   let childTotal = (childPrice || unitPrice * 0.5) * numChildren;
-
-  if (isPrivate) {
-    adultTotal *= privateMultiplier;
-    childTotal *= privateMultiplier;
-  }
-
+  if (isPrivate) { adultTotal *= privateMultiplier; childTotal *= privateMultiplier; }
   const subtotal = adultTotal + childTotal;
   const taxes = subtotal * taxRate;
-  const fees = 25; // Service fee
+  const fees = 25;
   const total = subtotal + taxes + fees;
-
-  return {
-    adultTotal: Math.round(adultTotal * 100) / 100,
-    childTotal: Math.round(childTotal * 100) / 100,
-    subtotal: Math.round(subtotal * 100) / 100,
-    taxes: Math.round(taxes * 100) / 100,
-    fees,
-    total: Math.round(total * 100) / 100,
-  };
+  return { adultTotal: Math.round(adultTotal * 100) / 100, childTotal: Math.round(childTotal * 100) / 100, subtotal: Math.round(subtotal * 100) / 100, taxes: Math.round(taxes * 100) / 100, fees, total: Math.round(total * 100) / 100 };
 }
 
-// Format duration
 export function formatDuration(minutes: number): string {
   if (minutes < 60) return `${minutes} min`;
   const hours = Math.floor(minutes / 60);
   const mins = minutes % 60;
-  if (mins === 0) return `${hours}h`;
-  return `${hours}h ${mins}m`;
+  return mins === 0 ? `${hours}h` : `${hours}h ${mins}m`;
 }

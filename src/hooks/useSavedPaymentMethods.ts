@@ -34,15 +34,15 @@ export function useSavedPaymentMethods() {
     queryFn: async () => {
       if (!user) return [];
 
-      const { data, error } = await supabase
-        .from('saved_payment_methods')
+      const { data, error } = await (supabase
+        .from('saved_payment_methods' as any)
         .select('*')
         .eq('user_id', user.id)
         .order('is_default', { ascending: false })
-        .order('created_at', { ascending: false });
+        .order('created_at', { ascending: false }) as any);
 
       if (error) throw error;
-      return data as SavedPaymentMethod[];
+      return (data || []) as SavedPaymentMethod[];
     },
     enabled: !!user,
   });
@@ -60,23 +60,23 @@ export function useAddPaymentMethod() {
 
       // If setting as default, clear other defaults first
       if (input.is_default) {
-        await supabase
-          .from('saved_payment_methods')
+        await (supabase
+          .from('saved_payment_methods' as any)
           .update({ is_default: false })
-          .eq('user_id', user.id);
+          .eq('user_id', user.id) as any);
       }
 
-      const { data, error } = await supabase
-        .from('saved_payment_methods')
+      const { data, error } = await (supabase
+        .from('saved_payment_methods' as any)
         .insert({
           ...input,
           user_id: user.id,
         })
         .select()
-        .single();
+        .single() as any);
 
       if (error) throw error;
-      return data;
+      return data as SavedPaymentMethod;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['saved-payment-methods'] });
@@ -102,10 +102,10 @@ export function useDeletePaymentMethod() {
 
   return useMutation({
     mutationFn: async (paymentMethodId: string) => {
-      const { error } = await supabase
-        .from('saved_payment_methods')
+      const { error } = await (supabase
+        .from('saved_payment_methods' as any)
         .delete()
-        .eq('id', paymentMethodId);
+        .eq('id', paymentMethodId) as any);
 
       if (error) throw error;
     },
@@ -137,16 +137,16 @@ export function useSetDefaultPaymentMethod() {
       if (!user) throw new Error('Not authenticated');
 
       // Clear all defaults first
-      await supabase
-        .from('saved_payment_methods')
+      await (supabase
+        .from('saved_payment_methods' as any)
         .update({ is_default: false })
-        .eq('user_id', user.id);
+        .eq('user_id', user.id) as any);
 
       // Set the new default
-      const { error } = await supabase
-        .from('saved_payment_methods')
+      const { error } = await (supabase
+        .from('saved_payment_methods' as any)
         .update({ is_default: true })
-        .eq('id', paymentMethodId);
+        .eq('id', paymentMethodId) as any);
 
       if (error) throw error;
     },

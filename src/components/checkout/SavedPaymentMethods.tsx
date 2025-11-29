@@ -85,7 +85,9 @@ export function SavedPaymentMethods({
             expiryYear: '',
             cvv: '',
           });
-          onSelectMethod(data.id);
+          if (data && (data as SavedPaymentMethod).id) {
+            onSelectMethod((data as SavedPaymentMethod).id);
+          }
         },
       }
     );

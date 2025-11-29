@@ -54,17 +54,17 @@ export function useDeliveryPartnerStatus() {
     queryFn: async () => {
       if (!user) return null;
 
-      const { data, error } = await supabase
-        .from('delivery_partner_status')
+      const { data, error } = await (supabase
+        .from('delivery_partner_status' as any)
         .select('*')
         .eq('partner_id', user.id)
-        .single();
+        .single() as any);
 
       if (error) {
         if (error.code === 'PGRST116') {
           // Create default status
-          const { data: newStatus, error: createError } = await supabase
-            .from('delivery_partner_status')
+          const { data: newStatus, error: createError } = await (supabase
+            .from('delivery_partner_status' as any)
             .insert({
               partner_id: user.id,
               is_online: false,
@@ -73,7 +73,7 @@ export function useDeliveryPartnerStatus() {
               current_order_count: 0,
             })
             .select()
-            .single();
+            .single() as any);
 
           if (createError) throw createError;
           return newStatus as DeliveryPartnerStatus;
@@ -99,10 +99,10 @@ export function useDeliveryPartnerStatus() {
         updates.last_online_at = new Date().toISOString();
       }
 
-      const { error } = await supabase
-        .from('delivery_partner_status')
+      const { error } = await (supabase
+        .from('delivery_partner_status' as any)
         .update(updates)
-        .eq('partner_id', user.id);
+        .eq('partner_id', user.id) as any);
 
       if (error) throw error;
 
@@ -130,14 +130,14 @@ export function useDeliveryPartnerStatus() {
     mutationFn: async ({ latitude, longitude }: { latitude: number; longitude: number }) => {
       if (!user) throw new Error('Not authenticated');
 
-      const { error } = await supabase
-        .from('delivery_partner_status')
+      const { error } = await (supabase
+        .from('delivery_partner_status' as any)
         .update({
           current_latitude: latitude,
           current_longitude: longitude,
           updated_at: new Date().toISOString(),
         })
-        .eq('partner_id', user.id);
+        .eq('partner_id', user.id) as any);
 
       if (error) throw error;
     },
@@ -164,8 +164,8 @@ export function useOrderOffers() {
     queryFn: async () => {
       if (!user) return [];
 
-      const { data, error } = await supabase
-        .from('order_offers')
+      const { data, error } = await (supabase
+        .from('order_offers' as any)
         .select(`
           *,
           order:orders(
@@ -180,10 +180,10 @@ export function useOrderOffers() {
         .eq('partner_id', user.id)
         .eq('status', 'pending')
         .gt('expires_at', new Date().toISOString())
-        .order('offered_at', { ascending: false });
+        .order('offered_at', { ascending: false }) as any);
 
       if (error) throw error;
-      return data as OrderOffer[];
+      return (data || []) as OrderOffer[];
     },
     enabled: !!user,
     refetchInterval: 10000, // Check every 10 seconds
@@ -201,23 +201,23 @@ export function useOrderOffers() {
     }) => {
       if (!user) throw new Error('Not authenticated');
 
-      const { data: offer, error: offerError } = await supabase
-        .from('order_offers')
+      const { data: offer, error: offerError } = await (supabase
+        .from('order_offers' as any)
         .select('order_id')
         .eq('id', offerId)
-        .single();
+        .single() as any);
 
       if (offerError) throw offerError;
 
       // Update offer status
-      const { error: updateError } = await supabase
-        .from('order_offers')
+      const { error: updateError } = await (supabase
+        .from('order_offers' as any)
         .update({
           status: response,
           responded_at: new Date().toISOString(),
           rejection_reason: rejectionReason,
         })
-        .eq('id', offerId);
+        .eq('id', offerId) as any);
 
       if (updateError) throw updateError;
 
@@ -229,12 +229,12 @@ export function useOrderOffers() {
             delivery_partner_id: user.id,
             status: 'confirmed',
           })
-          .eq('id', offer.order_id);
+          .eq('id', (offer as any).order_id);
 
         if (orderError) throw orderError;
 
         // Increment partner's current order count
-        await supabase.rpc('increment_order_count', { p_partner_id: user.id });
+        await (supabase.rpc as any)('increment_order_count', { p_partner_id: user.id });
       }
 
       return response;

@@ -105,11 +105,11 @@ export function useHotelSearch(params: HotelSearchParams) {
   return useQuery({
     queryKey: ['hotels', 'search', params],
     queryFn: async () => {
-      let query = supabase
-        .from('hotels')
+      let query = (supabase
+        .from('hotels' as any)
         .select('*')
         .eq('is_active', true)
-        .eq('verification_status', 'verified');
+        .eq('verification_status', 'verified') as any);
 
       if (params.city) {
         query = query.ilike('city', `%${params.city}%`);
@@ -138,7 +138,7 @@ export function useHotelSearch(params: HotelSearchParams) {
       const { data, error } = await query.order('is_featured', { ascending: false }).order('rating', { ascending: false });
 
       if (error) throw error;
-      return data as Hotel[];
+      return (data || []) as Hotel[];
     },
   });
 }
@@ -148,16 +148,16 @@ export function useFeaturedHotels(limit = 6) {
   return useQuery({
     queryKey: ['hotels', 'featured', limit],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from('hotels')
+      const { data, error } = await (supabase
+        .from('hotels' as any)
         .select('*')
         .eq('is_active', true)
         .eq('is_featured', true)
         .order('rating', { ascending: false })
-        .limit(limit);
+        .limit(limit) as any);
 
       if (error) throw error;
-      return data as Hotel[];
+      return (data || []) as Hotel[];
     },
   });
 }
@@ -167,11 +167,11 @@ export function useHotel(hotelId: string) {
   return useQuery({
     queryKey: ['hotel', hotelId],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from('hotels')
+      const { data, error } = await (supabase
+        .from('hotels' as any)
         .select('*')
         .eq('id', hotelId)
-        .single();
+        .single() as any);
 
       if (error) throw error;
       return data as Hotel;
@@ -185,15 +185,15 @@ export function useHotelRoomTypes(hotelId: string) {
   return useQuery({
     queryKey: ['hotel-rooms', hotelId],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from('room_types')
+      const { data, error } = await (supabase
+        .from('room_types' as any)
         .select('*')
         .eq('hotel_id', hotelId)
         .eq('is_active', true)
-        .order('base_price', { ascending: true });
+        .order('base_price', { ascending: true }) as any);
 
       if (error) throw error;
-      return data as RoomType[];
+      return (data || []) as RoomType[];
     },
     enabled: !!hotelId,
   });
@@ -209,7 +209,7 @@ export function useCheckAvailability(
   return useQuery({
     queryKey: ['room-availability', roomTypeId, checkIn, checkOut, numRooms],
     queryFn: async () => {
-      const { data, error } = await supabase.rpc('check_room_availability', {
+      const { data, error } = await (supabase.rpc as any)('check_room_availability', {
         p_room_type_id: roomTypeId,
         p_check_in: checkIn,
         p_check_out: checkOut,
@@ -248,8 +248,8 @@ export function useCreateHotelBooking() {
       total: number;
       special_requests?: string;
     }) => {
-      const { data, error } = await supabase
-        .from('hotel_bookings')
+      const { data, error } = await (supabase
+        .from('hotel_bookings' as any)
         .insert({
           ...booking,
           guest_id: user?.id,
@@ -257,7 +257,7 @@ export function useCreateHotelBooking() {
           payment_status: 'pending',
         })
         .select()
-        .single();
+        .single() as any);
 
       if (error) throw error;
       return data as HotelBooking;
@@ -288,18 +288,18 @@ export function useMyHotelBookings() {
     queryFn: async () => {
       if (!user) return [];
 
-      const { data, error } = await supabase
-        .from('hotel_bookings')
+      const { data, error } = await (supabase
+        .from('hotel_bookings' as any)
         .select(`
           *,
           hotel:hotels(*),
           room_type:room_types(*)
         `)
         .eq('guest_id', user.id)
-        .order('created_at', { ascending: false });
+        .order('created_at', { ascending: false }) as any);
 
       if (error) throw error;
-      return data as HotelBooking[];
+      return (data || []) as HotelBooking[];
     },
     enabled: !!user,
   });
@@ -312,8 +312,8 @@ export function useCancelHotelBooking() {
 
   return useMutation({
     mutationFn: async ({ bookingId, reason }: { bookingId: string; reason?: string }) => {
-      const { data, error } = await supabase
-        .from('hotel_bookings')
+      const { data, error } = await (supabase
+        .from('hotel_bookings' as any)
         .update({
           status: 'cancelled',
           cancelled_at: new Date().toISOString(),
@@ -321,7 +321,7 @@ export function useCancelHotelBooking() {
         })
         .eq('id', bookingId)
         .select()
-        .single();
+        .single() as any);
 
       if (error) throw error;
       return data;
