@@ -39,14 +39,13 @@ export function useNotificationPreferences() {
     queryFn: async () => {
       if (!user) return null;
 
-      const { data, error } = await supabase
-        .from('notification_preferences')
+      const { data, error } = await (supabase
+        .from('notification_preferences' as any)
         .select('*')
         .eq('user_id', user.id)
-        .single();
+        .single() as any);
 
       if (error) {
-        // If no preferences exist, return defaults
         if (error.code === 'PGRST116') {
           return {
             ...defaultPreferences,
@@ -68,33 +67,30 @@ export function useNotificationPreferences() {
     mutationFn: async (updates: Partial<NotificationPreferences>) => {
       if (!user) throw new Error('Not authenticated');
 
-      // Check if preferences exist
-      const { data: existing } = await supabase
-        .from('notification_preferences')
+      const { data: existing } = await (supabase
+        .from('notification_preferences' as any)
         .select('id')
         .eq('user_id', user.id)
-        .single();
+        .single() as any);
 
       if (existing) {
-        // Update existing
-        const { error } = await supabase
-          .from('notification_preferences')
+        const { error } = await (supabase
+          .from('notification_preferences' as any)
           .update({
             ...updates,
             updated_at: new Date().toISOString(),
           })
-          .eq('user_id', user.id);
+          .eq('user_id', user.id) as any);
 
         if (error) throw error;
       } else {
-        // Create new
-        const { error } = await supabase
-          .from('notification_preferences')
+        const { error } = await (supabase
+          .from('notification_preferences' as any)
           .insert({
             user_id: user.id,
             ...defaultPreferences,
             ...updates,
-          });
+          }) as any);
 
         if (error) throw error;
       }

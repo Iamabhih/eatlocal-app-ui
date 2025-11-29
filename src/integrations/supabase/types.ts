@@ -246,6 +246,48 @@ export type Database = {
           },
         ]
       }
+      delivery_partner_status: {
+        Row: {
+          available_for_orders: boolean | null
+          created_at: string | null
+          current_latitude: number | null
+          current_longitude: number | null
+          current_order_count: number | null
+          id: string
+          is_online: boolean | null
+          last_online_at: string | null
+          max_concurrent_orders: number | null
+          partner_id: string
+          updated_at: string | null
+        }
+        Insert: {
+          available_for_orders?: boolean | null
+          created_at?: string | null
+          current_latitude?: number | null
+          current_longitude?: number | null
+          current_order_count?: number | null
+          id?: string
+          is_online?: boolean | null
+          last_online_at?: string | null
+          max_concurrent_orders?: number | null
+          partner_id: string
+          updated_at?: string | null
+        }
+        Update: {
+          available_for_orders?: boolean | null
+          created_at?: string | null
+          current_latitude?: number | null
+          current_longitude?: number | null
+          current_order_count?: number | null
+          id?: string
+          is_online?: boolean | null
+          last_online_at?: string | null
+          max_concurrent_orders?: number | null
+          partner_id?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       driver_documents: {
         Row: {
           created_at: string
@@ -517,6 +559,293 @@ export type Database = {
         }
         Relationships: []
       }
+      hotel_bookings: {
+        Row: {
+          booking_number: string | null
+          cancellation_reason: string | null
+          cancelled_at: string | null
+          check_in_date: string
+          check_out_date: string
+          created_at: string | null
+          currency: string | null
+          discount: number | null
+          fees: number | null
+          guest_email: string
+          guest_id: string | null
+          guest_name: string
+          guest_phone: string | null
+          hotel_id: string
+          id: string
+          nightly_rate: number
+          num_guests: number | null
+          num_nights: number
+          num_rooms: number | null
+          payment_method: string | null
+          payment_reference: string | null
+          payment_status: string | null
+          room_type_id: string
+          special_requests: string | null
+          status: string | null
+          subtotal: number
+          taxes: number | null
+          total: number
+          updated_at: string | null
+        }
+        Insert: {
+          booking_number?: string | null
+          cancellation_reason?: string | null
+          cancelled_at?: string | null
+          check_in_date: string
+          check_out_date: string
+          created_at?: string | null
+          currency?: string | null
+          discount?: number | null
+          fees?: number | null
+          guest_email: string
+          guest_id?: string | null
+          guest_name: string
+          guest_phone?: string | null
+          hotel_id: string
+          id?: string
+          nightly_rate: number
+          num_guests?: number | null
+          num_nights: number
+          num_rooms?: number | null
+          payment_method?: string | null
+          payment_reference?: string | null
+          payment_status?: string | null
+          room_type_id: string
+          special_requests?: string | null
+          status?: string | null
+          subtotal: number
+          taxes?: number | null
+          total: number
+          updated_at?: string | null
+        }
+        Update: {
+          booking_number?: string | null
+          cancellation_reason?: string | null
+          cancelled_at?: string | null
+          check_in_date?: string
+          check_out_date?: string
+          created_at?: string | null
+          currency?: string | null
+          discount?: number | null
+          fees?: number | null
+          guest_email?: string
+          guest_id?: string | null
+          guest_name?: string
+          guest_phone?: string | null
+          hotel_id?: string
+          id?: string
+          nightly_rate?: number
+          num_guests?: number | null
+          num_nights?: number
+          num_rooms?: number | null
+          payment_method?: string | null
+          payment_reference?: string | null
+          payment_status?: string | null
+          room_type_id?: string
+          special_requests?: string | null
+          status?: string | null
+          subtotal?: number
+          taxes?: number | null
+          total?: number
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "hotel_bookings_hotel_id_fkey"
+            columns: ["hotel_id"]
+            isOneToOne: false
+            referencedRelation: "hotels"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "hotel_bookings_room_type_id_fkey"
+            columns: ["room_type_id"]
+            isOneToOne: false
+            referencedRelation: "room_types"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      hotels: {
+        Row: {
+          amenities: string[] | null
+          base_price: number | null
+          cancellation_policy: string | null
+          check_in_time: string | null
+          check_out_time: string | null
+          city: string
+          country: string | null
+          created_at: string | null
+          currency: string | null
+          description: string | null
+          email: string | null
+          gallery_images: string[] | null
+          house_rules: string | null
+          id: string
+          is_active: boolean | null
+          is_featured: boolean | null
+          latitude: number | null
+          longitude: number | null
+          main_image: string | null
+          name: string
+          owner_id: string
+          phone: string | null
+          property_type: string | null
+          rating: number | null
+          slug: string | null
+          star_rating: number | null
+          state: string | null
+          street_address: string
+          total_reviews: number | null
+          total_rooms: number | null
+          updated_at: string | null
+          verification_status: string | null
+          website: string | null
+          zip_code: string | null
+        }
+        Insert: {
+          amenities?: string[] | null
+          base_price?: number | null
+          cancellation_policy?: string | null
+          check_in_time?: string | null
+          check_out_time?: string | null
+          city: string
+          country?: string | null
+          created_at?: string | null
+          currency?: string | null
+          description?: string | null
+          email?: string | null
+          gallery_images?: string[] | null
+          house_rules?: string | null
+          id?: string
+          is_active?: boolean | null
+          is_featured?: boolean | null
+          latitude?: number | null
+          longitude?: number | null
+          main_image?: string | null
+          name: string
+          owner_id: string
+          phone?: string | null
+          property_type?: string | null
+          rating?: number | null
+          slug?: string | null
+          star_rating?: number | null
+          state?: string | null
+          street_address: string
+          total_reviews?: number | null
+          total_rooms?: number | null
+          updated_at?: string | null
+          verification_status?: string | null
+          website?: string | null
+          zip_code?: string | null
+        }
+        Update: {
+          amenities?: string[] | null
+          base_price?: number | null
+          cancellation_policy?: string | null
+          check_in_time?: string | null
+          check_out_time?: string | null
+          city?: string
+          country?: string | null
+          created_at?: string | null
+          currency?: string | null
+          description?: string | null
+          email?: string | null
+          gallery_images?: string[] | null
+          house_rules?: string | null
+          id?: string
+          is_active?: boolean | null
+          is_featured?: boolean | null
+          latitude?: number | null
+          longitude?: number | null
+          main_image?: string | null
+          name?: string
+          owner_id?: string
+          phone?: string | null
+          property_type?: string | null
+          rating?: number | null
+          slug?: string | null
+          star_rating?: number | null
+          state?: string | null
+          street_address?: string
+          total_reviews?: number | null
+          total_rooms?: number | null
+          updated_at?: string | null
+          verification_status?: string | null
+          website?: string | null
+          zip_code?: string | null
+        }
+        Relationships: []
+      }
+      loyalty_tiers: {
+        Row: {
+          badge_color: string
+          benefits: string[] | null
+          id: string
+          min_points: number
+          multiplier: number
+          name: string
+        }
+        Insert: {
+          badge_color: string
+          benefits?: string[] | null
+          id?: string
+          min_points?: number
+          multiplier?: number
+          name: string
+        }
+        Update: {
+          badge_color?: string
+          benefits?: string[] | null
+          id?: string
+          min_points?: number
+          multiplier?: number
+          name?: string
+        }
+        Relationships: []
+      }
+      loyalty_transactions: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          id: string
+          points: number
+          reference_id: string | null
+          type: string
+          user_loyalty_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          points: number
+          reference_id?: string | null
+          type: string
+          user_loyalty_id: string
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          points?: number
+          reference_id?: string | null
+          type?: string
+          user_loyalty_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "loyalty_transactions_user_loyalty_id_fkey"
+            columns: ["user_loyalty_id"]
+            isOneToOne: false
+            referencedRelation: "user_loyalty"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       marketing_campaigns: {
         Row: {
           campaign_type: string
@@ -701,6 +1030,42 @@ export type Database = {
           },
         ]
       }
+      notifications: {
+        Row: {
+          action_url: string | null
+          created_at: string | null
+          id: string
+          is_read: boolean | null
+          message: string
+          metadata: Json | null
+          title: string
+          type: string
+          user_id: string
+        }
+        Insert: {
+          action_url?: string | null
+          created_at?: string | null
+          id?: string
+          is_read?: boolean | null
+          message: string
+          metadata?: Json | null
+          title: string
+          type?: string
+          user_id: string
+        }
+        Update: {
+          action_url?: string | null
+          created_at?: string | null
+          id?: string
+          is_read?: boolean | null
+          message?: string
+          metadata?: Json | null
+          title?: string
+          type?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       order_items: {
         Row: {
           created_at: string
@@ -742,6 +1107,53 @@ export type Database = {
           },
           {
             foreignKeyName: "order_items_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      order_offers: {
+        Row: {
+          created_at: string | null
+          estimated_earnings: number | null
+          expires_at: string
+          id: string
+          offered_at: string | null
+          order_id: string
+          partner_id: string
+          rejection_reason: string | null
+          responded_at: string | null
+          status: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          estimated_earnings?: number | null
+          expires_at: string
+          id?: string
+          offered_at?: string | null
+          order_id: string
+          partner_id: string
+          rejection_reason?: string | null
+          responded_at?: string | null
+          status?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          estimated_earnings?: number | null
+          expires_at?: string
+          id?: string
+          offered_at?: string | null
+          order_id?: string
+          partner_id?: string
+          rejection_reason?: string | null
+          responded_at?: string | null
+          status?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "order_offers_order_id_fkey"
             columns: ["order_id"]
             isOneToOne: false
             referencedRelation: "orders"
@@ -892,6 +1304,57 @@ export type Database = {
           },
         ]
       }
+      panic_alerts: {
+        Row: {
+          address: string | null
+          created_at: string | null
+          description: string | null
+          id: string
+          latitude: number | null
+          longitude: number | null
+          province: string | null
+          resolved_at: string | null
+          resolved_by: string | null
+          status: string | null
+          user_email: string | null
+          user_id: string | null
+          user_name: string | null
+          user_phone: string | null
+        }
+        Insert: {
+          address?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          latitude?: number | null
+          longitude?: number | null
+          province?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          status?: string | null
+          user_email?: string | null
+          user_id?: string | null
+          user_name?: string | null
+          user_phone?: string | null
+        }
+        Update: {
+          address?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          latitude?: number | null
+          longitude?: number | null
+          province?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          status?: string | null
+          user_email?: string | null
+          user_id?: string | null
+          user_name?: string | null
+          user_phone?: string | null
+        }
+        Relationships: []
+      }
       payments: {
         Row: {
           amount: number
@@ -943,25 +1406,40 @@ export type Database = {
         Row: {
           avatar_url: string | null
           created_at: string
+          email_verified: boolean | null
           full_name: string
           id: string
+          is_suspended: boolean | null
           phone: string | null
+          suspended_at: string | null
+          suspension_reason: string | null
+          two_factor_enabled: boolean | null
           updated_at: string
         }
         Insert: {
           avatar_url?: string | null
           created_at?: string
+          email_verified?: boolean | null
           full_name: string
           id: string
+          is_suspended?: boolean | null
           phone?: string | null
+          suspended_at?: string | null
+          suspension_reason?: string | null
+          two_factor_enabled?: boolean | null
           updated_at?: string
         }
         Update: {
           avatar_url?: string | null
           created_at?: string
+          email_verified?: boolean | null
           full_name?: string
           id?: string
+          is_suspended?: boolean | null
           phone?: string | null
+          suspended_at?: string | null
+          suspension_reason?: string | null
+          two_factor_enabled?: boolean | null
           updated_at?: string
         }
         Relationships: []
@@ -1725,6 +2203,107 @@ export type Database = {
           },
         ]
       }
+      room_types: {
+        Row: {
+          amenities: string[] | null
+          base_price: number
+          beds_description: string | null
+          created_at: string | null
+          description: string | null
+          hotel_id: string
+          id: string
+          images: string[] | null
+          is_active: boolean | null
+          max_guests: number | null
+          name: string
+          room_size_sqm: number | null
+          total_rooms: number | null
+          updated_at: string | null
+          weekend_price: number | null
+        }
+        Insert: {
+          amenities?: string[] | null
+          base_price: number
+          beds_description?: string | null
+          created_at?: string | null
+          description?: string | null
+          hotel_id: string
+          id?: string
+          images?: string[] | null
+          is_active?: boolean | null
+          max_guests?: number | null
+          name: string
+          room_size_sqm?: number | null
+          total_rooms?: number | null
+          updated_at?: string | null
+          weekend_price?: number | null
+        }
+        Update: {
+          amenities?: string[] | null
+          base_price?: number
+          beds_description?: string | null
+          created_at?: string | null
+          description?: string | null
+          hotel_id?: string
+          id?: string
+          images?: string[] | null
+          is_active?: boolean | null
+          max_guests?: number | null
+          name?: string
+          room_size_sqm?: number | null
+          total_rooms?: number | null
+          updated_at?: string | null
+          weekend_price?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "room_types_hotel_id_fkey"
+            columns: ["hotel_id"]
+            isOneToOne: false
+            referencedRelation: "hotels"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      saved_payment_methods: {
+        Row: {
+          card_type: string
+          cardholder_name: string
+          created_at: string | null
+          expiry_month: number
+          expiry_year: number
+          id: string
+          is_default: boolean | null
+          last_four: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          card_type: string
+          cardholder_name: string
+          created_at?: string | null
+          expiry_month: number
+          expiry_year: number
+          id?: string
+          is_default?: boolean | null
+          last_four: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          card_type?: string
+          cardholder_name?: string
+          created_at?: string | null
+          expiry_month?: number
+          expiry_year?: number
+          id?: string
+          is_default?: boolean | null
+          last_four?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       shop_categories: {
         Row: {
           created_at: string | null
@@ -1863,6 +2442,39 @@ export type Database = {
         }
         Relationships: []
       }
+      two_factor_auth: {
+        Row: {
+          backup_codes: string[] | null
+          created_at: string | null
+          id: string
+          is_enabled: boolean | null
+          secret: string | null
+          updated_at: string | null
+          user_id: string
+          verified_at: string | null
+        }
+        Insert: {
+          backup_codes?: string[] | null
+          created_at?: string | null
+          id?: string
+          is_enabled?: boolean | null
+          secret?: string | null
+          updated_at?: string | null
+          user_id: string
+          verified_at?: string | null
+        }
+        Update: {
+          backup_codes?: string[] | null
+          created_at?: string | null
+          id?: string
+          is_enabled?: boolean | null
+          secret?: string | null
+          updated_at?: string | null
+          user_id?: string
+          verified_at?: string | null
+        }
+        Relationships: []
+      }
       user_favorites: {
         Row: {
           created_at: string
@@ -1940,6 +2552,47 @@ export type Database = {
         }
         Relationships: []
       }
+      user_loyalty: {
+        Row: {
+          created_at: string | null
+          current_points: number | null
+          id: string
+          lifetime_orders: number | null
+          tier_id: string | null
+          total_points: number | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          current_points?: number | null
+          id?: string
+          lifetime_orders?: number | null
+          tier_id?: string | null
+          total_points?: number | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          current_points?: number | null
+          id?: string
+          lifetime_orders?: number | null
+          tier_id?: string | null
+          total_points?: number | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_loyalty_tier_id_fkey"
+            columns: ["tier_id"]
+            isOneToOne: false
+            referencedRelation: "loyalty_tiers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_roles: {
         Row: {
           created_at: string
@@ -1960,6 +2613,77 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      user_wallets: {
+        Row: {
+          balance: number | null
+          created_at: string | null
+          currency: string | null
+          id: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          balance?: number | null
+          created_at?: string | null
+          currency?: string | null
+          id?: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          balance?: number | null
+          created_at?: string | null
+          currency?: string | null
+          id?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      wallet_transactions: {
+        Row: {
+          amount: number
+          balance_after: number
+          created_at: string | null
+          description: string | null
+          id: string
+          reference_id: string | null
+          reference_type: string | null
+          type: string
+          wallet_id: string
+        }
+        Insert: {
+          amount: number
+          balance_after: number
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          reference_id?: string | null
+          reference_type?: string | null
+          type: string
+          wallet_id: string
+        }
+        Update: {
+          amount?: number
+          balance_after?: number
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          reference_id?: string | null
+          reference_type?: string | null
+          type?: string
+          wallet_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "wallet_transactions_wallet_id_fkey"
+            columns: ["wallet_id"]
+            isOneToOne: false
+            referencedRelation: "user_wallets"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {
@@ -2134,6 +2858,15 @@ export type Database = {
             }
             Returns: string
           }
+      check_room_availability: {
+        Args: {
+          p_check_in: string
+          p_check_out: string
+          p_num_rooms?: number
+          p_room_type_id: string
+        }
+        Returns: boolean
+      }
       cleanup_old_logs: { Args: never; Returns: undefined }
       disablelongtransactions: { Args: never; Returns: string }
       dropgeometrycolumn:
@@ -2278,6 +3011,10 @@ export type Database = {
       }
       increment_helpful_count: {
         Args: { review_id: string }
+        Returns: undefined
+      }
+      increment_order_count: {
+        Args: { p_partner_id: string }
         Returns: undefined
       }
       longtransactionsenabled: { Args: never; Returns: boolean }

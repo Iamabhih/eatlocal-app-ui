@@ -131,7 +131,7 @@ export function PanicButton({ variant = 'floating', size = 'md' }: PanicButtonPr
 
     try {
       // Save panic alert to database
-      const { error } = await supabase.from('panic_alerts').insert({
+      const { error } = await (supabase.from('panic_alerts' as any).insert({
         user_id: user?.id || null,
         latitude: location?.lat,
         longitude: location?.lng,
@@ -142,7 +142,7 @@ export function PanicButton({ variant = 'floating', size = 'md' }: PanicButtonPr
         user_name: user?.user_metadata?.full_name || 'Anonymous',
         user_phone: user?.user_metadata?.phone || null,
         user_email: user?.email || null,
-      });
+      }) as any);
 
       if (error) {
         console.error('Failed to save panic alert:', error);
