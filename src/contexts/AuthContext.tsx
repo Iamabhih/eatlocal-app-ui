@@ -9,6 +9,7 @@ interface AuthContextType {
   session: Session | null;
   loading: boolean;
   userRoles: UserRole[];
+  isSuspended: boolean;
   hasRole: (role: UserRole) => boolean;
   isAdmin: () => boolean;
   isSuperAdmin: () => boolean;
@@ -22,6 +23,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
   const [userRoles, setUserRoles] = useState<UserRole[]>([]);
+  const [isSuspended, setIsSuspended] = useState(false);
 
   useEffect(() => {
     // Set up auth state listener
@@ -31,13 +33,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setUser(session?.user ?? null);
         setLoading(false);
         
-        // Fetch user roles
+        // Fetch user roles and suspension status
         if (session?.user) {
           setTimeout(() => {
             fetchUserRoles(session.user.id);
+            fetchSuspensionStatus(session.user.id);
           }, 0);
         } else {
           setUserRoles([]);
+          setIsSuspended(false);
         }
       }
     );
@@ -47,9 +51,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setSession(session);
       setUser(session?.user ?? null);
       
-      // Fetch user roles
+      // Fetch user roles and suspension status
       if (session?.user) {
         fetchUserRoles(session.user.id);
+        fetchSuspensionStatus(session.user.id);
       }
       setLoading(false);
     });
@@ -62,9 +67,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       .from('user_roles')
       .select('role')
       .eq('user_id', userId);
-    
+
     if (data) {
       setUserRoles(data.map(r => r.role as UserRole));
+    }
+  };
+
+  const fetchSuspensionStatus = async (userId: string) => {
+    const { data } = await supabase
+      .from('profiles')
+      .select('is_suspended')
+      .eq('id', userId)
+      .single();
+
+    if (data) {
+      setIsSuspended(data.is_suspended || false);
     }
   };
 
@@ -85,7 +102,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, session, loading, userRoles, hasRole, isAdmin, isSuperAdmin, signOut }}>
+    <AuthContext.Provider value={{ user, session, loading, userRoles, isSuspended, hasRole, isAdmin, isSuperAdmin, signOut }}>
       {children}
     </AuthContext.Provider>
   );

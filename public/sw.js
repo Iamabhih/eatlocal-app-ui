@@ -230,6 +230,10 @@ self.addEventListener('sync', (event) => {
   if (event.tag === 'sync-cart') {
     event.waitUntil(syncCart());
   }
+
+  if (event.tag === 'sync-mutations') {
+    event.waitUntil(syncOfflineMutations());
+  }
 });
 
 // Sync pending orders
@@ -250,6 +254,112 @@ async function syncCart() {
     // Implementation would sync cart data
   } catch (error) {
     console.error('[SW] Cart sync failed:', error);
+  }
+}
+
+// Sync offline mutations from IndexedDB
+async function syncOfflineMutations() {
+  const DB_NAME = 'smash-mutations';
+  const STORE_NAME = 'mutations';
+  const MAX_RETRIES = 3;
+
+  try {
+    console.log('[SW] Syncing offline mutations...');
+
+    const db = await new Promise((resolve, reject) => {
+      const request = indexedDB.open(DB_NAME, 1);
+      request.onerror = () => reject(request.error);
+      request.onsuccess = () => resolve(request.result);
+      request.onupgradeneeded = (event) => {
+        const database = event.target.result;
+        if (!database.objectStoreNames.contains(STORE_NAME)) {
+          const store = database.createObjectStore(STORE_NAME, {
+            keyPath: 'id',
+            autoIncrement: true,
+          });
+          store.createIndex('timestamp', 'timestamp');
+        }
+      };
+    });
+
+    const mutations = await new Promise((resolve, reject) => {
+      const transaction = db.transaction([STORE_NAME], 'readonly');
+      const store = transaction.objectStore(STORE_NAME);
+      const request = store.getAll();
+      request.onerror = () => reject(request.error);
+      request.onsuccess = () => resolve(request.result);
+    });
+
+    console.log(`[SW] Found ${mutations.length} pending mutations`);
+
+    for (const mutation of mutations) {
+      try {
+        const response = await fetch(mutation.url, {
+          method: mutation.method,
+          headers: mutation.headers,
+          body: JSON.stringify(mutation.body),
+        });
+
+        if (response.ok) {
+          // Success - delete mutation
+          await deleteMutation(db, mutation.id);
+          console.log('[SW] Synced mutation:', mutation.id);
+        } else if (response.status >= 400 && response.status < 500) {
+          // Client error - delete and don't retry
+          await deleteMutation(db, mutation.id);
+          console.error('[SW] Mutation failed with client error:', response.status);
+        } else {
+          // Server error - increment retry count
+          const newRetryCount = (mutation.retryCount || 0) + 1;
+          if (newRetryCount >= MAX_RETRIES) {
+            await deleteMutation(db, mutation.id);
+            console.error('[SW] Mutation exceeded max retries:', mutation.id);
+          } else {
+            await updateMutationRetry(db, mutation.id, newRetryCount);
+          }
+        }
+      } catch (error) {
+        console.error('[SW] Failed to process mutation:', mutation.id, error);
+        // Network error - keep for later retry
+      }
+    }
+
+    db.close();
+    console.log('[SW] Offline mutations sync complete');
+  } catch (error) {
+    console.error('[SW] Offline mutations sync failed:', error);
+  }
+
+  async function deleteMutation(db, id) {
+    return new Promise((resolve, reject) => {
+      const transaction = db.transaction([STORE_NAME], 'readwrite');
+      const store = transaction.objectStore(STORE_NAME);
+      const request = store.delete(id);
+      request.onerror = () => reject(request.error);
+      request.onsuccess = () => resolve();
+    });
+  }
+
+  async function updateMutationRetry(db, id, retryCount) {
+    return new Promise((resolve, reject) => {
+      const transaction = db.transaction([STORE_NAME], 'readwrite');
+      const store = transaction.objectStore(STORE_NAME);
+      const getRequest = store.get(id);
+
+      getRequest.onsuccess = () => {
+        const mutation = getRequest.result;
+        if (mutation) {
+          mutation.retryCount = retryCount;
+          const putRequest = store.put(mutation);
+          putRequest.onerror = () => reject(putRequest.error);
+          putRequest.onsuccess = () => resolve();
+        } else {
+          resolve();
+        }
+      };
+
+      getRequest.onerror = () => reject(getRequest.error);
+    });
   }
 }
 

@@ -21,6 +21,8 @@ import { useEffect, lazy, Suspense } from "react";
 // Core pages (loaded immediately)
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
 
 // Landing Pages (loaded immediately - marketing pages)
 import CustomerLanding from "./pages/CustomerLanding";
@@ -165,6 +167,8 @@ function AppContent() {
         <Route path="/shop-info" element={<ShopLanding />} />
         <Route path="/delivery-info" element={<DeliveryLanding />} />
         <Route path="/auth" element={<Auth />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
 
         {/* ============================================ */}
         {/* PROVIDER SIGNUP PAGES */}
