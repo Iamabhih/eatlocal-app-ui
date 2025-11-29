@@ -8,16 +8,20 @@
 
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Loader2, ShoppingBag, CreditCard, AlertCircle, Clock, CalendarDays } from "lucide-react";
+import { Loader2, ShoppingBag, CreditCard, AlertCircle, Clock, CalendarDays, Wallet, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
 import { AddressSelector } from "@/components/customer/AddressSelector";
 import { FulfillmentSelector } from "@/components/checkout/FulfillmentSelector";
 import { ScheduledOrderSelector } from "@/components/checkout/ScheduledOrderSelector";
+import { SavedPaymentMethods } from "@/components/checkout/SavedPaymentMethods";
 import { useAuth } from "@/contexts/AuthContext";
 import { useCart } from "@/hooks/useCart";
+import { useUserWallet, useWalletPayment, formatWalletAmount } from "@/hooks/useWallet";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import { isRestaurantOpen, isWithinDeliveryRadius, formatTime } from "@/lib/distanceUtils";
@@ -33,6 +37,8 @@ const Checkout = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { items, getSubtotal, getTax, getTotal, clearCart } = useCart();
+  const { data: wallet } = useUserWallet();
+  const walletPayment = useWalletPayment();
   const [loading, setLoading] = useState(false);
   const [processingPayment, setProcessingPayment] = useState(false);
   const [selectedAddressId, setSelectedAddressId] = useState<string | null>(null);
@@ -41,6 +47,8 @@ const Checkout = () => {
   const [restaurant, setRestaurant] = useState<any>(null);
   const [validationErrors, setValidationErrors] = useState<string[]>([]);
   const [scheduledFor, setScheduledFor] = useState<Date | null>(null);
+  const [selectedPaymentMethodId, setSelectedPaymentMethodId] = useState<string | null>(null);
+  const [useWalletBalance, setUseWalletBalance] = useState(false);
 
   useEffect(() => {
     if (!user) {
@@ -117,7 +125,12 @@ const Checkout = () => {
   const deliveryFee = fulfillmentType === "delivery" ? restaurant?.delivery_fee || PRICING.DELIVERY_FEE : 0;
   const subtotal = getSubtotal();
   const serviceFee = (subtotal + deliveryFee) * PRICING.SERVICE_FEE_RATE;
-  const total = subtotal + deliveryFee + serviceFee;
+  const totalBeforeWallet = subtotal + deliveryFee + serviceFee;
+
+  // Calculate wallet contribution
+  const walletBalance = wallet?.balance || 0;
+  const walletAmountToUse = useWalletBalance ? Math.min(walletBalance, totalBeforeWallet) : 0;
+  const total = totalBeforeWallet - walletAmountToUse;
 
   // Generate 4-digit pickup code
   const generatePickupCode = () => {
@@ -256,20 +269,6 @@ const Checkout = () => {
       return;
     }
 
-    // Validate PayFast credentials are configured
-    const merchantId = import.meta.env.VITE_PAYFAST_MERCHANT_ID;
-    const merchantKey = import.meta.env.VITE_PAYFAST_MERCHANT_KEY;
-
-    if (!merchantId || !merchantKey) {
-      toast({
-        title: "Payment Configuration Error",
-        description: "Payment system is not properly configured. Please contact support.",
-        variant: "destructive",
-      });
-      console.error("PayFast credentials not configured");
-      return;
-    }
-
     setLoading(true);
     setProcessingPayment(true);
 
@@ -283,7 +282,7 @@ const Checkout = () => {
         .from("orders")
         .insert([
           {
-            customer_id: user.id,
+            customer_id: user!.id,
             restaurant_id: items[0].restaurantId,
             delivery_address_id: fulfillmentType === "delivery" ? selectedAddressId : null,
             order_number: orderNumber,
@@ -292,9 +291,11 @@ const Checkout = () => {
             subtotal: Number(subtotal.toFixed(2)),
             delivery_fee: Number(deliveryFee.toFixed(2)),
             tax: 0,
-            total: Number(total.toFixed(2)),
+            total: Number(totalBeforeWallet.toFixed(2)),
             status: scheduledFor ? "scheduled" : "pending",
             scheduled_for: scheduledFor ? scheduledFor.toISOString() : null,
+            wallet_amount_used: walletAmountToUse > 0 ? Number(walletAmountToUse.toFixed(2)) : null,
+            payment_method_id: selectedPaymentMethodId,
           },
         ])
         .select()
@@ -316,6 +317,53 @@ const Checkout = () => {
 
       if (itemsError) throw itemsError;
 
+      // Process wallet payment if applicable
+      if (walletAmountToUse > 0) {
+        await walletPayment.mutateAsync({
+          amount: walletAmountToUse,
+          description: `Payment for order ${orderNumber}`,
+          referenceId: order.id,
+          referenceType: 'order',
+        });
+      }
+
+      // If wallet covers the full amount, complete the order immediately
+      if (total <= 0) {
+        // Update order status to confirmed (paid with wallet)
+        await supabase
+          .from("orders")
+          .update({
+            status: scheduledFor ? "scheduled" : "confirmed",
+            payment_status: "paid",
+            payment_method: "wallet",
+          })
+          .eq("id", order.id);
+
+        clearCart();
+
+        toast({
+          title: "Order Placed Successfully!",
+          description: `Your order has been paid with your wallet balance.`,
+        });
+
+        navigate(`/orders/${order.id}`);
+        return;
+      }
+
+      // Otherwise, proceed to PayFast for remaining amount
+      const merchantId = import.meta.env.VITE_PAYFAST_MERCHANT_ID;
+      const merchantKey = import.meta.env.VITE_PAYFAST_MERCHANT_KEY;
+
+      if (!merchantId || !merchantKey) {
+        toast({
+          title: "Payment Configuration Error",
+          description: "Payment system is not properly configured. Please contact support.",
+          variant: "destructive",
+        });
+        console.error("PayFast credentials not configured");
+        return;
+      }
+
       // Store order ID for retry mechanism
       localStorage.setItem("pending_order_id", order.id);
       localStorage.setItem("pending_order_expiry", (Date.now() + 30 * 60 * 1000).toString()); // 30 min expiry
@@ -327,12 +375,14 @@ const Checkout = () => {
         return_url: `${window.location.origin}/orders/${order.id}`,
         cancel_url: `${window.location.origin}/checkout`,
         notify_url: `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/payfast-webhook`,
-        name_first: user.email?.split("@")[0] || "Customer",
-        email_address: user.email || "",
+        name_first: user!.email?.split("@")[0] || "Customer",
+        email_address: user!.email || "",
         m_payment_id: order.id,
         amount: total.toFixed(2),
         item_name: `Order from ${items[0].restaurantName}`,
-        item_description: `${items.length} item(s)`,
+        item_description: walletAmountToUse > 0
+          ? `${items.length} item(s) - Wallet: R${walletAmountToUse.toFixed(2)} applied`
+          : `${items.length} item(s)`,
       };
 
       // Create form and submit
@@ -494,6 +544,63 @@ const Checkout = () => {
                 />
               </CardContent>
             </Card>
+
+            {/* Wallet Balance */}
+            {walletBalance > 0 && (
+              <Card className="border-primary/50 bg-primary/5">
+                <CardHeader className="pb-2">
+                  <CardTitle className="flex items-center gap-2 text-lg">
+                    <Wallet className="h-5 w-5" />
+                    Use Wallet Balance
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-3">
+                      <Checkbox
+                        id="useWallet"
+                        checked={useWalletBalance}
+                        onCheckedChange={(checked) => setUseWalletBalance(checked === true)}
+                      />
+                      <Label htmlFor="useWallet" className="cursor-pointer">
+                        <p className="font-medium">Apply {formatWalletAmount(Math.min(walletBalance, totalBeforeWallet))}</p>
+                        <p className="text-sm text-muted-foreground">
+                          Available: {formatWalletAmount(walletBalance)}
+                        </p>
+                      </Label>
+                    </div>
+                    {useWalletBalance && (
+                      <div className="text-right">
+                        <Check className="h-5 w-5 text-green-500" />
+                      </div>
+                    )}
+                  </div>
+                  {useWalletBalance && walletAmountToUse >= totalBeforeWallet && (
+                    <p className="mt-2 text-sm text-green-600 font-medium">
+                      Your wallet balance covers the entire order!
+                    </p>
+                  )}
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Payment Method (only if amount remaining) */}
+            {total > 0 && (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <CreditCard className="h-5 w-5" />
+                    Payment Method
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <SavedPaymentMethods
+                    selectedMethodId={selectedPaymentMethodId}
+                    onSelectMethod={setSelectedPaymentMethodId}
+                  />
+                </CardContent>
+              </Card>
+            )}
           </div>
 
           {/* Order Summary */}
@@ -532,13 +639,24 @@ const Checkout = () => {
                     <span>Service Fee (4.5%)</span>
                     <span>R{serviceFee.toFixed(2)}</span>
                   </div>
+                  {walletAmountToUse > 0 && (
+                    <div className="flex justify-between text-green-600 font-medium">
+                      <span className="flex items-center gap-1">
+                        <Wallet className="h-3 w-3" />
+                        Wallet Credit
+                      </span>
+                      <span>-R{walletAmountToUse.toFixed(2)}</span>
+                    </div>
+                  )}
                 </div>
 
                 <Separator />
 
                 <div className="flex justify-between font-bold text-lg">
-                  <span>Total</span>
-                  <span>R{total.toFixed(2)}</span>
+                  <span>{total <= 0 ? 'Amount Due' : 'Total to Pay'}</span>
+                  <span className={total <= 0 ? 'text-green-600' : ''}>
+                    R{Math.max(0, total).toFixed(2)}
+                  </span>
                 </div>
 
                 {scheduledFor && (
@@ -582,15 +700,22 @@ const Checkout = () => {
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                       Processing...
                     </>
+                  ) : total <= 0 ? (
+                    <>
+                      <Wallet className="mr-2 h-4 w-4" />
+                      Pay with Wallet
+                    </>
                   ) : (
                     <>
                       <CreditCard className="mr-2 h-4 w-4" />
-                      Proceed to Payment
+                      {walletAmountToUse > 0 ? `Pay R${total.toFixed(2)}` : 'Proceed to Payment'}
                     </>
                   )}
                 </Button>
 
-                <p className="text-xs text-center text-muted-foreground">Secure payment powered by PayFast</p>
+                <p className="text-xs text-center text-muted-foreground">
+                  {total <= 0 ? 'Pay using your wallet balance' : 'Secure payment powered by PayFast'}
+                </p>
               </CardContent>
             </Card>
           </div>
