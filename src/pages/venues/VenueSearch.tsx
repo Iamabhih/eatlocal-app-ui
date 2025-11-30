@@ -169,12 +169,12 @@ export default function VenueSearch() {
       {/* Venue Type */}
       <div>
         <h4 className="font-medium mb-3">Venue Type</h4>
-        <Select value={venueType} onValueChange={setVenueType}>
+        <Select value={venueType || 'all'} onValueChange={(v) => setVenueType(v === 'all' ? '' : v)}>
           <SelectTrigger>
             <SelectValue placeholder="All types" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">All types</SelectItem>
+            <SelectItem value="all">All types</SelectItem>
             {Object.entries(venueTypeLabels).map(([value, label]) => (
               <SelectItem key={value} value={value}>
                 {label}
@@ -284,12 +284,12 @@ export default function VenueSearch() {
                 <label className="text-sm font-medium text-foreground mb-1 block">
                   Type
                 </label>
-                <Select value={venueType} onValueChange={setVenueType}>
+                <Select value={venueType || 'all'} onValueChange={(v) => setVenueType(v === 'all' ? '' : v)}>
                   <SelectTrigger>
                     <SelectValue placeholder="All venues" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">All venues</SelectItem>
+                    <SelectItem value="all">All venues</SelectItem>
                     {Object.entries(venueTypeLabels).slice(0, 10).map(([value, label]) => (
                       <SelectItem key={value} value={value}>
                         {label}

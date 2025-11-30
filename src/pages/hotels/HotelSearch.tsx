@@ -181,12 +181,12 @@ export default function HotelSearch() {
       {/* Property Type */}
       <div>
         <h4 className="font-medium mb-3">Property Type</h4>
-        <Select value={propertyType} onValueChange={setPropertyType}>
+        <Select value={propertyType || 'all'} onValueChange={(v) => setPropertyType(v === 'all' ? '' : v)}>
           <SelectTrigger>
             <SelectValue placeholder="All types" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">All types</SelectItem>
+            <SelectItem value="all">All types</SelectItem>
             {Object.entries(propertyTypeLabels).map(([value, label]) => (
               <SelectItem key={value} value={value}>
                 {label}
