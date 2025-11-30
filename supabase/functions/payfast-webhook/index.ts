@@ -1,11 +1,12 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3";
 import { checkRateLimit, RATE_LIMITS, addRateLimitHeaders } from "../_shared/rateLimiter.ts";
+import { getCorsHeaders, verifyPayFastSignature, isPayFastIP, validateEnvVars } from "../_shared/auth.ts";
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+const corsHeaders = getCorsHeaders();
+
+// PayFast valid statuses
+const VALID_STATUSES = ['COMPLETE', 'FAILED', 'CANCELLED', 'PENDING'] as const;
 
 serve(async (req: Request) => {
   // Handle CORS preflight
@@ -13,10 +14,47 @@ serve(async (req: Request) => {
     return new Response(null, { headers: corsHeaders });
   }
 
-  // Get client identifier (IP or forwarded IP)
+  // Validate required environment variables
+  const envCheck = validateEnvVars(['SUPABASE_URL', 'SUPABASE_SERVICE_ROLE_KEY']);
+  if (!envCheck.valid) {
+    console.error('Missing environment variables:', envCheck.missing);
+    return new Response('OK', { status: 200, headers: corsHeaders }); // Don't expose config errors
+  }
+
+  // Get client IP for logging and security
   const clientIp = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim()
     || req.headers.get('cf-connecting-ip')
     || 'unknown';
+
+  // Initialize Supabase client for logging
+  const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+  const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+  const supabase = createClient(supabaseUrl, supabaseKey);
+
+  // Log webhook attempt
+  const logWebhook = async (success: boolean, orderId: string | null, error?: string) => {
+    try {
+      await supabase.from('system_logs').insert({
+        log_type: 'webhook',
+        action: 'payfast_webhook',
+        target: orderId,
+        metadata: { ip: clientIp, success, error },
+        success,
+        session_id: crypto.randomUUID(),
+        page_url: '/api/payfast-webhook'
+      });
+    } catch (e) {
+      console.error('Failed to log webhook:', e);
+    }
+  };
+
+  // Verify IP is from PayFast (production security)
+  if (!isPayFastIP(clientIp)) {
+    console.warn(`PayFast webhook from unauthorized IP: ${clientIp}`);
+    await logWebhook(false, null, `Unauthorized IP: ${clientIp}`);
+    // Still return 200 to avoid revealing security measures
+    return new Response('OK', { status: 200, headers: corsHeaders });
+  }
 
   // Check rate limit for webhooks
   const rateLimitResult = await checkRateLimit(
@@ -30,17 +68,15 @@ serve(async (req: Request) => {
   addRateLimitHeaders(responseHeaders, rateLimitResult, RATE_LIMITS.webhook.limit);
 
   if (!rateLimitResult.allowed) {
+    await logWebhook(false, null, 'Rate limit exceeded');
     return new Response(
       JSON.stringify({ error: 'Too many requests' }),
-      {
-        status: 429,
-        headers: { ...Object.fromEntries(responseHeaders), 'Content-Type': 'application/json' }
-      }
+      { status: 429, headers: { ...Object.fromEntries(responseHeaders), 'Content-Type': 'application/json' } }
     );
   }
 
   try {
-    // Parse form data from PayFast (simple HTML form submission)
+    // Parse form data from PayFast
     const formData = await req.formData();
     const data: Record<string, string> = {};
 
@@ -48,30 +84,70 @@ serve(async (req: Request) => {
       data[key] = value.toString();
     });
 
-    // Basic validation - just check required fields exist
+    // Extract fields
     const orderId = data.m_payment_id;
-    const paymentStatus = data.payment_status;
+    const paymentStatus = data.payment_status?.toUpperCase();
     const amountGross = data.amount_gross;
-    const pfPaymentId = data.pf_payment_id || `pf_${Date.now()}`;
+    const pfPaymentId = data.pf_payment_id;
+    const signature = data.signature;
 
+    // Validate required fields
     if (!orderId || !paymentStatus) {
+      await logWebhook(false, orderId, 'Missing required fields');
       return new Response(
         JSON.stringify({ error: 'Missing required fields: m_payment_id and payment_status' }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
-    // Initialize Supabase client
-    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
-    const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
-    const supabase = createClient(supabaseUrl, supabaseKey);
+    // Validate payment status
+    if (!VALID_STATUSES.includes(paymentStatus as typeof VALID_STATUSES[number])) {
+      await logWebhook(false, orderId, `Invalid payment status: ${paymentStatus}`);
+      return new Response('OK', { status: 200, headers: corsHeaders });
+    }
+
+    // Verify PayFast signature (CRITICAL SECURITY CHECK)
+    if (signature) {
+      const isValidSignature = await verifyPayFastSignature(data, signature);
+      if (!isValidSignature) {
+        console.error(`Invalid PayFast signature for order ${orderId}`);
+        await logWebhook(false, orderId, 'Invalid signature');
+        // Return 200 to avoid revealing signature validation failure
+        return new Response('OK', { status: 200, headers: corsHeaders });
+      }
+    } else if (Deno.env.get('PAYFAST_SANDBOX') !== 'true') {
+      // In production, signature is required
+      console.error(`Missing PayFast signature for order ${orderId}`);
+      await logWebhook(false, orderId, 'Missing signature');
+      return new Response('OK', { status: 200, headers: corsHeaders });
+    }
+
+    // Verify amount matches order (prevent amount manipulation)
+    if (amountGross) {
+      const { data: orderData } = await supabase
+        .from('orders')
+        .select('total')
+        .eq('id', orderId)
+        .single();
+
+      if (orderData) {
+        const expectedAmount = parseFloat(orderData.total);
+        const receivedAmount = parseFloat(amountGross);
+
+        // Allow small rounding difference (1 cent)
+        if (Math.abs(expectedAmount - receivedAmount) > 0.01) {
+          console.error(`Amount mismatch for order ${orderId}: expected ${expectedAmount}, got ${receivedAmount}`);
+          await logWebhook(false, orderId, `Amount mismatch: expected ${expectedAmount}, got ${receivedAmount}`);
+          return new Response('OK', { status: 200, headers: corsHeaders });
+        }
+      }
+    }
 
     // ATOMIC UPDATE: Only update if status is still 'pending' to prevent race conditions
-    // This ensures idempotency - if two webhooks arrive simultaneously, only one succeeds
     let orderStatus: string;
     let paymentRecordStatus: string;
 
-    switch (paymentStatus.toUpperCase()) {
+    switch (paymentStatus) {
       case 'COMPLETE':
         orderStatus = 'confirmed';
         paymentRecordStatus = 'completed';
@@ -81,8 +157,12 @@ serve(async (req: Request) => {
         orderStatus = 'cancelled';
         paymentRecordStatus = 'failed';
         break;
+      case 'PENDING':
+        // Acknowledge pending status but don't update order
+        await logWebhook(true, orderId, 'Payment pending');
+        return new Response('OK', { status: 200, headers: corsHeaders });
       default:
-        // For PENDING or unknown statuses, acknowledge but don't update
+        await logWebhook(true, orderId, `Unknown status: ${paymentStatus}`);
         return new Response('OK', { status: 200, headers: corsHeaders });
     }
 
@@ -95,12 +175,13 @@ serve(async (req: Request) => {
       })
       .eq('id', orderId)
       .eq('status', 'pending') // Only update if still pending (prevents double processing)
-      .select('id')
+      .select('id, customer_id, total')
       .single();
 
     if (updateError) {
       // If no rows updated, order was already processed
       if (updateError.code === 'PGRST116') {
+        await logWebhook(true, orderId, 'Already processed');
         return new Response('OK - Already processed', { status: 200, headers: corsHeaders });
       }
       throw updateError;
@@ -108,29 +189,52 @@ serve(async (req: Request) => {
 
     // Only create payment record if order was successfully updated
     if (updatedOrder) {
-      await supabase.from('payments').insert({
+      const { error: paymentError } = await supabase.from('payments').insert({
         order_id: orderId,
         amount: parseFloat(amountGross) || 0,
         status: paymentRecordStatus,
         payment_method: 'payfast',
-        stripe_payment_intent_id: pfPaymentId,
+        external_payment_id: pfPaymentId || `pf_${Date.now()}`,
+        metadata: {
+          pf_payment_id: pfPaymentId,
+          payment_status: paymentStatus,
+          verified_at: new Date().toISOString(),
+          client_ip: clientIp
+        },
         error_message: paymentRecordStatus === 'failed' ? `Payment ${paymentStatus.toLowerCase()}` : null
       });
+
+      if (paymentError) {
+        console.error('Failed to create payment record:', paymentError);
+      }
+
+      // Trigger order confirmation email (async, don't wait)
+      if (paymentRecordStatus === 'completed') {
+        fetch(`${supabaseUrl}/functions/v1/send-email`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${supabaseKey}`
+          },
+          body: JSON.stringify({
+            to: updatedOrder.customer_id, // Will be resolved by send-email
+            type: 'order_confirmation',
+            subject: `Order #${orderId.slice(0, 8)} Confirmed`,
+            data: { orderId }
+          })
+        }).catch(e => console.error('Failed to trigger confirmation email:', e));
+      }
     }
 
-    return new Response('OK', {
-      status: 200,
-      headers: corsHeaders
-    });
+    await logWebhook(true, orderId);
+    return new Response('OK', { status: 200, headers: corsHeaders });
 
   } catch (error: unknown) {
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    return new Response(
-      JSON.stringify({ error: errorMessage }),
-      {
-        status: 500,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-      }
-    );
+    console.error('PayFast webhook error:', error);
+    await logWebhook(false, null, errorMessage);
+
+    // Always return 200 to PayFast to prevent retries
+    return new Response('OK', { status: 200, headers: corsHeaders });
   }
 });
