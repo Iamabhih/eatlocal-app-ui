@@ -144,7 +144,7 @@ export function ProviderSignupHotel() {
 
     setIsSubmitting(true);
     try {
-      const { error } = await supabase.from('provider_applications').insert({
+      const { error } = await (supabase.from('provider_applications' as any).insert({
         user_id: user?.id || null,
         provider_type: 'hotel',
         business_name: formData.businessName,
@@ -167,7 +167,7 @@ export function ProviderSignupHotel() {
           check_out_time: formData.checkOutTime,
           amenities: formData.amenities,
         },
-      });
+      }) as any);
 
       if (error) throw error;
 

@@ -127,7 +127,7 @@ export function ProviderSignupDelivery() {
 
     setIsSubmitting(true);
     try {
-      const { error } = await supabase.from('provider_applications').insert({
+      const { error } = await (supabase.from('provider_applications' as any).insert({
         user_id: user?.id || null,
         provider_type: 'delivery',
         business_name: formData.fullName,
@@ -153,7 +153,7 @@ export function ProviderSignupDelivery() {
           availability: formData.availability,
           experience_years: formData.experienceYears,
         },
-      });
+      }) as any);
 
       if (error) throw error;
 

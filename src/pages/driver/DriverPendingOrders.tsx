@@ -56,40 +56,37 @@ export default function DriverPendingOrders() {
       if (!user) return [];
 
       // First get the driver profile
-      const { data: driver } = await supabase
-        .from('delivery_partners')
+      const { data: driver } = await (supabase
+        .from('drivers' as any)
         .select('id')
         .eq('user_id', user.id)
-        .single();
+        .single() as any);
 
       if (!driver) return [];
 
       // Get pending order offers
-      const { data, error } = await supabase
+      const { data, error } = await (supabase
         .from('order_offers')
         .select(`
           id,
           order_id,
           estimated_earnings,
-          distance_km,
           created_at,
           expires_at,
           order:orders!order_offers_order_id_fkey(
             id,
             total,
-            delivery_address,
             special_instructions,
             restaurant:restaurants!orders_restaurant_id_fkey(
               name,
-              address
-            ),
-            order_items(count)
+              street_address
+            )
           )
         `)
-        .eq('driver_id', driver.id)
+        .eq('partner_id', driver.id)
         .eq('status', 'pending')
         .gt('expires_at', new Date().toISOString())
-        .order('created_at', { ascending: false });
+        .order('created_at', { ascending: false }) as any);
 
       if (error) throw error;
 
@@ -97,11 +94,11 @@ export default function DriverPendingOrders() {
         id: offer.id,
         order_id: offer.order_id,
         restaurant_name: offer.order?.restaurant?.name || 'Unknown',
-        restaurant_address: offer.order?.restaurant?.address || '',
-        customer_address: offer.order?.delivery_address || '',
-        distance_km: offer.distance_km || 0,
+        restaurant_address: offer.order?.restaurant?.street_address || '',
+        customer_address: '',
+        distance_km: 0,
         estimated_earnings: offer.estimated_earnings || 0,
-        items_count: offer.order?.order_items?.[0]?.count || 0,
+        items_count: 0,
         created_at: offer.created_at,
         expires_at: offer.expires_at,
         order: offer.order,

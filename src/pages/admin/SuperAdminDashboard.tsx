@@ -160,10 +160,10 @@ export default function SuperAdminDashboard() {
         supabase.from('restaurants').select('*', { count: 'exact', head: true }),
         supabase.from('orders').select('*', { count: 'exact', head: true }).eq('status', 'pending'),
         supabase.from('hotels').select('*', { count: 'exact', head: true }),
-        supabase.from('venues').select('*', { count: 'exact', head: true }),
-        supabase.from('experiences').select('*', { count: 'exact', head: true }),
+        (supabase.from('venues' as any).select('*', { count: 'exact', head: true }) as any),
+        (supabase.from('experiences' as any).select('*', { count: 'exact', head: true }) as any),
         supabase.from('hotel_bookings').select('*', { count: 'exact', head: true }),
-        supabase.from('experience_bookings').select('*', { count: 'exact', head: true }),
+        (supabase.from('experience_bookings' as any).select('*', { count: 'exact', head: true }) as any),
       ]);
 
       return {

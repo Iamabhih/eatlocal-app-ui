@@ -451,8 +451,13 @@ export type Database = {
           created_at: string
           current_tier: Database["public"]["Enums"]["service_tier"] | null
           id: string
+          insurance_expiry: string | null
+          insurance_number: string | null
+          is_active: boolean | null
           is_available: boolean | null
           is_verified: boolean | null
+          license_expiry: string | null
+          license_number: string | null
           total_earnings: number | null
           total_rides: number | null
           updated_at: string
@@ -475,8 +480,13 @@ export type Database = {
           created_at?: string
           current_tier?: Database["public"]["Enums"]["service_tier"] | null
           id?: string
+          insurance_expiry?: string | null
+          insurance_number?: string | null
+          is_active?: boolean | null
           is_available?: boolean | null
           is_verified?: boolean | null
+          license_expiry?: string | null
+          license_number?: string | null
           total_earnings?: number | null
           total_rides?: number | null
           updated_at?: string
@@ -499,8 +509,13 @@ export type Database = {
           created_at?: string
           current_tier?: Database["public"]["Enums"]["service_tier"] | null
           id?: string
+          insurance_expiry?: string | null
+          insurance_number?: string | null
+          is_active?: boolean | null
           is_available?: boolean | null
           is_verified?: boolean | null
+          license_expiry?: string | null
+          license_number?: string | null
           total_earnings?: number | null
           total_rides?: number | null
           updated_at?: string
@@ -558,6 +573,247 @@ export type Database = {
           user_id?: string | null
         }
         Relationships: []
+      }
+      experience_bookings: {
+        Row: {
+          booking_date: string
+          booking_number: string | null
+          booking_time: string | null
+          cancellation_reason: string | null
+          cancelled_at: string | null
+          created_at: string | null
+          currency: string | null
+          discount: number | null
+          experience_id: string
+          fees: number | null
+          guest_email: string
+          guest_id: string | null
+          guest_name: string
+          guest_phone: string | null
+          id: string
+          num_participants: number
+          payment_method: string | null
+          payment_reference: string | null
+          payment_status: string | null
+          schedule_id: string | null
+          special_requests: string | null
+          status: string | null
+          subtotal: number
+          taxes: number | null
+          total: number
+          unit_price: number
+          updated_at: string | null
+        }
+        Insert: {
+          booking_date: string
+          booking_number?: string | null
+          booking_time?: string | null
+          cancellation_reason?: string | null
+          cancelled_at?: string | null
+          created_at?: string | null
+          currency?: string | null
+          discount?: number | null
+          experience_id: string
+          fees?: number | null
+          guest_email: string
+          guest_id?: string | null
+          guest_name: string
+          guest_phone?: string | null
+          id?: string
+          num_participants?: number
+          payment_method?: string | null
+          payment_reference?: string | null
+          payment_status?: string | null
+          schedule_id?: string | null
+          special_requests?: string | null
+          status?: string | null
+          subtotal: number
+          taxes?: number | null
+          total: number
+          unit_price: number
+          updated_at?: string | null
+        }
+        Update: {
+          booking_date?: string
+          booking_number?: string | null
+          booking_time?: string | null
+          cancellation_reason?: string | null
+          cancelled_at?: string | null
+          created_at?: string | null
+          currency?: string | null
+          discount?: number | null
+          experience_id?: string
+          fees?: number | null
+          guest_email?: string
+          guest_id?: string | null
+          guest_name?: string
+          guest_phone?: string | null
+          id?: string
+          num_participants?: number
+          payment_method?: string | null
+          payment_reference?: string | null
+          payment_status?: string | null
+          schedule_id?: string | null
+          special_requests?: string | null
+          status?: string | null
+          subtotal?: number
+          taxes?: number | null
+          total?: number
+          unit_price?: number
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "experience_bookings_experience_id_fkey"
+            columns: ["experience_id"]
+            isOneToOne: false
+            referencedRelation: "experiences"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "experience_bookings_schedule_id_fkey"
+            columns: ["schedule_id"]
+            isOneToOne: false
+            referencedRelation: "experience_schedules"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      experience_schedules: {
+        Row: {
+          available_spots: number
+          booked_spots: number | null
+          created_at: string | null
+          date: string
+          end_time: string | null
+          experience_id: string
+          id: string
+          is_active: boolean | null
+          price_override: number | null
+          start_time: string
+        }
+        Insert: {
+          available_spots: number
+          booked_spots?: number | null
+          created_at?: string | null
+          date: string
+          end_time?: string | null
+          experience_id: string
+          id?: string
+          is_active?: boolean | null
+          price_override?: number | null
+          start_time: string
+        }
+        Update: {
+          available_spots?: number
+          booked_spots?: number | null
+          created_at?: string | null
+          date?: string
+          end_time?: string | null
+          experience_id?: string
+          id?: string
+          is_active?: boolean | null
+          price_override?: number | null
+          start_time?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "experience_schedules_experience_id_fkey"
+            columns: ["experience_id"]
+            isOneToOne: false
+            referencedRelation: "experiences"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      experiences: {
+        Row: {
+          cancellation_policy: string | null
+          created_at: string | null
+          currency: string | null
+          description: string | null
+          duration_minutes: number | null
+          excludes: string[] | null
+          experience_type: string
+          gallery_images: string[] | null
+          id: string
+          includes: string[] | null
+          is_active: boolean | null
+          is_featured: boolean | null
+          main_image: string | null
+          max_participants: number | null
+          min_participants: number | null
+          name: string
+          owner_id: string
+          price: number
+          rating: number | null
+          requirements: string[] | null
+          slug: string | null
+          total_reviews: number | null
+          updated_at: string | null
+          venue_id: string | null
+        }
+        Insert: {
+          cancellation_policy?: string | null
+          created_at?: string | null
+          currency?: string | null
+          description?: string | null
+          duration_minutes?: number | null
+          excludes?: string[] | null
+          experience_type?: string
+          gallery_images?: string[] | null
+          id?: string
+          includes?: string[] | null
+          is_active?: boolean | null
+          is_featured?: boolean | null
+          main_image?: string | null
+          max_participants?: number | null
+          min_participants?: number | null
+          name: string
+          owner_id: string
+          price: number
+          rating?: number | null
+          requirements?: string[] | null
+          slug?: string | null
+          total_reviews?: number | null
+          updated_at?: string | null
+          venue_id?: string | null
+        }
+        Update: {
+          cancellation_policy?: string | null
+          created_at?: string | null
+          currency?: string | null
+          description?: string | null
+          duration_minutes?: number | null
+          excludes?: string[] | null
+          experience_type?: string
+          gallery_images?: string[] | null
+          id?: string
+          includes?: string[] | null
+          is_active?: boolean | null
+          is_featured?: boolean | null
+          main_image?: string | null
+          max_participants?: number | null
+          min_participants?: number | null
+          name?: string
+          owner_id?: string
+          price?: number
+          rating?: number | null
+          requirements?: string[] | null
+          slug?: string | null
+          total_reviews?: number | null
+          updated_at?: string | null
+          venue_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "experiences_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: false
+            referencedRelation: "venues"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       hotel_bookings: {
         Row: {
@@ -1212,12 +1468,16 @@ export type Database = {
           id: string
           net_restaurant_payout: number
           order_number: string
+          payment_method: string | null
+          payment_method_id: string | null
+          payment_status: string | null
           picked_up_at: string | null
           pickup_code: string | null
           pickup_time: string | null
           platform_commission: number
           ready_at: string | null
           restaurant_id: string
+          scheduled_for: string | null
           settlement_fee: number
           special_instructions: string | null
           status: Database["public"]["Enums"]["order_status"]
@@ -1226,6 +1486,7 @@ export type Database = {
           tip: number | null
           total: number
           updated_at: string
+          wallet_amount_used: number | null
         }
         Insert: {
           accepted_at?: string | null
@@ -1242,12 +1503,16 @@ export type Database = {
           id?: string
           net_restaurant_payout?: number
           order_number: string
+          payment_method?: string | null
+          payment_method_id?: string | null
+          payment_status?: string | null
           picked_up_at?: string | null
           pickup_code?: string | null
           pickup_time?: string | null
           platform_commission?: number
           ready_at?: string | null
           restaurant_id: string
+          scheduled_for?: string | null
           settlement_fee?: number
           special_instructions?: string | null
           status?: Database["public"]["Enums"]["order_status"]
@@ -1256,6 +1521,7 @@ export type Database = {
           tip?: number | null
           total: number
           updated_at?: string
+          wallet_amount_used?: number | null
         }
         Update: {
           accepted_at?: string | null
@@ -1272,12 +1538,16 @@ export type Database = {
           id?: string
           net_restaurant_payout?: number
           order_number?: string
+          payment_method?: string | null
+          payment_method_id?: string | null
+          payment_status?: string | null
           picked_up_at?: string | null
           pickup_code?: string | null
           pickup_time?: string | null
           platform_commission?: number
           ready_at?: string | null
           restaurant_id?: string
+          scheduled_for?: string | null
           settlement_fee?: number
           special_instructions?: string | null
           status?: Database["public"]["Enums"]["order_status"]
@@ -1286,6 +1556,7 @@ export type Database = {
           tip?: number | null
           total?: number
           updated_at?: string
+          wallet_amount_used?: number | null
         }
         Relationships: [
           {
@@ -1606,6 +1877,78 @@ export type Database = {
         }
         Relationships: []
       }
+      provider_applications: {
+        Row: {
+          address: string | null
+          business_name: string
+          business_type: string | null
+          city: string | null
+          contact_email: string
+          contact_name: string
+          contact_phone: string
+          created_at: string | null
+          documents: Json | null
+          id: string
+          postal_code: string | null
+          provider_type: string
+          province: string | null
+          registration_number: string | null
+          rejection_reason: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string | null
+          updated_at: string | null
+          user_id: string | null
+          vat_number: string | null
+        }
+        Insert: {
+          address?: string | null
+          business_name: string
+          business_type?: string | null
+          city?: string | null
+          contact_email: string
+          contact_name: string
+          contact_phone: string
+          created_at?: string | null
+          documents?: Json | null
+          id?: string
+          postal_code?: string | null
+          provider_type: string
+          province?: string | null
+          registration_number?: string | null
+          rejection_reason?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+          vat_number?: string | null
+        }
+        Update: {
+          address?: string | null
+          business_name?: string
+          business_type?: string | null
+          city?: string | null
+          contact_email?: string
+          contact_name?: string
+          contact_phone?: string
+          created_at?: string | null
+          documents?: Json | null
+          id?: string
+          postal_code?: string | null
+          provider_type?: string
+          province?: string | null
+          registration_number?: string | null
+          rejection_reason?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+          vat_number?: string | null
+        }
+        Relationships: []
+      }
       push_subscriptions: {
         Row: {
           auth: string | null
@@ -1676,6 +2019,8 @@ export type Database = {
           image_url: string | null
           is_active: boolean | null
           is_open: boolean | null
+          latitude: number | null
+          longitude: number | null
           minimum_order: number | null
           name: string
           owner_id: string
@@ -1708,6 +2053,8 @@ export type Database = {
           image_url?: string | null
           is_active?: boolean | null
           is_open?: boolean | null
+          latitude?: number | null
+          longitude?: number | null
           minimum_order?: number | null
           name: string
           owner_id: string
@@ -1740,6 +2087,8 @@ export type Database = {
           image_url?: string | null
           is_active?: boolean | null
           is_open?: boolean | null
+          latitude?: number | null
+          longitude?: number | null
           minimum_order?: number | null
           name?: string
           owner_id?: string
@@ -2638,6 +2987,168 @@ export type Database = {
           id?: string
           updated_at?: string | null
           user_id?: string
+        }
+        Relationships: []
+      }
+      venue_reviews: {
+        Row: {
+          booking_id: string | null
+          created_at: string | null
+          experience_id: string | null
+          helpful_count: number | null
+          id: string
+          images: string[] | null
+          is_verified: boolean | null
+          rating: number
+          response_date: string | null
+          response_text: string | null
+          review_text: string | null
+          title: string | null
+          updated_at: string | null
+          user_id: string
+          venue_id: string | null
+        }
+        Insert: {
+          booking_id?: string | null
+          created_at?: string | null
+          experience_id?: string | null
+          helpful_count?: number | null
+          id?: string
+          images?: string[] | null
+          is_verified?: boolean | null
+          rating: number
+          response_date?: string | null
+          response_text?: string | null
+          review_text?: string | null
+          title?: string | null
+          updated_at?: string | null
+          user_id: string
+          venue_id?: string | null
+        }
+        Update: {
+          booking_id?: string | null
+          created_at?: string | null
+          experience_id?: string | null
+          helpful_count?: number | null
+          id?: string
+          images?: string[] | null
+          is_verified?: boolean | null
+          rating?: number
+          response_date?: string | null
+          response_text?: string | null
+          review_text?: string | null
+          title?: string | null
+          updated_at?: string | null
+          user_id?: string
+          venue_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "venue_reviews_experience_id_fkey"
+            columns: ["experience_id"]
+            isOneToOne: false
+            referencedRelation: "experiences"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "venue_reviews_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: false
+            referencedRelation: "venues"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      venues: {
+        Row: {
+          amenities: string[] | null
+          city: string
+          country: string | null
+          created_at: string | null
+          description: string | null
+          email: string | null
+          gallery_images: string[] | null
+          id: string
+          is_active: boolean | null
+          is_featured: boolean | null
+          latitude: number | null
+          longitude: number | null
+          main_image: string | null
+          name: string
+          opening_hours: Json | null
+          owner_id: string
+          phone: string | null
+          price_level: string | null
+          rating: number | null
+          slug: string | null
+          state: string | null
+          street_address: string
+          total_reviews: number | null
+          updated_at: string | null
+          venue_type: string
+          verification_status: string | null
+          website: string | null
+          zip_code: string | null
+        }
+        Insert: {
+          amenities?: string[] | null
+          city: string
+          country?: string | null
+          created_at?: string | null
+          description?: string | null
+          email?: string | null
+          gallery_images?: string[] | null
+          id?: string
+          is_active?: boolean | null
+          is_featured?: boolean | null
+          latitude?: number | null
+          longitude?: number | null
+          main_image?: string | null
+          name: string
+          opening_hours?: Json | null
+          owner_id: string
+          phone?: string | null
+          price_level?: string | null
+          rating?: number | null
+          slug?: string | null
+          state?: string | null
+          street_address: string
+          total_reviews?: number | null
+          updated_at?: string | null
+          venue_type?: string
+          verification_status?: string | null
+          website?: string | null
+          zip_code?: string | null
+        }
+        Update: {
+          amenities?: string[] | null
+          city?: string
+          country?: string | null
+          created_at?: string | null
+          description?: string | null
+          email?: string | null
+          gallery_images?: string[] | null
+          id?: string
+          is_active?: boolean | null
+          is_featured?: boolean | null
+          latitude?: number | null
+          longitude?: number | null
+          main_image?: string | null
+          name?: string
+          opening_hours?: Json | null
+          owner_id?: string
+          phone?: string | null
+          price_level?: string | null
+          rating?: number | null
+          slug?: string | null
+          state?: string | null
+          street_address?: string
+          total_reviews?: number | null
+          updated_at?: string | null
+          venue_type?: string
+          verification_status?: string | null
+          website?: string | null
+          zip_code?: string | null
         }
         Relationships: []
       }
@@ -3685,6 +4196,7 @@ export type Database = {
         | "picked_up"
         | "delivered"
         | "cancelled"
+        | "scheduled"
       payment_status: "pending" | "completed" | "failed" | "refunded"
       ride_status:
         | "requested"
@@ -3875,6 +4387,7 @@ export const Constants = {
         "picked_up",
         "delivered",
         "cancelled",
+        "scheduled",
       ],
       payment_status: ["pending", "completed", "failed", "refunded"],
       ride_status: [
