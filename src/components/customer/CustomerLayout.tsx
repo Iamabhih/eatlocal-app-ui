@@ -6,6 +6,7 @@ import { useCart } from "@/hooks/useCart";
 import { useAuth } from "@/contexts/AuthContext";
 import { Badge } from "@/components/ui/badge";
 import Navbar from "@/components/shared/Navbar";
+import { Footer } from "@/components/shared/Footer";
 
 export function CustomerLayout() {
   const location = useLocation();
@@ -37,6 +38,11 @@ export function CustomerLayout() {
       <main className="flex-1 pb-20 md:pb-0">
         <Outlet />
       </main>
+
+      {/* Footer - Desktop Only */}
+      <div className="hidden md:block">
+        <Footer />
+      </div>
 
       {/* Bottom Navigation - Mobile Only */}
       <nav className="fixed bottom-0 left-0 right-0 z-50 md:hidden bg-background/95 backdrop-blur-lg border-t border-border safe-area-bottom">

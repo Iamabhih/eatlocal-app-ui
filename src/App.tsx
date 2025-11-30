@@ -301,33 +301,35 @@ function AppContent() {
         </Route>
 
         {/* ============================================ */}
-        {/* RIDE-SHARING MODULE */}
+        {/* RIDE-SHARING MODULE (with CustomerLayout) */}
         {/* ============================================ */}
-        <Route path="/rides/book" element={
-          <RouteErrorBoundary fallbackTitle="Ride Booking Error">
-            <Suspense fallback={<PageLoader />}>
-              <BookRide />
-            </Suspense>
-          </RouteErrorBoundary>
-        } />
-        <Route path="/rides/my-rides" element={
-          <RouteErrorBoundary fallbackTitle="My Rides Error">
-            <Suspense fallback={<PageLoader />}>
-              <ProtectedRoute requiredRole="rider">
-                <MyRides />
-              </ProtectedRoute>
-            </Suspense>
-          </RouteErrorBoundary>
-        } />
-        <Route path="/rides/tracking/:id" element={
-          <RouteErrorBoundary fallbackTitle="Ride Tracking Error">
-            <Suspense fallback={<PageLoader />}>
-              <ProtectedRoute requiredRole="rider">
-                <RideTracking />
-              </ProtectedRoute>
-            </Suspense>
-          </RouteErrorBoundary>
-        } />
+        <Route element={<CustomerLayout />}>
+          <Route path="/rides/book" element={
+            <RouteErrorBoundary fallbackTitle="Ride Booking Error">
+              <Suspense fallback={<PageLoader />}>
+                <BookRide />
+              </Suspense>
+            </RouteErrorBoundary>
+          } />
+          <Route path="/rides/my-rides" element={
+            <RouteErrorBoundary fallbackTitle="My Rides Error">
+              <Suspense fallback={<PageLoader />}>
+                <ProtectedRoute requiredRole="rider">
+                  <MyRides />
+                </ProtectedRoute>
+              </Suspense>
+            </RouteErrorBoundary>
+          } />
+          <Route path="/rides/tracking/:id" element={
+            <RouteErrorBoundary fallbackTitle="Ride Tracking Error">
+              <Suspense fallback={<PageLoader />}>
+                <ProtectedRoute requiredRole="rider">
+                  <RideTracking />
+                </ProtectedRoute>
+              </Suspense>
+            </RouteErrorBoundary>
+          } />
+        </Route>
 
         {/* ============================================ */}
         {/* DRIVER PORTAL - Pending Orders */}
@@ -343,22 +345,24 @@ function AppContent() {
         } />
 
         {/* ============================================ */}
-        {/* HOTELS MODULE - Accommodation Booking */}
+        {/* HOTELS MODULE - Accommodation Booking (with CustomerLayout) */}
         {/* ============================================ */}
-        <Route path="/hotels" element={
-          <RouteErrorBoundary fallbackTitle="Hotel Search Error">
-            <Suspense fallback={<PageLoader />}>
-              <HotelSearch />
-            </Suspense>
-          </RouteErrorBoundary>
-        } />
-        <Route path="/hotels/:id" element={
-          <RouteErrorBoundary fallbackTitle="Hotel Details Error">
-            <Suspense fallback={<PageLoader />}>
-              <HotelDetail />
-            </Suspense>
-          </RouteErrorBoundary>
-        } />
+        <Route element={<CustomerLayout />}>
+          <Route path="/hotels" element={
+            <RouteErrorBoundary fallbackTitle="Hotel Search Error">
+              <Suspense fallback={<PageLoader />}>
+                <HotelSearch />
+              </Suspense>
+            </RouteErrorBoundary>
+          } />
+          <Route path="/hotels/:id" element={
+            <RouteErrorBoundary fallbackTitle="Hotel Details Error">
+              <Suspense fallback={<PageLoader />}>
+                <HotelDetail />
+              </Suspense>
+            </RouteErrorBoundary>
+          } />
+        </Route>
 
         {/* ============================================ */}
         {/* HOTEL PARTNER PORTAL - Property Management */}
@@ -374,36 +378,38 @@ function AppContent() {
         } />
 
         {/* ============================================ */}
-        {/* VENUES & EXPERIENCES MODULE */}
+        {/* VENUES & EXPERIENCES MODULE (with CustomerLayout) */}
         {/* ============================================ */}
-        <Route path="/venues" element={
-          <RouteErrorBoundary fallbackTitle="Venue Search Error">
-            <Suspense fallback={<PageLoader />}>
-              <VenueSearch />
-            </Suspense>
-          </RouteErrorBoundary>
-        } />
-        <Route path="/venues/:id" element={
-          <RouteErrorBoundary fallbackTitle="Venue Details Error">
-            <Suspense fallback={<PageLoader />}>
-              <VenueDetail />
-            </Suspense>
-          </RouteErrorBoundary>
-        } />
-        <Route path="/experiences" element={
-          <RouteErrorBoundary fallbackTitle="Experience Search Error">
-            <Suspense fallback={<PageLoader />}>
-              <ExperienceSearch />
-            </Suspense>
-          </RouteErrorBoundary>
-        } />
-        <Route path="/experiences/:id" element={
-          <RouteErrorBoundary fallbackTitle="Experience Details Error">
-            <Suspense fallback={<PageLoader />}>
-              <ExperienceDetail />
-            </Suspense>
-          </RouteErrorBoundary>
-        } />
+        <Route element={<CustomerLayout />}>
+          <Route path="/venues" element={
+            <RouteErrorBoundary fallbackTitle="Venue Search Error">
+              <Suspense fallback={<PageLoader />}>
+                <VenueSearch />
+              </Suspense>
+            </RouteErrorBoundary>
+          } />
+          <Route path="/venues/:id" element={
+            <RouteErrorBoundary fallbackTitle="Venue Details Error">
+              <Suspense fallback={<PageLoader />}>
+                <VenueDetail />
+              </Suspense>
+            </RouteErrorBoundary>
+          } />
+          <Route path="/experiences" element={
+            <RouteErrorBoundary fallbackTitle="Experience Search Error">
+              <Suspense fallback={<PageLoader />}>
+                <ExperienceSearch />
+              </Suspense>
+            </RouteErrorBoundary>
+          } />
+          <Route path="/experiences/:id" element={
+            <RouteErrorBoundary fallbackTitle="Experience Details Error">
+              <Suspense fallback={<PageLoader />}>
+                <ExperienceDetail />
+              </Suspense>
+            </RouteErrorBoundary>
+          } />
+        </Route>
 
         {/* ============================================ */}
         {/* VENUE PARTNER PORTAL */}
@@ -419,15 +425,17 @@ function AppContent() {
         } />
 
         {/* ============================================ */}
-        {/* LIVE MAP SEARCH */}
+        {/* LIVE MAP SEARCH (with CustomerLayout) */}
         {/* ============================================ */}
-        <Route path="/map" element={
-          <RouteErrorBoundary fallbackTitle="Map Search Error">
-            <Suspense fallback={<PageLoader />}>
-              <LiveMapSearch />
-            </Suspense>
-          </RouteErrorBoundary>
-        } />
+        <Route element={<CustomerLayout />}>
+          <Route path="/map" element={
+            <RouteErrorBoundary fallbackTitle="Map Search Error">
+              <Suspense fallback={<PageLoader />}>
+                <LiveMapSearch />
+              </Suspense>
+            </RouteErrorBoundary>
+          } />
+        </Route>
 
         {/* ============================================ */}
         {/* RESTAURANT PORTAL - Business Management */}
@@ -656,29 +664,31 @@ function AppContent() {
         </Route>
 
         {/* ============================================ */}
-        {/* LEGAL & SUPPORT PAGES */}
+        {/* LEGAL & SUPPORT PAGES (with CustomerLayout) */}
         {/* ============================================ */}
-        <Route path="/terms" element={
-          <RouteErrorBoundary fallbackTitle="Terms Error">
-            <Suspense fallback={<PageLoader />}>
-              <Terms />
-            </Suspense>
-          </RouteErrorBoundary>
-        } />
-        <Route path="/privacy" element={
-          <RouteErrorBoundary fallbackTitle="Privacy Error">
-            <Suspense fallback={<PageLoader />}>
-              <Privacy />
-            </Suspense>
-          </RouteErrorBoundary>
-        } />
-        <Route path="/help" element={
-          <RouteErrorBoundary fallbackTitle="Help Error">
-            <Suspense fallback={<PageLoader />}>
-              <Help />
-            </Suspense>
-          </RouteErrorBoundary>
-        } />
+        <Route element={<CustomerLayout />}>
+          <Route path="/terms" element={
+            <RouteErrorBoundary fallbackTitle="Terms Error">
+              <Suspense fallback={<PageLoader />}>
+                <Terms />
+              </Suspense>
+            </RouteErrorBoundary>
+          } />
+          <Route path="/privacy" element={
+            <RouteErrorBoundary fallbackTitle="Privacy Error">
+              <Suspense fallback={<PageLoader />}>
+                <Privacy />
+              </Suspense>
+            </RouteErrorBoundary>
+          } />
+          <Route path="/help" element={
+            <RouteErrorBoundary fallbackTitle="Help Error">
+              <Suspense fallback={<PageLoader />}>
+                <Help />
+              </Suspense>
+            </RouteErrorBoundary>
+          } />
+        </Route>
 
         {/* Account redirect to profile */}
         <Route path="/account" element={
