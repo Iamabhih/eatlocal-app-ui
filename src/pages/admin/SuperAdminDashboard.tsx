@@ -44,12 +44,7 @@ export default function SuperAdminDashboard() {
   const [newAdminRole, setNewAdminRole] = useState<'admin' | 'superadmin'>('admin');
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
 
-  // Redirect non-superadmins
-  if (!isSuperadmin) {
-    return <Navigate to="/admin/dashboard" replace />;
-  }
-
-  // Fetch all admin users
+  // Fetch all admin users - hooks must be called before any conditional returns
   const { data: adminUsers = [], isLoading } = useQuery({
     queryKey: ['admin-users'],
     queryFn: async () => {
@@ -73,6 +68,7 @@ export default function SuperAdminDashboard() {
         user_email: profiles?.find(p => p.id === role.user_id)?.full_name || 'Unknown User'
       })) as AdminUser[];
     },
+    enabled: isSuperadmin,
   });
 
   // Add admin mutation
@@ -81,7 +77,7 @@ export default function SuperAdminDashboard() {
       // Note: Since profiles doesn't have email, we need to search auth.users
       // For now, we'll need to have the user ID directly or use a different approach
       // This is a simplified version - in production, you'd use an edge function to look up by email
-      
+
       // Try to find user by looking up profiles with matching full_name (workaround)
       const { data: profiles, error: profileError } = await supabase
         .from('profiles')
@@ -182,7 +178,13 @@ export default function SuperAdminDashboard() {
         experienceBookings: experienceBookings || 0,
       };
     },
+    enabled: isSuperadmin,
   });
+
+  // Redirect non-superadmins - after all hooks
+  if (!isSuperadmin) {
+    return <Navigate to="/admin/dashboard" replace />;
+  }
 
   return (
     <SidebarProvider>
