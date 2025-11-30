@@ -34,7 +34,7 @@ function SuspendedAccount({ onSignOut }: { onSignOut: () => void }) {
               <AlertCircle className="w-4 h-4 mt-0.5 flex-shrink-0" />
               <div>
                 <p className="font-medium">Need help?</p>
-                <p>Contact support at support@smash.co.za or call +27 10 XXX XXXX</p>
+                <p>Contact support at support@smash.co.za or call +27 10 900 0001</p>
               </div>
             </div>
           </div>

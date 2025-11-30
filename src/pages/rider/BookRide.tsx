@@ -9,6 +9,7 @@ import { JourneyModeSelector } from '@/components/rides/JourneyModeSelector';
 import { useRides } from '@/hooks/useRides';
 import { MapPin, Navigation } from 'lucide-react';
 import { toast } from 'sonner';
+import { logger } from '@/lib/logger';
 
 const libraries: ("places")[] = ["places"];
 
@@ -69,7 +70,7 @@ export default function BookRide() {
         }
       }
     } catch (error) {
-      console.error('Geocoding error:', error);
+      logger.error('Geocoding error:', error);
       toast.error('Could not find address');
     }
   };

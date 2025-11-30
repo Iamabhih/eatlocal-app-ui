@@ -364,7 +364,7 @@ const Checkout = () => {
           description: "Payment system is not properly configured. Please contact support.",
           variant: "destructive",
         });
-        console.error("PayFast credentials not configured");
+        logger.error("PayFast credentials not configured");
         return;
       }
 
@@ -414,7 +414,7 @@ const Checkout = () => {
         // Submit form to PayFast
         form.submit();
       } catch (submitError) {
-        console.error("Form submission error:", submitError);
+        logger.error("Form submission error:", submitError);
 
         // Fallback: Navigate to order page with payment instructions
         toast({
@@ -428,7 +428,7 @@ const Checkout = () => {
         }, 2000);
       }
     } catch (error: unknown) {
-      console.error("Checkout error:", error);
+      logger.error("Checkout error:", error);
 
       // Clear pending order on error
       localStorage.removeItem("pending_order_id");

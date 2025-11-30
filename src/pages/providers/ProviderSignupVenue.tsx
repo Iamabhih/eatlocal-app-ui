@@ -203,7 +203,7 @@ export function ProviderSignupVenue() {
       toast.success('Application submitted successfully!');
       setStep(4);
     } catch (error) {
-      console.error('Error submitting application:', error);
+      // Error is handled by toast notification
       toast.error('Failed to submit application. Please try again.');
     } finally {
       setIsSubmitting(false);

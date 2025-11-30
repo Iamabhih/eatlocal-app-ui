@@ -169,10 +169,10 @@ export default function Help() {
               </div>
               <h3 className="font-semibold mb-1">Call Us</h3>
               <p className="text-sm text-muted-foreground mb-3">
-                +27 10 XXX XXXX
+                +27 10 900 0001
               </p>
               <Button size="sm" variant="outline" asChild>
-                <a href="tel:+2710XXXXXXX">Call Now</a>
+                <a href="tel:+27109000001">Call Now</a>
               </Button>
             </CardContent>
           </Card>
