@@ -54,6 +54,7 @@ import { CustomerLayout } from "./components/customer/CustomerLayout";
 const OrderHistory = lazy(() => import("./pages/customer/OrderHistory"));
 const Profile = lazy(() => import("./pages/customer/Profile"));
 const Favorites = lazy(() => import("./pages/customer/Favorites"));
+const Notifications = lazy(() => import("./pages/customer/Notifications"));
 
 // Lazy-loaded: Ride-Sharing App
 const BookRide = lazy(() => import("./pages/rider/BookRide"));
@@ -276,6 +277,15 @@ function AppContent() {
             <RouteErrorBoundary fallbackTitle="Favorites Error">
               <Suspense fallback={<PageLoader />}>
                 <Favorites />
+              </Suspense>
+            </RouteErrorBoundary>
+          } />
+          <Route path="/notifications" element={
+            <RouteErrorBoundary fallbackTitle="Notifications Error">
+              <Suspense fallback={<PageLoader />}>
+                <ProtectedRoute requiredRole="customer">
+                  <Notifications />
+                </ProtectedRoute>
               </Suspense>
             </RouteErrorBoundary>
           } />

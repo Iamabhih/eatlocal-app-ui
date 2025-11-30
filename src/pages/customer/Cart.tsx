@@ -1,4 +1,4 @@
-import { Trash2, Plus, Minus, MapPin, Clock, ArrowRight } from "lucide-react";
+import { Trash2, Plus, Minus, MapPin, Clock, ArrowRight, Loader2, Tag, X } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -7,6 +7,8 @@ import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { useCart } from "@/hooks/useCart";
 import { useState, useEffect } from "react";
+import { useValidatePromoCode, PromoCode, formatDiscount } from "@/hooks/usePromoCodes";
+import { useToast } from "@/hooks/use-toast";
 
 const Cart = () => {
   const {
@@ -20,25 +22,77 @@ const Cart = () => {
     checkExpiry,
   } = useCart();
   const [promoCode, setPromoCode] = useState("");
-  const [appliedPromo, setAppliedPromo] = useState<string | null>(null);
+  const [appliedPromo, setAppliedPromo] = useState<PromoCode | null>(null);
+  const [promoDiscount, setPromoDiscount] = useState(0);
   const navigate = useNavigate();
+  const { toast } = useToast();
+  const validatePromoMutation = useValidatePromoCode();
 
   // Check cart expiry on mount
   useEffect(() => {
     checkExpiry();
   }, [checkExpiry]);
 
-  const applyPromoCode = () => {
-    if (promoCode.toLowerCase() === "save10") {
-      setAppliedPromo("SAVE10");
+  // Get restaurant ID from cart items
+  const restaurantId = items.length > 0 ? items[0].restaurantId : undefined;
+
+  const applyPromoCode = async () => {
+    if (!promoCode.trim()) return;
+
+    const subtotal = getCartTotal();
+    const result = await validatePromoMutation.mutateAsync({
+      code: promoCode,
+      orderTotal: subtotal,
+      restaurantId,
+      serviceType: 'food',
+    });
+
+    if (result.valid && result.promoCode) {
+      setAppliedPromo(result.promoCode);
+      setPromoDiscount(result.discountAmount);
       setPromoCode("");
+      toast({
+        title: "Promo Applied!",
+        description: `${formatDiscount(result.promoCode)} - You save R${result.discountAmount.toFixed(2)}`,
+      });
+    } else {
+      toast({
+        title: "Invalid Promo Code",
+        description: result.errorMessage || "This promo code is not valid",
+        variant: "destructive",
+      });
     }
   };
+
+  const removePromoCode = () => {
+    setAppliedPromo(null);
+    setPromoDiscount(0);
+  };
+
+  // Recalculate discount when cart changes
+  useEffect(() => {
+    if (appliedPromo) {
+      const subtotal = getCartTotal();
+      let discount: number;
+      if (appliedPromo.discount_type === 'percentage') {
+        discount = subtotal * (appliedPromo.discount_value / 100);
+      } else {
+        discount = appliedPromo.discount_value;
+      }
+      if (appliedPromo.max_discount_amount && discount > appliedPromo.max_discount_amount) {
+        discount = appliedPromo.max_discount_amount;
+      }
+      if (discount > subtotal) {
+        discount = subtotal;
+      }
+      setPromoDiscount(discount);
+    }
+  }, [items, appliedPromo, getCartTotal]);
 
   const subtotal = getCartTotal();
   const deliveryFee = 2.49;
   const serviceFee = getServiceFee();
-  const discount = appliedPromo === "SAVE10" ? subtotal * 0.1 : 0;
+  const discount = promoDiscount;
   const total = subtotal + deliveryFee + serviceFee - discount;
   const totalItems = getTotalItems();
 
@@ -177,31 +231,45 @@ const Cart = () => {
             {/* Promo Code */}
             <Card className="mt-6 shadow-card">
               <CardContent className="p-4">
-                <h3 className="font-semibold mb-3">Promo Code</h3>
+                <div className="flex items-center gap-2 mb-3">
+                  <Tag className="h-5 w-5 text-primary" />
+                  <h3 className="font-semibold">Promo Code</h3>
+                </div>
                 {appliedPromo ? (
                   <div className="flex items-center justify-between p-3 bg-primary/10 rounded-lg">
-                    <span className="text-primary font-medium">{appliedPromo} applied!</span>
-                    <Button 
-                      variant="ghost" 
+                    <div>
+                      <span className="text-primary font-medium">{appliedPromo.code}</span>
+                      <p className="text-sm text-muted-foreground">
+                        {formatDiscount(appliedPromo)} - Save R{promoDiscount.toFixed(2)}
+                      </p>
+                    </div>
+                    <Button
+                      variant="ghost"
                       size="sm"
-                      onClick={() => setAppliedPromo(null)}
+                      onClick={removePromoCode}
+                      className="text-destructive hover:text-destructive"
                     >
-                      Remove
+                      <X className="h-4 w-4" />
                     </Button>
                   </div>
                 ) : (
                   <div className="flex gap-2">
                     <Input
-                      placeholder="Enter promo code (try SAVE10)"
+                      placeholder="Enter promo code"
                       value={promoCode}
-                      onChange={(e) => setPromoCode(e.target.value)}
+                      onChange={(e) => setPromoCode(e.target.value.toUpperCase())}
+                      onKeyDown={(e) => e.key === 'Enter' && applyPromoCode()}
                     />
-                    <Button 
+                    <Button
                       variant="outline"
                       onClick={applyPromoCode}
-                      disabled={!promoCode.trim()}
+                      disabled={!promoCode.trim() || validatePromoMutation.isPending}
                     >
-                      Apply
+                      {validatePromoMutation.isPending ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      ) : (
+                        'Apply'
+                      )}
                     </Button>
                   </div>
                 )}
@@ -231,7 +299,7 @@ const Cart = () => {
                     </div>
                     {appliedPromo && discount > 0 && (
                       <div className="flex justify-between text-primary">
-                        <span>Discount ({appliedPromo})</span>
+                        <span>Discount ({appliedPromo.code})</span>
                         <span>-R{discount.toFixed(2)}</span>
                       </div>
                     )}
