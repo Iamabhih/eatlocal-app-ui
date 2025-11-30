@@ -176,12 +176,12 @@ export default function ExperienceSearch() {
       {/* Experience Type */}
       <div>
         <h4 className="font-medium mb-3">Experience Type</h4>
-        <Select value={experienceType} onValueChange={setExperienceType}>
+        <Select value={experienceType || 'all'} onValueChange={(v) => setExperienceType(v === 'all' ? '' : v)}>
           <SelectTrigger>
             <SelectValue placeholder="All types" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">All types</SelectItem>
+            <SelectItem value="all">All types</SelectItem>
             {Object.entries(experienceTypeLabels).map(([value, label]) => (
               <SelectItem key={value} value={value}>
                 {label}
@@ -304,12 +304,12 @@ export default function ExperienceSearch() {
                 <label className="text-sm font-medium text-foreground mb-1 block">
                   Type
                 </label>
-                <Select value={experienceType} onValueChange={setExperienceType}>
+                <Select value={experienceType || 'all'} onValueChange={(v) => setExperienceType(v === 'all' ? '' : v)}>
                   <SelectTrigger>
                     <SelectValue placeholder="All experiences" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">All experiences</SelectItem>
+                    <SelectItem value="all">All experiences</SelectItem>
                     {Object.entries(experienceTypeLabels).map(([value, label]) => (
                       <SelectItem key={value} value={value}>
                         {label}
