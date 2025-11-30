@@ -446,3 +446,293 @@ $$;
 
 -- Grant execute to service role only (will be called by scheduled function)
 REVOKE ALL ON FUNCTION public.cleanup_old_rate_limits FROM PUBLIC;
+
+-- =====================================================
+-- 12. FIND NEARBY DRIVERS FUNCTION
+-- Used by match-ride edge function
+-- =====================================================
+
+CREATE OR REPLACE FUNCTION public.find_nearby_drivers(
+  pickup_lat DOUBLE PRECISION,
+  pickup_lng DOUBLE PRECISION,
+  max_distance_km DOUBLE PRECISION DEFAULT 10,
+  required_tier TEXT DEFAULT NULL
+)
+RETURNS TABLE (
+  id UUID,
+  user_id UUID,
+  full_name TEXT,
+  phone TEXT,
+  vehicle_make TEXT,
+  vehicle_model TEXT,
+  vehicle_color TEXT,
+  license_plate TEXT,
+  vehicle_type TEXT,
+  average_rating NUMERIC,
+  distance_km DOUBLE PRECISION,
+  estimated_fare NUMERIC
+)
+LANGUAGE plpgsql
+SECURITY DEFINER
+AS $$
+BEGIN
+  RETURN QUERY
+  SELECT
+    d.id,
+    d.user_id,
+    p.full_name,
+    p.phone,
+    d.vehicle_make,
+    d.vehicle_model,
+    d.vehicle_color,
+    d.license_plate,
+    d.vehicle_type,
+    d.average_rating,
+    -- Calculate distance using Haversine formula (approximate)
+    6371 * acos(
+      cos(radians(pickup_lat)) * cos(radians(d.current_latitude)) *
+      cos(radians(d.current_longitude) - radians(pickup_lng)) +
+      sin(radians(pickup_lat)) * sin(radians(d.current_latitude))
+    ) AS distance_km,
+    -- Estimated fare based on distance (base fare + per km rate)
+    15.0 + (6371 * acos(
+      cos(radians(pickup_lat)) * cos(radians(d.current_latitude)) *
+      cos(radians(d.current_longitude) - radians(pickup_lng)) +
+      sin(radians(pickup_lat)) * sin(radians(d.current_latitude))
+    ) * 8.0) AS estimated_fare
+  FROM
+    public.drivers d
+    JOIN public.profiles p ON d.user_id = p.id
+    LEFT JOIN public.ride_service_tiers rst ON d.service_tier = rst.tier
+  WHERE
+    d.is_active = true
+    AND d.is_verified = true
+    AND d.is_available = true
+    AND d.current_latitude IS NOT NULL
+    AND d.current_longitude IS NOT NULL
+    AND (required_tier IS NULL OR d.service_tier = required_tier)
+    -- Distance filter
+    AND (
+      6371 * acos(
+        cos(radians(pickup_lat)) * cos(radians(d.current_latitude)) *
+        cos(radians(d.current_longitude) - radians(pickup_lng)) +
+        sin(radians(pickup_lat)) * sin(radians(d.current_latitude))
+      )
+    ) <= max_distance_km
+  ORDER BY
+    distance_km ASC
+  LIMIT 20;
+END;
+$$;
+
+-- Grant execute to authenticated users
+GRANT EXECUTE ON FUNCTION public.find_nearby_drivers TO authenticated;
+
+-- =====================================================
+-- 13. VALIDATE PROMO CODE FUNCTION
+-- Server-side promo code validation
+-- =====================================================
+
+CREATE OR REPLACE FUNCTION public.validate_promo_code(
+  p_code TEXT,
+  p_order_total NUMERIC,
+  p_user_id UUID DEFAULT NULL,
+  p_restaurant_id UUID DEFAULT NULL,
+  p_service_type TEXT DEFAULT 'food'
+)
+RETURNS TABLE (
+  is_valid BOOLEAN,
+  promo_code_id UUID,
+  discount_type TEXT,
+  discount_value NUMERIC,
+  discount_amount NUMERIC,
+  error_message TEXT
+)
+LANGUAGE plpgsql
+SECURITY DEFINER
+AS $$
+DECLARE
+  v_promo RECORD;
+  v_discount_amount NUMERIC;
+  v_user_usage_count INTEGER;
+BEGIN
+  -- Normalize code
+  p_code := UPPER(TRIM(p_code));
+
+  -- Fetch promo code
+  SELECT * INTO v_promo
+  FROM public.promo_codes
+  WHERE code = p_code AND is_active = true;
+
+  IF NOT FOUND THEN
+    RETURN QUERY SELECT false, NULL::UUID, NULL::TEXT, 0::NUMERIC, 0::NUMERIC, 'Invalid promo code'::TEXT;
+    RETURN;
+  END IF;
+
+  -- Check date range
+  IF NOW() < v_promo.start_date THEN
+    RETURN QUERY SELECT false, NULL::UUID, NULL::TEXT, 0::NUMERIC, 0::NUMERIC, 'This promo code is not yet active'::TEXT;
+    RETURN;
+  END IF;
+
+  IF NOW() > v_promo.end_date THEN
+    RETURN QUERY SELECT false, NULL::UUID, NULL::TEXT, 0::NUMERIC, 0::NUMERIC, 'This promo code has expired'::TEXT;
+    RETURN;
+  END IF;
+
+  -- Check minimum order amount
+  IF v_promo.min_order_amount IS NOT NULL AND p_order_total < v_promo.min_order_amount THEN
+    RETURN QUERY SELECT false, NULL::UUID, NULL::TEXT, 0::NUMERIC, 0::NUMERIC,
+      ('Minimum order of R' || v_promo.min_order_amount::TEXT || ' required')::TEXT;
+    RETURN;
+  END IF;
+
+  -- Check global usage limit
+  IF v_promo.usage_limit IS NOT NULL AND COALESCE(v_promo.usage_count, 0) >= v_promo.usage_limit THEN
+    RETURN QUERY SELECT false, NULL::UUID, NULL::TEXT, 0::NUMERIC, 0::NUMERIC, 'This promo code has reached its usage limit'::TEXT;
+    RETURN;
+  END IF;
+
+  -- Check per-user limit
+  IF p_user_id IS NOT NULL AND v_promo.per_user_limit IS NOT NULL THEN
+    SELECT COUNT(*) INTO v_user_usage_count
+    FROM public.promo_code_usage
+    WHERE promo_code_id = v_promo.id AND user_id = p_user_id;
+
+    IF v_user_usage_count >= v_promo.per_user_limit THEN
+      RETURN QUERY SELECT false, NULL::UUID, NULL::TEXT, 0::NUMERIC, 0::NUMERIC,
+        ('You have already used this promo code ' || v_promo.per_user_limit::TEXT || ' time(s)')::TEXT;
+      RETURN;
+    END IF;
+  END IF;
+
+  -- Check restaurant restriction
+  IF v_promo.restaurant_ids IS NOT NULL AND p_restaurant_id IS NOT NULL THEN
+    IF NOT (p_restaurant_id::TEXT = ANY(v_promo.restaurant_ids)) THEN
+      RETURN QUERY SELECT false, NULL::UUID, NULL::TEXT, 0::NUMERIC, 0::NUMERIC, 'This promo code is not valid for this restaurant'::TEXT;
+      RETURN;
+    END IF;
+  END IF;
+
+  -- Check service type restriction
+  IF v_promo.applicable_to IS NOT NULL AND v_promo.applicable_to != 'all' THEN
+    IF NOT (p_service_type = ANY(string_to_array(v_promo.applicable_to, ','))) THEN
+      RETURN QUERY SELECT false, NULL::UUID, NULL::TEXT, 0::NUMERIC, 0::NUMERIC,
+        ('This promo code is not valid for ' || p_service_type || ' orders')::TEXT;
+      RETURN;
+    END IF;
+  END IF;
+
+  -- Calculate discount
+  IF v_promo.discount_type = 'percentage' THEN
+    v_discount_amount := p_order_total * (v_promo.discount_value / 100);
+  ELSE
+    v_discount_amount := v_promo.discount_value;
+  END IF;
+
+  -- Apply max discount cap
+  IF v_promo.max_discount_amount IS NOT NULL AND v_discount_amount > v_promo.max_discount_amount THEN
+    v_discount_amount := v_promo.max_discount_amount;
+  END IF;
+
+  -- Ensure discount doesn't exceed order total
+  IF v_discount_amount > p_order_total THEN
+    v_discount_amount := p_order_total;
+  END IF;
+
+  -- Valid promo code
+  RETURN QUERY SELECT
+    true,
+    v_promo.id,
+    v_promo.discount_type::TEXT,
+    v_promo.discount_value,
+    v_discount_amount,
+    NULL::TEXT;
+END;
+$$;
+
+-- Grant execute to authenticated users
+GRANT EXECUTE ON FUNCTION public.validate_promo_code TO authenticated;
+
+-- =====================================================
+-- 14. INCREMENT PROMO USAGE FUNCTION
+-- Atomically increment promo code usage count
+-- =====================================================
+
+CREATE OR REPLACE FUNCTION public.increment_promo_usage(p_promo_id UUID)
+RETURNS VOID
+LANGUAGE plpgsql
+SECURITY DEFINER
+AS $$
+BEGIN
+  UPDATE public.promo_codes
+  SET usage_count = COALESCE(usage_count, 0) + 1,
+      updated_at = NOW()
+  WHERE id = p_promo_id;
+END;
+$$;
+
+-- Grant execute to authenticated users
+GRANT EXECUTE ON FUNCTION public.increment_promo_usage TO authenticated;
+
+-- =====================================================
+-- 15. SEARCH RESTAURANTS FUNCTION
+-- Full-text search for restaurants
+-- =====================================================
+
+CREATE OR REPLACE FUNCTION public.search_restaurants(
+  search_query TEXT,
+  p_limit INTEGER DEFAULT 20
+)
+RETURNS TABLE (
+  id UUID,
+  name TEXT,
+  description TEXT,
+  cuisine_type TEXT,
+  address TEXT,
+  city TEXT,
+  image_url TEXT,
+  rating NUMERIC,
+  delivery_fee NUMERIC,
+  estimated_delivery_time INTEGER,
+  is_open BOOLEAN,
+  rank REAL
+)
+LANGUAGE plpgsql
+SECURITY DEFINER
+AS $$
+BEGIN
+  RETURN QUERY
+  SELECT
+    r.id,
+    r.name,
+    r.description,
+    r.cuisine_type,
+    r.address,
+    r.city,
+    r.image_url,
+    r.rating,
+    r.delivery_fee,
+    r.estimated_delivery_time,
+    r.is_open,
+    ts_rank(
+      to_tsvector('english', COALESCE(r.name, '') || ' ' || COALESCE(r.description, '') || ' ' || COALESCE(r.cuisine_type, '')),
+      plainto_tsquery('english', search_query)
+    ) AS rank
+  FROM public.restaurants r
+  WHERE
+    r.is_active = true
+    AND (
+      to_tsvector('english', COALESCE(r.name, '') || ' ' || COALESCE(r.description, '') || ' ' || COALESCE(r.cuisine_type, ''))
+      @@ plainto_tsquery('english', search_query)
+      OR r.name ILIKE '%' || search_query || '%'
+      OR r.cuisine_type ILIKE '%' || search_query || '%'
+    )
+  ORDER BY rank DESC, r.rating DESC NULLS LAST
+  LIMIT p_limit;
+END;
+$$;
+
+-- Grant execute to public (search doesn't require auth)
+GRANT EXECUTE ON FUNCTION public.search_restaurants TO anon;
+GRANT EXECUTE ON FUNCTION public.search_restaurants TO authenticated;
