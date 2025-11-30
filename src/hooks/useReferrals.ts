@@ -39,43 +39,53 @@ function generateReferralCode(userId: string): string {
 }
 
 /**
- * Get or create user's referral code
+ * Get or create user's referral code from database
  */
 export function useReferralCode() {
   const { user } = useAuth();
-  const { toast } = useToast();
 
   return useQuery({
     queryKey: ['referral-code', user?.id],
     queryFn: async () => {
       if (!user) return null;
 
-      // Check user metadata for existing code
-      const { data: profile } = await supabase
-        .from('profiles')
+      // Check if referral code exists in database
+      const { data: existingCode, error: fetchError } = await supabase
+        .from('referral_codes')
         .select('*')
-        .eq('id', user.id)
+        .eq('user_id', user.id)
+        .eq('is_active', true)
         .single();
-
-      // Check if referral code exists in user metadata
-      const { data: metadata } = await supabase.auth.getUser();
-      const existingCode = metadata?.user?.user_metadata?.referral_code;
 
       if (existingCode) {
         return {
-          code: existingCode,
+          code: existingCode.code,
           userId: user.id,
-          createdAt: user.created_at || new Date().toISOString(),
-          totalReferrals: 0,
+          createdAt: existingCode.created_at,
+          totalReferrals: existingCode.current_uses || 0,
           pendingRewards: 0,
           totalRewardsEarned: 0,
         } as ReferralCode;
       }
 
-      // Generate new code
+      // Generate new code and store in database
       const newCode = generateReferralCode(user.id);
 
-      // Store in user metadata
+      const { data: newCodeData, error: insertError } = await supabase
+        .from('referral_codes')
+        .insert({
+          user_id: user.id,
+          code: newCode,
+          referrer_reward_type: 'credit',
+          referrer_reward_value: REFERRAL_REWARDS.REFERRER,
+          referee_reward_type: 'credit',
+          referee_reward_value: REFERRAL_REWARDS.REFERRED,
+          is_active: true,
+        })
+        .select()
+        .single();
+
+      // Also store in user metadata for backwards compatibility
       await supabase.auth.updateUser({
         data: { referral_code: newCode },
       });
@@ -95,7 +105,7 @@ export function useReferralCode() {
 }
 
 /**
- * Get referral statistics
+ * Get referral statistics from database
  */
 export function useReferralStats() {
   const { user } = useAuth();
@@ -105,18 +115,63 @@ export function useReferralStats() {
     queryFn: async () => {
       if (!user) return null;
 
-      // This would query a referrals table - for now return mock data
-      // In production, you'd have a referrals table to track this
+      // Get user's referral code info
+      const { data: codeData } = await supabase
+        .from('referral_codes')
+        .select('id, code, current_uses, referrer_reward_value')
+        .eq('user_id', user.id)
+        .eq('is_active', true)
+        .single();
+
+      // Get referrals made by this user
+      const { data: referrals } = await supabase
+        .from('referrals')
+        .select(`
+          id,
+          status,
+          created_at,
+          qualified_at,
+          referee_id
+        `)
+        .eq('referrer_id', user.id)
+        .order('created_at', { ascending: false })
+        .limit(10);
+
+      // Get referee profile names
+      let recentReferrals: Array<{ name: string; date: string; status: 'pending' | 'completed'; reward: number }> = [];
+      if (referrals && referrals.length > 0) {
+        const refereeIds = referrals.map(r => r.referee_id);
+        const { data: profiles } = await supabase
+          .from('profiles')
+          .select('id, full_name')
+          .in('id', refereeIds);
+
+        const profileMap = new Map(profiles?.map(p => [p.id, p.full_name]) || []);
+
+        recentReferrals = referrals.map(r => ({
+          name: profileMap.get(r.referee_id) || 'Anonymous',
+          date: r.created_at,
+          status: r.status === 'rewarded' ? 'completed' as const : 'pending' as const,
+          reward: Number(codeData?.referrer_reward_value || REFERRAL_REWARDS.REFERRER),
+        }));
+      }
+
+      // Get bonuses earned
+      const { data: bonuses } = await supabase
+        .from('referral_bonuses')
+        .select('reward_value, status')
+        .eq('user_id', user.id)
+        .eq('bonus_type', 'referrer');
+
+      const totalRewardsEarned = bonuses?.filter(b => b.status === 'credited').reduce((sum, b) => sum + Number(b.reward_value), 0) || 0;
+      const pendingRewards = bonuses?.filter(b => b.status === 'pending').reduce((sum, b) => sum + Number(b.reward_value), 0) || 0;
+
       return {
-        totalReferrals: 0,
-        pendingRewards: 0,
-        totalRewardsEarned: 0,
-        recentReferrals: [] as Array<{
-          name: string;
-          date: string;
-          status: 'pending' | 'completed';
-          reward: number;
-        }>,
+        totalReferrals: codeData?.current_uses || 0,
+        pendingRewards,
+        totalRewardsEarned,
+        referralCode: codeData?.code,
+        recentReferrals,
       };
     },
     enabled: !!user,
@@ -124,35 +179,54 @@ export function useReferralStats() {
 }
 
 /**
- * Apply a referral code during signup
+ * Apply a referral code during signup using database function
  */
 export function useApplyReferralCode() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { user } = useAuth();
 
   return useMutation({
-    mutationFn: async ({ code, newUserId }: { code: string; newUserId: string }) => {
-      // Validate the referral code by finding the referrer
-      const { data: users } = await supabase.auth.admin.listUsers();
+    mutationFn: async ({ code }: { code: string }) => {
+      if (!user) throw new Error('Not authenticated');
 
-      // In a real implementation, you'd query a referral_codes table
-      // For now, we'll store the referral in the new user's metadata
-      await supabase.auth.updateUser({
-        data: { referred_by: code },
+      // Call the database function to apply referral code
+      const { data, error } = await supabase.rpc('apply_referral_code', {
+        p_referee_id: user.id,
+        p_code: code.toUpperCase(),
       });
 
-      return { success: true, referrerReward: REFERRAL_REWARDS.REFERRER, referredReward: REFERRAL_REWARDS.REFERRED };
+      if (error) {
+        throw new Error(error.message);
+      }
+
+      if (!data.success) {
+        throw new Error(data.error || 'Failed to apply referral code');
+      }
+
+      // Also store in user metadata for reference
+      await supabase.auth.updateUser({
+        data: { referred_by: code.toUpperCase() },
+      });
+
+      return {
+        success: true,
+        referralId: data.referral_id,
+        rewardType: data.reward_type,
+        rewardValue: data.reward_value,
+      };
     },
     onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ['referral-stats'] });
       toast({
         title: 'Referral Applied!',
-        description: `You'll receive R${data.referredReward} credit after your first order.`,
+        description: `You'll receive R${data.rewardValue} credit after your first order.`,
       });
     },
-    onError: () => {
+    onError: (error: Error) => {
       toast({
         title: 'Invalid Referral Code',
-        description: 'The referral code you entered is not valid.',
+        description: error.message || 'The referral code you entered is not valid.',
         variant: 'destructive',
       });
     },

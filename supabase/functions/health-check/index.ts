@@ -1,11 +1,9 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3";
 import { checkRateLimitMemory, addRateLimitHeaders } from "../_shared/rateLimiter.ts";
+import { getCorsHeaders, validateEnvVars } from "../_shared/auth.ts";
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+const corsHeaders = getCorsHeaders();
 
 // Health check specific rate limit (higher for monitoring tools)
 const HEALTH_CHECK_LIMIT = 60; // 60 per minute
