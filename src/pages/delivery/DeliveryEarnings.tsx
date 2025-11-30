@@ -4,7 +4,6 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import Navbar from "@/components/shared/Navbar";
 import { useDeliveryEarnings } from "@/hooks/useDeliveryEarnings";
 
 const DeliveryEarnings = () => {
@@ -12,8 +11,6 @@ const DeliveryEarnings = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <Navbar type="delivery" />
-      
       <div className="container mx-auto px-4 py-8">
         <div className="flex items-center justify-between mb-8">
           <h1 className="text-3xl font-bold">Earnings</h1>

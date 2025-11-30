@@ -4,7 +4,6 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-import Navbar from "@/components/shared/Navbar";
 import deliveryHero from "@/assets/delivery-partner-hero.jpg";
 import { useDeliveryOrders } from "@/hooks/useDeliveryOrders";
 import { useDeliveryEarnings } from "@/hooks/useDeliveryEarnings";
@@ -22,8 +21,6 @@ const DeliveryDashboard = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <Navbar type="delivery" />
-      
       {/* Hero Section */}
       <section className="relative h-48 bg-gradient-hero overflow-hidden">
         <img 

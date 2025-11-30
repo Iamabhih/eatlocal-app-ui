@@ -1,4 +1,4 @@
-import { MapPin, Clock, Phone, CheckCircle, Navigation, MapPinned } from "lucide-react"; 
+import { MapPin, Clock, Phone, CheckCircle, Navigation, MapPinned } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -6,7 +6,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-import Navbar from "@/components/shared/Navbar";
 import { useDeliveryOrders } from "@/hooks/useDeliveryOrders";
 import { useLocationTracking } from "@/hooks/useLocationTracking";
 import { useState } from "react";
@@ -187,8 +186,6 @@ const DeliveryOrders = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <Navbar type="delivery" />
-      
       <div className="container mx-auto px-4 py-8">
         <div className="flex items-center justify-between mb-8">
           <h1 className="text-3xl font-bold">Delivery Orders</h1>
