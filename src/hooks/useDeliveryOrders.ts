@@ -325,14 +325,14 @@ export function useDeclineOrder() {
       if (error) throw error;
 
       // Log the decline (for analytics/driver reliability tracking)
+      // Note: order_events table may not exist - using order_status_history instead
       await supabase
-        .from('order_events')
+        .from('order_status_history')
         .insert({
           order_id: orderId,
-          event_type: 'driver_declined',
-          event_data: { driver_id: user.id, reason },
-        })
-        .single();
+          status: 'ready_for_pickup',
+          notes: `Driver ${user.id} declined: ${reason}`,
+        } as any);
 
       return orderId;
     },

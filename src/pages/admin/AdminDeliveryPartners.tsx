@@ -125,15 +125,15 @@ export default function AdminDeliveryPartners() {
   });
 
   // Filter partners
-  const filteredPartners = (deliveryPartners || []).filter((partner) => {
+  const filteredPartners = (deliveryPartners || []).filter((partner: any) => {
     const matchesSearch =
       partner.full_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       partner.phone?.toLowerCase().includes(searchTerm.toLowerCase());
 
     const matchesStatus =
       statusFilter === 'all' ||
-      (statusFilter === 'verified' && partner.is_verified) ||
-      (statusFilter === 'unverified' && !partner.is_verified) ||
+      (statusFilter === 'verified' && partner.email_verified) ||
+      (statusFilter === 'unverified' && !partner.email_verified) ||
       (statusFilter === 'suspended' && partner.is_suspended) ||
       (statusFilter === 'active' && partner.activeDeliveries > 0);
 
@@ -143,7 +143,7 @@ export default function AdminDeliveryPartners() {
   // Calculate stats
   const stats = {
     total: deliveryPartners?.length || 0,
-    verified: deliveryPartners?.filter((p) => p.is_verified).length || 0,
+    verified: deliveryPartners?.filter((p: any) => p.email_verified).length || 0,
     active: deliveryPartners?.filter((p) => p.activeDeliveries > 0).length || 0,
     totalEarnings: deliveryPartners?.reduce((sum, p) => sum + p.totalEarnings, 0) || 0,
     platformFees: deliveryPartners?.reduce((sum, p) => sum + p.totalFees, 0) || 0,

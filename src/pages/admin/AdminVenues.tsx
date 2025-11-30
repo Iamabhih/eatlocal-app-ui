@@ -66,10 +66,10 @@ export default function AdminVenues() {
   const { data: venues = [], isLoading: venuesLoading } = useQuery({
     queryKey: ['admin-venues', statusFilter, typeFilter],
     queryFn: async () => {
-      let query = supabase
-        .from('venues')
+      let query = (supabase
+        .from('venues' as any)
         .select('*')
-        .order('created_at', { ascending: false });
+        .order('created_at', { ascending: false }) as any);
 
       if (statusFilter !== 'all') {
         query = query.eq('verification_status', statusFilter);
@@ -80,8 +80,11 @@ export default function AdminVenues() {
       }
 
       const { data, error } = await query;
-      if (error) throw error;
-      return data as Venue[];
+      if (error) {
+        if (error.code === '42P01') return [];
+        throw error;
+      }
+      return (data || []) as Venue[];
     },
   });
 
@@ -89,12 +92,15 @@ export default function AdminVenues() {
   const { data: experiences = [], isLoading: experiencesLoading } = useQuery({
     queryKey: ['admin-experiences'],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from('experiences')
+      const { data, error } = await (supabase
+        .from('experiences' as any)
         .select('*, venue:venues(id, name, city)')
-        .order('created_at', { ascending: false });
-      if (error) throw error;
-      return data;
+        .order('created_at', { ascending: false }) as any);
+      if (error) {
+        if (error.code === '42P01') return [];
+        throw error;
+      }
+      return data || [];
     },
   });
 
@@ -102,26 +108,25 @@ export default function AdminVenues() {
   const { data: stats } = useQuery({
     queryKey: ['admin-venue-stats'],
     queryFn: async () => {
-      const [
-        { count: totalVenues },
-        { count: pendingVenues },
-        { count: verifiedVenues },
-        { count: totalExperiences },
-        { count: totalBookings },
-      ] = await Promise.all([
-        supabase.from('venues').select('*', { count: 'exact', head: true }),
-        supabase.from('venues').select('*', { count: 'exact', head: true }).eq('verification_status', 'pending'),
-        supabase.from('venues').select('*', { count: 'exact', head: true }).eq('verification_status', 'verified'),
-        supabase.from('experiences').select('*', { count: 'exact', head: true }),
-        supabase.from('experience_bookings').select('*', { count: 'exact', head: true }),
+      const results = await Promise.allSettled([
+        (supabase.from('venues' as any).select('*', { count: 'exact', head: true }) as any),
+        (supabase.from('venues' as any).select('*', { count: 'exact', head: true }).eq('verification_status', 'pending') as any),
+        (supabase.from('venues' as any).select('*', { count: 'exact', head: true }).eq('verification_status', 'verified') as any),
+        (supabase.from('experiences' as any).select('*', { count: 'exact', head: true }) as any),
+        (supabase.from('experience_bookings' as any).select('*', { count: 'exact', head: true }) as any),
       ]);
 
+      const getCounts = (result: PromiseSettledResult<any>) => {
+        if (result.status === 'fulfilled') return result.value?.count || 0;
+        return 0;
+      };
+
       return {
-        totalVenues: totalVenues || 0,
-        pendingVenues: pendingVenues || 0,
-        verifiedVenues: verifiedVenues || 0,
-        totalExperiences: totalExperiences || 0,
-        totalBookings: totalBookings || 0,
+        totalVenues: getCounts(results[0]),
+        pendingVenues: getCounts(results[1]),
+        verifiedVenues: getCounts(results[2]),
+        totalExperiences: getCounts(results[3]),
+        totalBookings: getCounts(results[4]),
       };
     },
   });
@@ -129,10 +134,10 @@ export default function AdminVenues() {
   // Update venue verification status
   const updateVerification = useMutation({
     mutationFn: async ({ venueId, status }: { venueId: string; status: string }) => {
-      const { error } = await supabase
-        .from('venues')
+      const { error } = await (supabase
+        .from('venues' as any)
         .update({ verification_status: status })
-        .eq('id', venueId);
+        .eq('id', venueId) as any);
       if (error) throw error;
     },
     onSuccess: () => {
@@ -148,10 +153,10 @@ export default function AdminVenues() {
   // Toggle venue active status
   const toggleActive = useMutation({
     mutationFn: async ({ venueId, isActive }: { venueId: string; isActive: boolean }) => {
-      const { error } = await supabase
-        .from('venues')
+      const { error } = await (supabase
+        .from('venues' as any)
         .update({ is_active: isActive })
-        .eq('id', venueId);
+        .eq('id', venueId) as any);
       if (error) throw error;
     },
     onSuccess: () => {
@@ -166,10 +171,10 @@ export default function AdminVenues() {
   // Toggle featured status
   const toggleFeatured = useMutation({
     mutationFn: async ({ venueId, isFeatured }: { venueId: string; isFeatured: boolean }) => {
-      const { error } = await supabase
-        .from('venues')
+      const { error } = await (supabase
+        .from('venues' as any)
         .update({ is_featured: isFeatured })
-        .eq('id', venueId);
+        .eq('id', venueId) as any);
       if (error) throw error;
     },
     onSuccess: () => {
@@ -184,10 +189,10 @@ export default function AdminVenues() {
   // Toggle experience active status
   const toggleExperienceActive = useMutation({
     mutationFn: async ({ experienceId, isActive }: { experienceId: string; isActive: boolean }) => {
-      const { error } = await supabase
-        .from('experiences')
+      const { error } = await (supabase
+        .from('experiences' as any)
         .update({ is_active: isActive })
-        .eq('id', experienceId);
+        .eq('id', experienceId) as any);
       if (error) throw error;
     },
     onSuccess: () => {

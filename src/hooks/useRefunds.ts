@@ -82,8 +82,8 @@ export function useRefundRequests() {
     queryFn: async () => {
       if (!user) return [];
 
-      const { data, error } = await supabase
-        .from('refund_requests')
+      const { data, error } = await (supabase
+        .from('refund_requests' as any)
         .select(`
           *,
           order:orders(
@@ -95,7 +95,7 @@ export function useRefundRequests() {
           )
         `)
         .eq('user_id', user.id)
-        .order('created_at', { ascending: false });
+        .order('created_at', { ascending: false }) as any);
 
       if (error) {
         // Table might not exist yet, return empty array
@@ -120,8 +120,8 @@ export function useRefundRequest(refundId: string | undefined) {
     queryFn: async () => {
       if (!refundId) return null;
 
-      const { data, error } = await supabase
-        .from('refund_requests')
+      const { data, error } = await (supabase
+        .from('refund_requests' as any)
         .select(`
           *,
           order:orders(
@@ -133,7 +133,7 @@ export function useRefundRequest(refundId: string | undefined) {
           )
         `)
         .eq('id', refundId)
-        .single();
+        .single() as any);
 
       if (error) throw error;
       return data as RefundRequest;
@@ -167,13 +167,13 @@ export function useCreateRefundRequest() {
       if (!user) throw new Error('Not authenticated');
 
       // Check if a refund request already exists for this order
-      const { data: existing } = await supabase
-        .from('refund_requests')
+      const { data: existing } = await (supabase
+        .from('refund_requests' as any)
         .select('id, status')
         .eq('order_id', orderId)
         .eq('user_id', user.id)
         .not('status', 'eq', 'rejected')
-        .single();
+        .single() as any);
 
       if (existing) {
         throw new Error('A refund request already exists for this order');
@@ -197,8 +197,8 @@ export function useCreateRefundRequest() {
       }
 
       // Create refund request
-      const { data, error } = await supabase
-        .from('refund_requests')
+      const { data, error } = await (supabase
+        .from('refund_requests' as any)
         .insert({
           order_id: orderId,
           user_id: user.id,
@@ -209,7 +209,7 @@ export function useCreateRefundRequest() {
           status: 'pending',
         })
         .select()
-        .single();
+        .single() as any);
 
       if (error) throw error;
       return data;
@@ -243,12 +243,12 @@ export function useCancelRefundRequest() {
     mutationFn: async (refundId: string) => {
       if (!user) throw new Error('Not authenticated');
 
-      const { error } = await supabase
-        .from('refund_requests')
+      const { error } = await (supabase
+        .from('refund_requests' as any)
         .delete()
         .eq('id', refundId)
         .eq('user_id', user.id)
-        .eq('status', 'pending');
+        .eq('status', 'pending') as any);
 
       if (error) throw error;
       return refundId;
@@ -279,8 +279,8 @@ export function useAdminRefundRequests(status?: RefundStatus) {
   return useQuery({
     queryKey: ['admin-refund-requests', status],
     queryFn: async () => {
-      let query = supabase
-        .from('refund_requests')
+      let query = (supabase
+        .from('refund_requests' as any)
         .select(`
           *,
           order:orders(
@@ -292,7 +292,7 @@ export function useAdminRefundRequests(status?: RefundStatus) {
           ),
           user:profiles(full_name, phone)
         `)
-        .order('created_at', { ascending: false });
+        .order('created_at', { ascending: false }) as any);
 
       if (status) {
         query = query.eq('status', status);
@@ -332,17 +332,17 @@ export function useApproveRefund() {
       if (!user) throw new Error('Not authenticated');
 
       // Get the refund request details
-      const { data: refund, error: fetchError } = await supabase
-        .from('refund_requests')
+      const { data: refund, error: fetchError } = await (supabase
+        .from('refund_requests' as any)
         .select('*, order:orders(total, customer_id)')
         .eq('id', refundId)
-        .single();
+        .single() as any);
 
       if (fetchError) throw fetchError;
 
       // Update refund status
-      const { error: updateError } = await supabase
-        .from('refund_requests')
+      const { error: updateError } = await (supabase
+        .from('refund_requests' as any)
         .update({
           status: 'approved',
           amount_approved: approvedAmount,
@@ -350,7 +350,7 @@ export function useApproveRefund() {
           resolved_at: new Date().toISOString(),
           resolved_by: user.id,
         })
-        .eq('id', refundId);
+        .eq('id', refundId) as any);
 
       if (updateError) throw updateError;
 
@@ -403,15 +403,15 @@ export function useRejectRefund() {
     }) => {
       if (!user) throw new Error('Not authenticated');
 
-      const { error } = await supabase
-        .from('refund_requests')
+      const { error } = await (supabase
+        .from('refund_requests' as any)
         .update({
           status: 'rejected',
           admin_notes: notes,
           resolved_at: new Date().toISOString(),
           resolved_by: user.id,
         })
-        .eq('id', refundId);
+        .eq('id', refundId) as any);
 
       if (error) throw error;
       return refundId;

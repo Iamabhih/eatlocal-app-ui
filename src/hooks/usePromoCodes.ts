@@ -225,25 +225,24 @@ export function useRecordPromoUsage() {
           promo_code_id: promoCodeId,
           user_id: user.id,
           order_id: orderId,
-          discount_amount: discountAmount,
+          discount_applied: discountAmount,
         });
 
       if (usageError) throw usageError;
 
-      // Increment the usage count
-      const { error: updateError } = await supabase.rpc('increment_promo_usage', {
-        promo_id: promoCodeId,
-      });
+      // Manual increment of usage count
+      const { data: currentPromo } = await supabase
+        .from('promo_codes')
+        .select('usage_count')
+        .eq('id', promoCodeId)
+        .single();
 
-      // If RPC doesn't exist, do manual update
-      if (updateError) {
-        await supabase
-          .from('promo_codes')
-          .update({
-            usage_count: supabase.raw('COALESCE(usage_count, 0) + 1'),
-          })
-          .eq('id', promoCodeId);
-      }
+      await supabase
+        .from('promo_codes')
+        .update({
+          usage_count: (currentPromo?.usage_count || 0) + 1,
+        })
+        .eq('id', promoCodeId);
 
       return true;
     },

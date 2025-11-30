@@ -2,7 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
-import { useEffect, useCallback, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 export interface Message {
   id: string;
@@ -52,15 +52,15 @@ export function useConversations() {
       if (!user) return [];
 
       // Get conversations where user is customer or participant
-      const { data, error } = await supabase
-        .from('order_conversations')
+      const { data, error } = await (supabase
+        .from('order_conversations' as any)
         .select(`
           *,
           order:orders(order_number, status)
         `)
         .or(`customer_id.eq.${user.id},participant_id.eq.${user.id}`)
         .eq('status', 'active')
-        .order('updated_at', { ascending: false });
+        .order('updated_at', { ascending: false }) as any);
 
       if (error) {
         if (error.code === '42P01') return []; // Table doesn't exist
@@ -85,14 +85,14 @@ export function useMessages(conversationId: string | undefined) {
     queryFn: async () => {
       if (!conversationId) return [];
 
-      const { data, error } = await supabase
-        .from('order_messages')
+      const { data, error } = await (supabase
+        .from('order_messages' as any)
         .select(`
           *,
           sender:profiles(full_name, avatar_url)
         `)
         .eq('conversation_id', conversationId)
-        .order('created_at', { ascending: true });
+        .order('created_at', { ascending: true }) as any);
 
       if (error) {
         if (error.code === '42P01') return [];
@@ -125,8 +125,8 @@ export function useSendMessage() {
     }) => {
       if (!user) throw new Error('Not authenticated');
 
-      const { data, error } = await supabase
-        .from('order_messages')
+      const { data, error } = await (supabase
+        .from('order_messages' as any)
         .insert({
           conversation_id: conversationId,
           sender_id: user.id,
@@ -134,19 +134,19 @@ export function useSendMessage() {
           message_type: messageType,
         })
         .select()
-        .single();
+        .single() as any);
 
       if (error) throw error;
 
       // Update conversation's last message
-      await supabase
-        .from('order_conversations')
+      await (supabase
+        .from('order_conversations' as any)
         .update({
           last_message: content.substring(0, 100),
           last_message_at: new Date().toISOString(),
           updated_at: new Date().toISOString(),
         })
-        .eq('id', conversationId);
+        .eq('id', conversationId) as any);
 
       return data;
     },
@@ -184,18 +184,18 @@ export function useGetOrCreateConversation() {
       if (!user) throw new Error('Not authenticated');
 
       // Check if conversation already exists
-      const { data: existing } = await supabase
-        .from('order_conversations')
+      const { data: existing } = await (supabase
+        .from('order_conversations' as any)
         .select('*')
         .eq('order_id', orderId)
         .eq('participant_type', participantType)
-        .single();
+        .single() as any);
 
       if (existing) return existing as Conversation;
 
       // Create new conversation
-      const { data, error } = await supabase
-        .from('order_conversations')
+      const { data, error } = await (supabase
+        .from('order_conversations' as any)
         .insert({
           order_id: orderId,
           customer_id: user.id,
@@ -204,7 +204,7 @@ export function useGetOrCreateConversation() {
           status: 'active',
         })
         .select()
-        .single();
+        .single() as any);
 
       if (error) throw error;
       return data as Conversation;
@@ -226,12 +226,12 @@ export function useMarkMessagesAsRead() {
     mutationFn: async (conversationId: string) => {
       if (!user) throw new Error('Not authenticated');
 
-      const { error } = await supabase
-        .from('order_messages')
+      const { error } = await (supabase
+        .from('order_messages' as any)
         .update({ is_read: true })
         .eq('conversation_id', conversationId)
         .neq('sender_id', user.id)
-        .eq('is_read', false);
+        .eq('is_read', false) as any);
 
       if (error) throw error;
     },
@@ -255,23 +255,23 @@ export function useUnreadMessageCount() {
       if (!user) return 0;
 
       // Get all conversation IDs where user is a participant
-      const { data: conversations } = await supabase
-        .from('order_conversations')
+      const { data: conversations } = await (supabase
+        .from('order_conversations' as any)
         .select('id')
         .or(`customer_id.eq.${user.id},participant_id.eq.${user.id}`)
-        .eq('status', 'active');
+        .eq('status', 'active') as any);
 
       if (!conversations?.length) return 0;
 
-      const conversationIds = conversations.map(c => c.id);
+      const conversationIds = conversations.map((c: any) => c.id);
 
       // Count unread messages in those conversations
-      const { count } = await supabase
-        .from('order_messages')
+      const { count } = await (supabase
+        .from('order_messages' as any)
         .select('*', { count: 'exact', head: true })
         .in('conversation_id', conversationIds)
         .neq('sender_id', user.id)
-        .eq('is_read', false);
+        .eq('is_read', false) as any);
 
       return count || 0;
     },
@@ -343,10 +343,10 @@ export function useCloseConversation() {
     mutationFn: async (conversationId: string) => {
       if (!user) throw new Error('Not authenticated');
 
-      const { error } = await supabase
-        .from('order_conversations')
+      const { error } = await (supabase
+        .from('order_conversations' as any)
         .update({ status: 'closed', updated_at: new Date().toISOString() })
-        .eq('id', conversationId);
+        .eq('id', conversationId) as any);
 
       if (error) throw error;
     },

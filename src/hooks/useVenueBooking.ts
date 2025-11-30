@@ -129,12 +129,12 @@ export function useVenues(filters?: {
   return useQuery({
     queryKey: ['venues', filters],
     queryFn: async () => {
-      let query = supabase
-        .from('venues')
+      let query = (supabase
+        .from('venues' as any)
         .select('*')
         .eq('is_active', true)
         .order('is_featured', { ascending: false })
-        .order('rating', { ascending: false });
+        .order('rating', { ascending: false }) as any);
 
       if (filters?.city) {
         query = query.eq('city', filters.city);
@@ -169,15 +169,15 @@ export function useVenue(idOrSlug: string | undefined) {
 
       const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(idOrSlug);
 
-      const { data, error } = await supabase
-        .from('venues')
+      const { data, error } = await (supabase
+        .from('venues' as any)
         .select('*')
         .eq(isUuid ? 'id' : 'slug', idOrSlug)
         .eq('is_active', true)
-        .single();
+        .single() as any);
 
       if (error) {
-        if (error.code === 'PGRST116') return null;
+        if (error.code === 'PGRST116' || error.code === '42P01') return null;
         throw error;
       }
 
@@ -200,15 +200,15 @@ export function useExperiences(filters?: {
   return useQuery({
     queryKey: ['experiences', filters],
     queryFn: async () => {
-      let query = supabase
-        .from('experiences')
+      let query = (supabase
+        .from('experiences' as any)
         .select(`
           *,
           venue:venues(id, name, city, main_image)
         `)
         .eq('is_active', true)
         .order('is_featured', { ascending: false })
-        .order('rating', { ascending: false });
+        .order('rating', { ascending: false }) as any);
 
       if (filters?.venueId) {
         query = query.eq('venue_id', filters.venueId);
@@ -247,18 +247,18 @@ export function useExperience(id: string | undefined) {
     queryFn: async () => {
       if (!id) return null;
 
-      const { data, error } = await supabase
-        .from('experiences')
+      const { data, error } = await (supabase
+        .from('experiences' as any)
         .select(`
           *,
           venue:venues(*)
         `)
         .eq('id', id)
         .eq('is_active', true)
-        .single();
+        .single() as any);
 
       if (error) {
-        if (error.code === 'PGRST116') return null;
+        if (error.code === 'PGRST116' || error.code === '42P01') return null;
         throw error;
       }
 
@@ -281,42 +281,42 @@ export function useExperienceTimeSlots(experienceId: string | undefined, date: D
       const dayOfWeek = date.getDay();
 
       // Get experience details
-      const { data: experience } = await supabase
-        .from('experiences')
+      const { data: experience } = await (supabase
+        .from('experiences' as any)
         .select('base_price, max_participants')
         .eq('id', experienceId)
-        .single();
+        .single() as any);
 
       if (!experience) return [];
 
       // Get schedules for this date
-      const { data: schedules, error } = await supabase
-        .from('experience_schedules')
+      const { data: schedules, error } = await (supabase
+        .from('experience_schedules' as any)
         .select('*')
         .eq('experience_id', experienceId)
         .eq('is_active', true)
-        .or(`schedule_type.eq.on_demand,and(schedule_type.eq.recurring,day_of_week.eq.${dayOfWeek}),and(schedule_type.eq.specific_date,specific_date.eq.${dateStr})`);
+        .or(`schedule_type.eq.on_demand,and(schedule_type.eq.recurring,day_of_week.eq.${dayOfWeek}),and(schedule_type.eq.specific_date,specific_date.eq.${dateStr})`) as any);
 
       if (error) return [];
 
       // Get existing bookings for this date
-      const { data: bookings } = await supabase
-        .from('experience_bookings')
+      const { data: bookings } = await (supabase
+        .from('experience_bookings' as any)
         .select('start_time, num_adults, num_children')
         .eq('experience_id', experienceId)
         .eq('booking_date', dateStr)
-        .not('status', 'in', '("cancelled","no_show")');
+        .not('status', 'in', '("cancelled","no_show")') as any);
 
       // Build time slots
       const slots: TimeSlot[] = [];
       const bookingsByTime = new Map<string, number>();
 
-      (bookings || []).forEach((b) => {
+      (bookings || []).forEach((b: any) => {
         const key = b.start_time;
         bookingsByTime.set(key, (bookingsByTime.get(key) || 0) + b.num_adults + b.num_children);
       });
 
-      (schedules || []).forEach((schedule) => {
+      (schedules || []).forEach((schedule: any) => {
         const capacity = schedule.capacity_override || experience.max_participants;
         const booked = bookingsByTime.get(schedule.start_time) || 0;
         const spotsLeft = capacity ? capacity - booked : null;
@@ -369,11 +369,11 @@ export function useCreateExperienceBooking() {
       specialRequests?: string;
     }) => {
       // Get experience details
-      const { data: experience, error: expError } = await supabase
-        .from('experiences')
+      const { data: experience, error: expError } = await (supabase
+        .from('experiences' as any)
         .select('*, venue:venues(name)')
         .eq('id', experienceId)
-        .single();
+        .single() as any);
 
       if (expError) throw expError;
 
@@ -383,13 +383,13 @@ export function useCreateExperienceBooking() {
 
       // Check for price override in schedule
       const dateStr = date.toISOString().split('T')[0];
-      const { data: schedule } = await supabase
-        .from('experience_schedules')
+      const { data: schedule } = await (supabase
+        .from('experience_schedules' as any)
         .select('price_override')
         .eq('experience_id', experienceId)
         .eq('start_time', time)
         .or(`specific_date.eq.${dateStr},and(schedule_type.eq.recurring,day_of_week.eq.${date.getDay()})`)
-        .single();
+        .single() as any);
 
       if (schedule?.price_override) {
         unitPrice = schedule.price_override;
@@ -418,8 +418,8 @@ export function useCreateExperienceBooking() {
       const total = subtotal + taxes - discount;
 
       // Create booking
-      const { data: booking, error: bookingError } = await supabase
-        .from('experience_bookings')
+      const { data: booking, error: bookingError } = await (supabase
+        .from('experience_bookings' as any)
         .insert({
           experience_id: experienceId,
           customer_id: user?.id || null,
@@ -443,7 +443,7 @@ export function useCreateExperienceBooking() {
           confirmed_at: experience.instant_confirmation ? new Date().toISOString() : null,
         })
         .select()
-        .single();
+        .single() as any);
 
       if (bookingError) throw bookingError;
 
@@ -480,8 +480,8 @@ export function useMyExperienceBookings() {
     queryFn: async () => {
       if (!user) return [];
 
-      const { data, error } = await supabase
-        .from('experience_bookings')
+      const { data, error } = await (supabase
+        .from('experience_bookings' as any)
         .select(`
           *,
           experience:experiences(
@@ -492,7 +492,7 @@ export function useMyExperienceBookings() {
           )
         `)
         .eq('customer_id', user.id)
-        .order('booking_date', { ascending: false });
+        .order('booking_date', { ascending: false }) as any);
 
       if (error) {
         if (error.code === '42P01') return [];
@@ -524,15 +524,15 @@ export function useCancelExperienceBooking() {
       if (!user) throw new Error('Not authenticated');
 
       // Get booking to check cancellation policy
-      const { data: booking, error: fetchError } = await supabase
-        .from('experience_bookings')
+      const { data: booking, error: fetchError } = await (supabase
+        .from('experience_bookings' as any)
         .select(`
           *,
           experience:experiences(cancellation_hours)
         `)
         .eq('id', bookingId)
         .eq('customer_id', user.id)
-        .single();
+        .single() as any);
 
       if (fetchError) throw fetchError;
       if (!booking) throw new Error('Booking not found');
@@ -549,14 +549,14 @@ export function useCancelExperienceBooking() {
       }
 
       // Cancel the booking
-      const { error: updateError } = await supabase
-        .from('experience_bookings')
+      const { error: updateError } = await (supabase
+        .from('experience_bookings' as any)
         .update({
           status: 'cancelled',
           cancelled_at: new Date().toISOString(),
           cancellation_reason: reason,
         })
-        .eq('id', bookingId);
+        .eq('id', bookingId) as any);
 
       if (updateError) throw updateError;
 
@@ -590,8 +590,8 @@ export function useVenueBookings(venueId?: string) {
     queryFn: async () => {
       if (!user) return [];
 
-      let query = supabase
-        .from('experience_bookings')
+      let query = (supabase
+        .from('experience_bookings' as any)
         .select(`
           *,
           experience:experiences(
@@ -601,7 +601,7 @@ export function useVenueBookings(venueId?: string) {
           )
         `)
         .order('booking_date', { ascending: true })
-        .order('start_time', { ascending: true });
+        .order('start_time', { ascending: true }) as any);
 
       // Filter by venue if provided
       if (venueId) {
@@ -647,10 +647,10 @@ export function useUpdateBookingStatus() {
       if (status === 'checked_in') updates.checked_in_at = new Date().toISOString();
       if (status === 'completed') updates.completed_at = new Date().toISOString();
 
-      const { error } = await supabase
-        .from('experience_bookings')
+      const { error } = await (supabase
+        .from('experience_bookings' as any)
         .update(updates)
-        .eq('id', bookingId);
+        .eq('id', bookingId) as any);
 
       if (error) throw error;
     },

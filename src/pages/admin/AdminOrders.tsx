@@ -61,6 +61,7 @@ import { ExportReportButton } from '@/components/admin/ExportReportButton';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
+import { useQueryClient } from '@tanstack/react-query';
 
 type OrderStatus = 'pending' | 'confirmed' | 'preparing' | 'ready_for_pickup' | 'picked_up' | 'out_for_delivery' | 'delivered' | 'cancelled' | 'refunded';
 
@@ -78,7 +79,12 @@ const statusConfig: Record<OrderStatus, { label: string; color: string; icon: an
 
 export default function AdminOrders() {
   const { toast } = useToast();
-  const { orders, ordersLoading, updateOrder, refetchOrders } = useAdminData();
+  const { orders, ordersLoading, updateOrder } = useAdminData();
+  const queryClient = useQueryClient();
+
+  const refetchOrders = () => {
+    queryClient.invalidateQueries({ queryKey: ['admin-data'] });
+  };
 
   // Filters
   const [searchTerm, setSearchTerm] = useState('');
@@ -110,8 +116,7 @@ export default function AdminOrders() {
         const search = searchTerm.toLowerCase();
         const matchesSearch =
           order.order_number?.toLowerCase().includes(search) ||
-          order.restaurant?.name?.toLowerCase().includes(search) ||
-          order.customer?.email?.toLowerCase().includes(search);
+          order.restaurant?.name?.toLowerCase().includes(search);
         if (!matchesSearch) return false;
       }
 
@@ -152,8 +157,8 @@ export default function AdminOrders() {
     };
   }, [orders]);
 
-  const handleStatusChange = (orderId: string, newStatus: OrderStatus) => {
-    updateOrder({ orderId, status: newStatus });
+  const handleStatusChange = (orderId: string, newStatus: string) => {
+    updateOrder({ orderId, status: newStatus as any });
   };
 
   const handleCancelOrder = async () => {
@@ -196,23 +201,27 @@ export default function AdminOrders() {
     setIsProcessing(true);
 
     try {
-      // Create refund record
-      const { error: refundError } = await supabase
-        .from('order_refunds')
+      // Create refund record in refund_requests table
+      const { error: refundError } = await (supabase
+        .from('refund_requests' as any)
         .insert({
           order_id: selectedOrder.id,
-          amount: refundAmount,
-          reason: refundReason,
-          status: 'processed',
-          processed_at: new Date().toISOString(),
-        });
+          user_id: selectedOrder.customer_id,
+          reason: 'admin_refund',
+          description: refundReason,
+          amount_requested: refundAmount,
+          amount_approved: refundAmount,
+          status: 'completed',
+          refund_method: 'original_payment',
+          resolved_at: new Date().toISOString(),
+        }) as any);
 
       // Update order status
       const { error: orderError } = await supabase
         .from('orders')
         .update({
-          status: 'refunded',
-          refund_amount: refundAmount,
+          status: 'cancelled' as any,
+          cancellation_reason: `Refunded: ${refundReason}`,
         })
         .eq('id', selectedOrder.id);
 
