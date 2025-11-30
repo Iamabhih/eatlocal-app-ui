@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3";
 import { z } from "https://deno.land/x/zod@v3.22.4/mod.ts";
+import { checkRateLimit, RATE_LIMITS, addRateLimitHeaders } from "../_shared/rateLimiter.ts";
 
 // Simple fetch-based email sending (no external dependencies)
 const sendEmail = async (to: string, subject: string, html: string) => {
@@ -165,6 +166,49 @@ const handler = async (req: Request): Promise<Response> => {
   // Handle CORS preflight requests
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
+  }
+
+  // Get client identifier from auth header or IP
+  const authHeader = req.headers.get('authorization');
+  const clientIp = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim()
+    || req.headers.get('cf-connecting-ip')
+    || 'unknown';
+
+  // Use user ID if authenticated, otherwise IP
+  let identifier = clientIp;
+  if (authHeader) {
+    // Extract user info if possible
+    try {
+      const token = authHeader.replace('Bearer ', '');
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      if (payload.sub) {
+        identifier = payload.sub;
+      }
+    } catch {
+      // Use IP if token parsing fails
+    }
+  }
+
+  // Check rate limit for email sending
+  const rateLimitResult = await checkRateLimit(
+    identifier,
+    RATE_LIMITS.sendEmail.limit,
+    RATE_LIMITS.sendEmail.windowMs,
+    'send-email'
+  );
+
+  const responseHeaders = new Headers(corsHeaders);
+  addRateLimitHeaders(responseHeaders, rateLimitResult, RATE_LIMITS.sendEmail.limit);
+
+  if (!rateLimitResult.allowed) {
+    console.warn(`Rate limit exceeded for send-email from ${identifier}`);
+    return new Response(
+      JSON.stringify({ error: 'Too many email requests. Please try again later.' }),
+      {
+        status: 429,
+        headers: { ...Object.fromEntries(responseHeaders), 'Content-Type': 'application/json' }
+      }
+    );
   }
 
   try {

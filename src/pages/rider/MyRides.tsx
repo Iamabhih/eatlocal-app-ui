@@ -27,13 +27,13 @@ export default function MyRides() {
     <div className="container mx-auto p-4 max-w-4xl">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold">My Rides</h1>
-        <Button onClick={() => navigate('/rider/book')}>Book New Ride</Button>
+        <Button onClick={() => navigate('/rides/book')}>Book New Ride</Button>
       </div>
 
       {!rides || rides.length === 0 ? (
         <Card className="p-8 text-center">
           <p className="text-muted-foreground mb-4">You haven't booked any rides yet</p>
-          <Button onClick={() => navigate('/rider/book')}>Book Your First Ride</Button>
+          <Button onClick={() => navigate('/rides/book')}>Book Your First Ride</Button>
         </Card>
       ) : (
         <div className="space-y-4">

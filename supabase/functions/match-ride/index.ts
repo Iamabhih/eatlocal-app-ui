@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { checkRateLimit, RATE_LIMITS, addRateLimitHeaders } from "../_shared/rateLimiter.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -9,6 +10,48 @@ const corsHeaders = {
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
+  }
+
+  // Get client identifier from auth header or IP
+  const authHeader = req.headers.get('authorization');
+  const clientIp = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim()
+    || req.headers.get('cf-connecting-ip')
+    || 'unknown';
+
+  // Use user ID if authenticated, otherwise IP
+  let identifier = clientIp;
+  if (authHeader) {
+    try {
+      const token = authHeader.replace('Bearer ', '');
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      if (payload.sub) {
+        identifier = payload.sub;
+      }
+    } catch {
+      // Use IP if token parsing fails
+    }
+  }
+
+  // Check rate limit for API calls
+  const rateLimitResult = await checkRateLimit(
+    identifier,
+    RATE_LIMITS.api.limit,
+    RATE_LIMITS.api.windowMs,
+    'match-ride'
+  );
+
+  const responseHeaders = new Headers(corsHeaders);
+  addRateLimitHeaders(responseHeaders, rateLimitResult, RATE_LIMITS.api.limit);
+
+  if (!rateLimitResult.allowed) {
+    console.warn(`Rate limit exceeded for match-ride from ${identifier}`);
+    return new Response(
+      JSON.stringify({ error: 'Too many requests. Please try again later.' }),
+      {
+        status: 429,
+        headers: { ...Object.fromEntries(responseHeaders), 'Content-Type': 'application/json' }
+      }
+    );
   }
 
   try {

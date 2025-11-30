@@ -59,6 +59,15 @@ const Notifications = lazy(() => import("./pages/customer/Notifications"));
 // Lazy-loaded: Ride-Sharing App
 const BookRide = lazy(() => import("./pages/rider/BookRide"));
 const MyRides = lazy(() => import("./pages/rider/MyRides"));
+const RideTracking = lazy(() => import("./pages/rider/RideTracking"));
+
+// Lazy-loaded: Driver Portal
+const DriverPendingOrders = lazy(() => import("./pages/driver/DriverPendingOrders"));
+
+// Lazy-loaded: Legal & Support Pages
+const Terms = lazy(() => import("./pages/legal/Terms"));
+const Privacy = lazy(() => import("./pages/legal/Privacy"));
+const Help = lazy(() => import("./pages/support/Help"));
 
 // Lazy-loaded: Hotels Module
 const HotelSearch = lazy(() => import("./pages/hotels/HotelSearch"));
@@ -306,6 +315,28 @@ function AppContent() {
             <Suspense fallback={<PageLoader />}>
               <ProtectedRoute requiredRole="rider">
                 <MyRides />
+              </ProtectedRoute>
+            </Suspense>
+          </RouteErrorBoundary>
+        } />
+        <Route path="/rides/tracking/:id" element={
+          <RouteErrorBoundary fallbackTitle="Ride Tracking Error">
+            <Suspense fallback={<PageLoader />}>
+              <ProtectedRoute requiredRole="rider">
+                <RideTracking />
+              </ProtectedRoute>
+            </Suspense>
+          </RouteErrorBoundary>
+        } />
+
+        {/* ============================================ */}
+        {/* DRIVER PORTAL - Pending Orders */}
+        {/* ============================================ */}
+        <Route path="/driver/pending" element={
+          <RouteErrorBoundary fallbackTitle="Driver Pending Orders Error">
+            <Suspense fallback={<PageLoader />}>
+              <ProtectedRoute requiredRole="driver">
+                <DriverPendingOrders />
               </ProtectedRoute>
             </Suspense>
           </RouteErrorBoundary>
@@ -623,6 +654,42 @@ function AppContent() {
             </RouteErrorBoundary>
           } />
         </Route>
+
+        {/* ============================================ */}
+        {/* LEGAL & SUPPORT PAGES */}
+        {/* ============================================ */}
+        <Route path="/terms" element={
+          <RouteErrorBoundary fallbackTitle="Terms Error">
+            <Suspense fallback={<PageLoader />}>
+              <Terms />
+            </Suspense>
+          </RouteErrorBoundary>
+        } />
+        <Route path="/privacy" element={
+          <RouteErrorBoundary fallbackTitle="Privacy Error">
+            <Suspense fallback={<PageLoader />}>
+              <Privacy />
+            </Suspense>
+          </RouteErrorBoundary>
+        } />
+        <Route path="/help" element={
+          <RouteErrorBoundary fallbackTitle="Help Error">
+            <Suspense fallback={<PageLoader />}>
+              <Help />
+            </Suspense>
+          </RouteErrorBoundary>
+        } />
+
+        {/* Account redirect to profile */}
+        <Route path="/account" element={
+          <RouteErrorBoundary fallbackTitle="Account Error">
+            <Suspense fallback={<PageLoader />}>
+              <ProtectedRoute requiredRole="customer">
+                <Profile />
+              </ProtectedRoute>
+            </Suspense>
+          </RouteErrorBoundary>
+        } />
 
         {/* Catch-all route */}
         <Route path="*" element={<NotFound />} />
