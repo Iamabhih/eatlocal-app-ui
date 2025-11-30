@@ -60,18 +60,45 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
 
-    const { 
-      pickup_latitude, 
-      pickup_longitude, 
-      dropoff_latitude, 
+    const {
+      pickup_latitude,
+      pickup_longitude,
+      dropoff_latitude,
       dropoff_longitude,
       pickup_address,
       dropoff_address,
       journey_mode,
-      service_tier 
+      service_tier
     } = await req.json();
 
-    console.log('Matching ride request:', { pickup_latitude, pickup_longitude, journey_mode, service_tier });
+    // GPS coordinate validation
+    const isValidLatitude = (lat: unknown): lat is number =>
+      typeof lat === 'number' && !isNaN(lat) && lat >= -90 && lat <= 90;
+
+    const isValidLongitude = (lng: unknown): lng is number =>
+      typeof lng === 'number' && !isNaN(lng) && lng >= -180 && lng <= 180;
+
+    if (!isValidLatitude(pickup_latitude) || !isValidLongitude(pickup_longitude)) {
+      return new Response(
+        JSON.stringify({ error: 'Invalid pickup coordinates. Latitude must be between -90 and 90, longitude between -180 and 180.' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    if (!isValidLatitude(dropoff_latitude) || !isValidLongitude(dropoff_longitude)) {
+      return new Response(
+        JSON.stringify({ error: 'Invalid dropoff coordinates. Latitude must be between -90 and 90, longitude between -180 and 180.' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Validate coordinates are not at (0,0) which often indicates missing data
+    if ((pickup_latitude === 0 && pickup_longitude === 0) || (dropoff_latitude === 0 && dropoff_longitude === 0)) {
+      return new Response(
+        JSON.stringify({ error: 'Coordinates cannot be at origin (0,0). Please provide valid location data.' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
 
     // Calculate distance using Haversine formula (simplified for demo)
     const R = 6371; // Earth's radius in km

@@ -160,7 +160,7 @@ export function ProviderSignupDelivery() {
       toast.success('Application submitted successfully!');
       setStep(4);
     } catch (error) {
-      console.error('Error submitting application:', error);
+      // Error logged via toast notification - no console.error in production
       toast.error('Failed to submit application. Please try again.');
     } finally {
       setIsSubmitting(false);

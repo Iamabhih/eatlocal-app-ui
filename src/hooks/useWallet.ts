@@ -112,34 +112,45 @@ export function useWalletPayment() {
     }) => {
       if (!user) throw new Error('Not authenticated');
 
-      // Get user's wallet
+      // ATOMIC UPDATE: Use conditional update to prevent race conditions
+      // Only deduct if balance >= amount (checked at database level)
       const { data: wallet, error: walletError } = await supabase
         .from('user_wallets')
-        .select('*')
+        .select('id, balance')
         .eq('user_id', user.id)
+        .gte('balance', amount) // Ensure sufficient balance
         .single();
 
-      if (walletError) throw walletError;
-
-      if (wallet.balance < amount) {
-        throw new Error('Insufficient wallet balance');
+      if (walletError) {
+        if (walletError.code === 'PGRST116') {
+          throw new Error('Insufficient wallet balance');
+        }
+        throw walletError;
       }
 
       const newBalance = wallet.balance - amount;
 
-      // Deduct from wallet
-      const { error: updateError } = await supabase
+      // Atomic update with optimistic locking using balance check
+      const { data: updated, error: updateError } = await supabase
         .from('user_wallets')
         .update({
           balance: newBalance,
           updated_at: new Date().toISOString(),
         })
-        .eq('id', wallet.id);
+        .eq('id', wallet.id)
+        .eq('balance', wallet.balance) // Optimistic lock - fails if balance changed
+        .select('balance')
+        .single();
 
-      if (updateError) throw updateError;
+      if (updateError) {
+        if (updateError.code === 'PGRST116') {
+          throw new Error('Transaction failed - please try again');
+        }
+        throw updateError;
+      }
 
       // Log transaction
-      const { error: transactionError } = await supabase
+      await supabase
         .from('wallet_transactions')
         .insert({
           wallet_id: wallet.id,
@@ -148,12 +159,10 @@ export function useWalletPayment() {
           description: description || 'Payment',
           reference_id: referenceId,
           reference_type: referenceType,
-          balance_after: newBalance,
+          balance_after: updated.balance,
         });
 
-      if (transactionError) throw transactionError;
-
-      return { amountPaid: amount, newBalance };
+      return { amountPaid: amount, newBalance: updated.balance };
     },
     onSuccess: ({ amountPaid }) => {
       queryClient.invalidateQueries({ queryKey: ['user-wallet'] });
@@ -195,56 +204,67 @@ export function useAddWalletCredits() {
     }) => {
       if (!user) throw new Error('Not authenticated');
 
-      // Get or create wallet
-      let wallet = await supabase
+      // Try to get existing wallet
+      const { data: existingWallet, error: fetchError } = await supabase
         .from('user_wallets')
-        .select('*')
+        .select('id, balance')
         .eq('user_id', user.id)
         .single();
 
-      if (wallet.error && wallet.error.code === 'PGRST116') {
-        // Create wallet if doesn't exist
+      let walletId: string;
+      let currentBalance: number;
+
+      if (fetchError && fetchError.code === 'PGRST116') {
+        // Create wallet if doesn't exist with initial amount
         const { data: newWallet, error: createError } = await supabase
           .from('user_wallets')
-          .insert({ user_id: user.id, balance: 0 })
-          .select()
+          .insert({ user_id: user.id, balance: amount })
+          .select('id, balance')
           .single();
 
         if (createError) throw createError;
-        wallet = { data: newWallet, error: null };
+        walletId = newWallet.id;
+        currentBalance = newWallet.balance;
+      } else if (fetchError) {
+        throw fetchError;
+      } else {
+        // ATOMIC UPDATE with optimistic locking to prevent race conditions
+        const newBalance = existingWallet.balance + amount;
+        const { data: updated, error: updateError } = await supabase
+          .from('user_wallets')
+          .update({
+            balance: newBalance,
+            updated_at: new Date().toISOString(),
+          })
+          .eq('id', existingWallet.id)
+          .eq('balance', existingWallet.balance) // Optimistic lock
+          .select('id, balance')
+          .single();
+
+        if (updateError) {
+          if (updateError.code === 'PGRST116') {
+            throw new Error('Transaction failed - please try again');
+          }
+          throw updateError;
+        }
+        walletId = updated.id;
+        currentBalance = updated.balance;
       }
 
-      if (wallet.error) throw wallet.error;
-
-      const newBalance = wallet.data.balance + amount;
-
-      // Add to wallet
-      const { error: updateError } = await supabase
-        .from('user_wallets')
-        .update({
-          balance: newBalance,
-          updated_at: new Date().toISOString(),
-        })
-        .eq('id', wallet.data.id);
-
-      if (updateError) throw updateError;
-
       // Log transaction
-      const { error: transactionError } = await supabase
+      await supabase
         .from('wallet_transactions')
         .insert({
-          wallet_id: wallet.data.id,
+          wallet_id: walletId,
           type,
           amount,
           description: description || getDefaultDescription(type),
           reference_id: referenceId,
           reference_type: referenceType,
-          balance_after: newBalance,
+          balance_after: currentBalance,
         });
 
-      if (transactionError) throw transactionError;
-
-      return { amountAdded: amount, newBalance };
+      return { amountAdded: amount, newBalance: currentBalance };
     },
     onSuccess: ({ amountAdded }) => {
       queryClient.invalidateQueries({ queryKey: ['user-wallet'] });

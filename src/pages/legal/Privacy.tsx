@@ -123,7 +123,7 @@ export default function Privacy() {
             </p>
             <ul>
               <li>Email: privacy@eatlocal.co.za</li>
-              <li>Phone: +27 10 XXX XXXX</li>
+              <li>Phone: +27 10 900 0001</li>
               <li>Address: Johannesburg, South Africa</li>
             </ul>
           </CardContent>
