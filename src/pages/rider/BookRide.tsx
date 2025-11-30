@@ -97,7 +97,7 @@ export default function BookRide() {
       special_instructions: specialInstructions,
     }, {
       onSuccess: () => {
-        navigate('/rider/rides');
+        navigate('/rides/my-rides');
       },
     });
   };

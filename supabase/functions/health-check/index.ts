@@ -54,10 +54,10 @@ serve(async (req: Request) => {
   };
   
   try {
-    // Check database connectivity
+    // Check database connectivity - select single row to verify connection
     const { error: dbError } = await supabase
       .from('restaurants')
-      .select('count')
+      .select('id')
       .limit(1);
     checks.database = !dbError;
     

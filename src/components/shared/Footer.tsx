@@ -48,21 +48,21 @@ export const Footer = () => {
           <div>
             <h3 className="font-semibold text-lg mb-4">Support</h3>
             <ul className="space-y-2">
-              <li><Link to="/" className="text-muted-foreground hover:text-primary transition-colors">Help Center</Link></li>
-              <li><Link to="/" className="text-muted-foreground hover:text-primary transition-colors">Contact Us</Link></li>
-              <li><Link to="/" className="text-muted-foreground hover:text-primary transition-colors">Terms of Service</Link></li>
-              <li><Link to="/" className="text-muted-foreground hover:text-primary transition-colors">Privacy Policy</Link></li>
+              <li><Link to="/help" className="text-muted-foreground hover:text-primary transition-colors">Help Center</Link></li>
+              <li><Link to="/help" className="text-muted-foreground hover:text-primary transition-colors">Contact Us</Link></li>
+              <li><Link to="/terms" className="text-muted-foreground hover:text-primary transition-colors">Terms of Service</Link></li>
+              <li><Link to="/privacy" className="text-muted-foreground hover:text-primary transition-colors">Privacy Policy</Link></li>
             </ul>
           </div>
 
-          {/* Company */}
+          {/* Explore */}
           <div>
-            <h3 className="font-semibold text-lg mb-4">Company</h3>
+            <h3 className="font-semibold text-lg mb-4">Explore</h3>
             <ul className="space-y-2">
-              <li><Link to="/" className="text-muted-foreground hover:text-primary transition-colors">About Us</Link></li>
-              <li><Link to="/" className="text-muted-foreground hover:text-primary transition-colors">Careers</Link></li>
-              <li><Link to="/" className="text-muted-foreground hover:text-primary transition-colors">Press</Link></li>
-              <li><Link to="/" className="text-muted-foreground hover:text-primary transition-colors">Blog</Link></li>
+              <li><Link to="/hotels" className="text-muted-foreground hover:text-primary transition-colors">Hotels</Link></li>
+              <li><Link to="/venues" className="text-muted-foreground hover:text-primary transition-colors">Venues</Link></li>
+              <li><Link to="/experiences" className="text-muted-foreground hover:text-primary transition-colors">Experiences</Link></li>
+              <li><Link to="/rides/book" className="text-muted-foreground hover:text-primary transition-colors">Book a Ride</Link></li>
             </ul>
           </div>
         </div>
