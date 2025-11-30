@@ -93,13 +93,13 @@ export default function VenuePartnerDashboard() {
     queryKey: ['my-venues', user?.id],
     queryFn: async () => {
       if (!user) return [];
-      const { data, error } = await supabase
+      const { data, error } = await (supabase
         .from('venues')
         .select('*')
         .eq('owner_id', user.id)
-        .order('created_at', { ascending: false });
+        .order('created_at', { ascending: false }) as any);
       if (error) throw error;
-      return data as Venue[];
+      return (data || []) as Venue[];
     },
     enabled: !!user,
   });
@@ -111,13 +111,13 @@ export default function VenuePartnerDashboard() {
       if (!user) return [];
       const venueIds = venues.map((v) => v.id);
       if (venueIds.length === 0) return [];
-      const { data, error } = await supabase
+      const { data, error } = await (supabase
         .from('experiences')
         .select('*, venue:venues(id, name)')
         .in('venue_id', venueIds)
-        .order('created_at', { ascending: false });
+        .order('created_at', { ascending: false }) as any);
       if (error) throw error;
-      return data as Experience[];
+      return (data || []) as Experience[];
     },
     enabled: venues.length > 0,
   });
@@ -129,13 +129,13 @@ export default function VenuePartnerDashboard() {
       if (!user) return [];
       const experienceIds = experiences.map((e) => e.id);
       if (experienceIds.length === 0) return [];
-      const { data, error } = await supabase
+      const { data, error } = await (supabase
         .from('experience_bookings')
         .select('*, experience:experiences(id, name, venue:venues(id, name))')
         .in('experience_id', experienceIds)
-        .order('created_at', { ascending: false });
+        .order('created_at', { ascending: false }) as any);
       if (error) throw error;
-      return data as ExperienceBooking[];
+      return (data || []) as ExperienceBooking[];
     },
     enabled: experiences.length > 0,
   });

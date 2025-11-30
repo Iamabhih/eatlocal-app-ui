@@ -85,25 +85,25 @@ export default function DriverRegistration() {
       if (!user) throw new Error('Not authenticated');
 
       // Create driver record
-      const { data: driver, error: driverError } = await supabase
+      const { data: driver, error: driverError } = await (supabase
         .from('drivers')
         .insert({
           user_id: user.id,
           license_number: formData.license_number,
-          license_expiry: formData.license_expiry,
+          license_expiry: formData.license_expiry || null,
           vehicle_make: formData.vehicle_make,
           vehicle_model: formData.vehicle_model,
           vehicle_year: parseInt(formData.vehicle_year),
           vehicle_color: formData.vehicle_color,
-          vehicle_plate: formData.vehicle_plate,
+          vehicle_license_plate: formData.vehicle_plate,
           vehicle_type: formData.vehicle_type,
-          insurance_number: formData.insurance_number,
-          insurance_expiry: formData.insurance_expiry,
+          insurance_number: formData.insurance_number || null,
+          insurance_expiry: formData.insurance_expiry || null,
           is_verified: false,
           is_active: false,
-        })
+        } as any)
         .select()
-        .single();
+        .single() as any);
 
       if (driverError) throw driverError;
 

@@ -344,7 +344,7 @@ export default function AdminDeliveryPartners() {
                               </div>
                             </TableCell>
                             <TableCell>
-                              {partner.is_verified ? (
+                              {partner.email_verified ? (
                                 <Badge variant="outline" className="gap-1 text-green-600 border-green-600">
                                   <ShieldCheck className="h-3 w-3" />
                                   Verified
@@ -413,11 +413,11 @@ export default function AdminDeliveryPartners() {
                                     onClick={() => {
                                       toggleVerifyMutation.mutate({
                                         userId: partner.id,
-                                        verify: !partner.is_verified,
+                                        verify: !partner.email_verified,
                                       });
                                     }}
                                   >
-                                    {partner.is_verified ? (
+                                    {partner.email_verified ? (
                                       <>
                                         <ShieldX className="h-4 w-4 mr-2" />
                                         Remove Verification

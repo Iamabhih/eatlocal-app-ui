@@ -87,14 +87,14 @@ export default function RestaurantSettings() {
     queryFn: async () => {
       if (!restaurant?.id) return [];
 
-      const { data, error } = await supabase
-        .from('restaurant_operating_hours')
+      const { data, error } = await (supabase
+        .from('restaurant_operating_hours' as any)
         .select('*')
         .eq('restaurant_id', restaurant.id)
-        .order('day_of_week');
+        .order('day_of_week') as any);
 
       if (error) throw error;
-      return data;
+      return data as OperatingHours[];
     },
     enabled: !!restaurant?.id,
   });
@@ -122,7 +122,7 @@ export default function RestaurantSettings() {
       setDeliverySettings({
         supports_delivery: restaurant.supports_delivery ?? true,
         supports_pickup: restaurant.supports_pickup ?? true,
-        delivery_radius_km: restaurant.delivery_radius_km ?? 10,
+        delivery_radius_km: (restaurant as any).delivery_radius_km ?? 10,
         delivery_fee: restaurant.delivery_fee ?? 0,
         minimum_order: restaurant.minimum_order ?? 0,
         estimated_delivery_time: restaurant.estimated_delivery_time ?? 30,
@@ -136,20 +136,20 @@ export default function RestaurantSettings() {
       if (!restaurant?.id) throw new Error('No restaurant');
 
       // Delete existing hours
-      await supabase
-        .from('restaurant_operating_hours')
+      await (supabase
+        .from('restaurant_operating_hours' as any)
         .delete()
-        .eq('restaurant_id', restaurant.id);
+        .eq('restaurant_id', restaurant.id) as any);
 
       // Insert new hours
-      const { error } = await supabase
-        .from('restaurant_operating_hours')
+      const { error } = await (supabase
+        .from('restaurant_operating_hours' as any)
         .insert(
           operatingHours.map(h => ({
             restaurant_id: restaurant.id,
             ...h,
           }))
-        );
+        ) as any);
 
       if (error) throw error;
     },

@@ -286,7 +286,7 @@ export default function AdminOrders() {
                   reportType="orders"
                   data={filteredOrders.map(o => ({
                     ...o,
-                    customer_name: o.customer?.email || 'N/A',
+                    customer_name: (o as any).customer?.email || 'N/A',
                     restaurant_name: o.restaurant?.name || 'N/A',
                   }))}
                   dateRange={dateRange.from && dateRange.to ? { from: dateRange.from, to: dateRange.to } : undefined}
@@ -461,10 +461,10 @@ export default function AdminOrders() {
                           onClick={() => viewOrderDetails(order)}
                         >
                           <TableCell className="font-medium">{order.order_number}</TableCell>
-                          <TableCell>{order.customer?.email?.split('@')[0] || 'N/A'}</TableCell>
+                          <TableCell>{(order as any).customer?.email?.split('@')[0] || 'N/A'}</TableCell>
                           <TableCell>{order.restaurant?.name || 'N/A'}</TableCell>
                           <TableCell>
-                            <StatusBadge status={order.status} />
+                            <StatusBadge status={order.status as OrderStatus} />
                           </TableCell>
                           <TableCell>
                             <Badge variant="outline">

@@ -296,7 +296,7 @@ const Checkout = () => {
             tax: 0,
             tip: tipAmount > 0 ? Number(tipAmount.toFixed(2)) : null,
             total: Number(totalBeforeWallet.toFixed(2)),
-            status: scheduledFor ? "scheduled" : "pending",
+            status: (scheduledFor ? "scheduled" : "pending") as any,
             scheduled_for: scheduledFor ? scheduledFor.toISOString() : null,
             wallet_amount_used: walletAmountToUse > 0 ? Number(walletAmountToUse.toFixed(2)) : null,
             payment_method_id: selectedPaymentMethodId,
@@ -337,7 +337,7 @@ const Checkout = () => {
         await supabase
           .from("orders")
           .update({
-            status: scheduledFor ? "scheduled" : "confirmed",
+            status: (scheduledFor ? "scheduled" : "confirmed") as any,
             payment_status: "paid",
             payment_method: "wallet",
           })

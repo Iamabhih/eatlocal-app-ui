@@ -151,7 +151,7 @@ export function ProviderSignupRestaurant() {
 
     setIsSubmitting(true);
     try {
-      const { error } = await supabase.from('provider_applications').insert({
+      const { error } = await (supabase.from('provider_applications' as any).insert({
         user_id: user?.id || null,
         provider_type: 'restaurant',
         business_name: formData.businessName,
@@ -175,7 +175,7 @@ export function ProviderSignupRestaurant() {
           has_dine_in: formData.hasDineIn,
           operating_hours: formData.operatingHours,
         },
-      });
+      }) as any);
 
       if (error) throw error;
 

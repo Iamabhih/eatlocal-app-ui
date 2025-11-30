@@ -94,7 +94,7 @@ export default function RideTracking() {
         .single();
 
       if (error) throw error;
-      return data as RideDetails;
+      return data as unknown as RideDetails;
     },
     refetchInterval: 5000, // Poll every 5 seconds for live updates
     enabled: !!id && !!user,

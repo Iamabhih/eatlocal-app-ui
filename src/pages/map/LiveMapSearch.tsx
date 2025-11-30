@@ -106,26 +106,22 @@ export default function LiveMapSearch() {
 
       // Fetch restaurants
       if (searchType === 'all' || searchType === 'restaurants') {
-        const { data: restaurants } = await supabase
+        const { data: restaurants } = await (supabase
           .from('restaurants')
-          .select('id, name, cuisine_type, latitude, longitude, rating, address, city, image_url')
-          .eq('is_active', true)
-          .gte('latitude', userLocation.lat - latDelta)
-          .lte('latitude', userLocation.lat + latDelta)
-          .gte('longitude', userLocation.lng - lngDelta)
-          .lte('longitude', userLocation.lng + lngDelta);
+          .select('id, name, cuisine_type, latitude, longitude, rating, street_address, city, image_url')
+          .eq('is_active', true) as any);
 
         if (restaurants) {
           results.push(
-            ...restaurants.map((r) => ({
+            ...(restaurants as any[]).filter((r: any) => r.latitude && r.longitude).map((r: any) => ({
               id: r.id,
               name: r.name,
               type: 'restaurants' as SearchType,
-              latitude: r.latitude || 0,
-              longitude: r.longitude || 0,
-              rating: r.rating || 0,
+              latitude: Number(r.latitude) || 0,
+              longitude: Number(r.longitude) || 0,
+              rating: Number(r.rating) || 0,
               image: r.image_url,
-              address: r.address || '',
+              address: r.street_address || '',
               city: r.city || '',
             }))
           );
@@ -164,25 +160,21 @@ export default function LiveMapSearch() {
 
       // Fetch venues
       if (searchType === 'all' || searchType === 'venues') {
-        const { data: venues } = await supabase
-          .from('venues')
+        const { data: venues } = await (supabase
+          .from('venues' as any)
           .select('id, name, venue_type, latitude, longitude, rating, street_address, city, main_image, price_level')
           .eq('is_active', true)
-          .eq('verification_status', 'verified')
-          .gte('latitude', userLocation.lat - latDelta)
-          .lte('latitude', userLocation.lat + latDelta)
-          .gte('longitude', userLocation.lng - lngDelta)
-          .lte('longitude', userLocation.lng + lngDelta);
+          .eq('verification_status', 'verified') as any);
 
         if (venues) {
           results.push(
-            ...venues.map((v) => ({
+            ...(venues as any[]).filter((v: any) => v.latitude && v.longitude).map((v: any) => ({
               id: v.id,
               name: v.name,
               type: 'venues' as SearchType,
-              latitude: v.latitude || 0,
-              longitude: v.longitude || 0,
-              rating: v.rating || 0,
+              latitude: Number(v.latitude) || 0,
+              longitude: Number(v.longitude) || 0,
+              rating: Number(v.rating) || 0,
               image: v.main_image || undefined,
               address: v.street_address || '',
               city: v.city || '',
