@@ -116,9 +116,10 @@ export default function HotelDetail() {
         special_requests: guestDetails.specialRequests || undefined,
       },
       {
-        onSuccess: (booking) => {
+        onSuccess: () => {
           setShowBookingDialog(false);
-          navigate(`/hotels/bookings/${booking.id}`);
+          // Redirect to dashboard with success message
+          navigate('/dashboard', { state: { bookingSuccess: true, message: 'Hotel booking confirmed!' } });
         },
       }
     );

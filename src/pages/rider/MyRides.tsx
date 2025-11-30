@@ -92,7 +92,7 @@ export default function MyRides() {
                 <Button 
                   className="w-full mt-4" 
                   variant="outline"
-                  onClick={() => navigate(`/rider/tracking/${ride.id}`)}
+                  onClick={() => navigate(`/rides/tracking/${ride.id}`)}
                 >
                   Track Ride
                 </Button>
