@@ -130,12 +130,12 @@ export function useRoomAvailabilityCalendar(
       if (roomTypeError) throw roomTypeError;
 
       // Get availability overrides
-      const { data: availabilityData, error: availError } = await supabase
-        .from('room_availability')
+      const { data: availabilityData, error: availError } = await (supabase
+        .from('room_availability' as any)
         .select('*')
         .eq('room_type_id', roomTypeId)
         .gte('date', startDate.toISOString().split('T')[0])
-        .lte('date', endDate.toISOString().split('T')[0]);
+        .lte('date', endDate.toISOString().split('T')[0]) as any);
 
       if (availError && availError.code !== '42P01') throw availError;
 
@@ -151,8 +151,8 @@ export function useRoomAvailabilityCalendar(
       if (bookingsError && bookingsError.code !== '42P01') throw bookingsError;
 
       // Build availability map
-      const availabilityMap = new Map(
-        (availabilityData || []).map((a) => [a.date, a])
+      const availabilityMap = new Map<string, RoomAvailability>(
+        (availabilityData || []).map((a: any) => [a.date, a as RoomAvailability])
       );
 
       // Build calendar
@@ -242,12 +242,12 @@ export function useCheckAvailability() {
       if (roomTypeError) throw roomTypeError;
 
       // Get availability overrides
-      const { data: availabilityData } = await supabase
-        .from('room_availability')
+      const { data: availabilityData } = await (supabase
+        .from('room_availability' as any)
         .select('*')
         .eq('room_type_id', roomTypeId)
         .gte('date', checkInStr)
-        .lt('date', checkOutStr);
+        .lt('date', checkOutStr) as any);
 
       // Get existing bookings
       const { data: bookings } = await supabase
@@ -258,8 +258,8 @@ export function useCheckAvailability() {
         .lte('check_in_date', checkOutStr)
         .gte('check_out_date', checkInStr);
 
-      const availabilityMap = new Map(
-        (availabilityData || []).map((a) => [a.date, a])
+      const availabilityMap = new Map<string, RoomAvailability>(
+        (availabilityData || []).map((a: any) => [a.date, a as RoomAvailability])
       );
 
       let available = true;
@@ -346,8 +346,8 @@ export function useUpdateAvailability() {
       if (!user) throw new Error('Not authenticated');
 
       // Upsert availability
-      const { data, error } = await supabase
-        .from('room_availability')
+      const { data, error } = await (supabase
+        .from('room_availability' as any)
         .upsert(
           {
             room_type_id: roomTypeId,
@@ -359,7 +359,7 @@ export function useUpdateAvailability() {
           { onConflict: 'room_type_id,date' }
         )
         .select()
-        .single();
+        .single() as any);
 
       if (error) throw error;
       return data;
@@ -439,10 +439,10 @@ export function useBulkUpdateAvailability() {
 
       if (updates.length === 0) return [];
 
-      const { data, error } = await supabase
-        .from('room_availability')
-        .upsert(updates, { onConflict: 'room_type_id,date' })
-        .select();
+      const { data, error } = await (supabase
+        .from('room_availability' as any)
+        .upsert(updates as any, { onConflict: 'room_type_id,date' })
+        .select() as any);
 
       if (error) throw error;
       return data;

@@ -174,7 +174,7 @@ export function ExperienceBookingForm({ experience, onSuccess }: ExperienceBooki
         specialRequests,
       });
 
-      onSuccess?.(result.booking.booking_number);
+      onSuccess?.((result.booking as any).booking_number);
     } catch (error) {
       // Error handled by mutation
     }
