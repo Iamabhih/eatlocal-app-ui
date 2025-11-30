@@ -24,7 +24,7 @@ export interface TwoFactorStatus {
 
 // Hook to get 2FA status
 export function useTwoFactorStatus() {
-  const { user, role } = useAuth();
+  const { user, isAdmin, isSuperAdmin } = useAuth();
 
   return useQuery({
     queryKey: ['two-factor-status', user?.id],
@@ -46,7 +46,8 @@ export function useTwoFactorStatus() {
 
       return data as Omit<TwoFactorStatus, 'secret' | 'backup_codes'>;
     },
-    enabled: !!user && (role === 'admin' || role === 'superadmin'),
+    // Only enable for admin/superadmin users
+    enabled: !!user && (isAdmin() || isSuperAdmin()),
   });
 }
 

@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3";
 import { z } from "https://deno.land/x/zod@v3.22.4/mod.ts";
+import { checkRateLimit, RATE_LIMITS, addRateLimitHeaders } from "../_shared/rateLimiter.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -57,6 +58,33 @@ serve(async (req: Request) => {
   // Handle CORS preflight
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
+  }
+
+  // Get client identifier (IP or forwarded IP)
+  const clientIp = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim()
+    || req.headers.get('cf-connecting-ip')
+    || 'unknown';
+
+  // Check rate limit for webhooks
+  const rateLimitResult = await checkRateLimit(
+    clientIp,
+    RATE_LIMITS.webhook.limit,
+    RATE_LIMITS.webhook.windowMs,
+    'payfast-webhook'
+  );
+
+  const responseHeaders = new Headers(corsHeaders);
+  addRateLimitHeaders(responseHeaders, rateLimitResult, RATE_LIMITS.webhook.limit);
+
+  if (!rateLimitResult.allowed) {
+    console.warn(`Rate limit exceeded for PayFast webhook from ${clientIp}`);
+    return new Response(
+      JSON.stringify({ error: 'Too many requests' }),
+      {
+        status: 429,
+        headers: { ...Object.fromEntries(responseHeaders), 'Content-Type': 'application/json' }
+      }
+    );
   }
 
   try {

@@ -1,11 +1,9 @@
 import { ReactNode, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth, type UserRole } from '@/contexts/AuthContext';
 import { AlertCircle, Ban } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-
-type UserRole = 'customer' | 'restaurant' | 'delivery_partner' | 'admin' | 'superadmin' | 'rider' | 'driver' | 'shop' | 'hotel_partner' | 'venue_partner';
 
 interface ProtectedRouteProps {
   children: ReactNode;
@@ -66,12 +64,12 @@ export function ProtectedRoute({
       }
 
       // Check if user has required role(s)
-      if (requiredRole && !hasRole(requiredRole as any)) {
+      if (requiredRole && !hasRole(requiredRole)) {
         navigate('/');
         return;
       }
 
-      if (requiredRoles && !requiredRoles.some(role => hasRole(role as any))) {
+      if (requiredRoles && !requiredRoles.some(role => hasRole(role))) {
         navigate('/');
         return;
       }

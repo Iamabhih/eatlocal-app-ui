@@ -1,8 +1,20 @@
-import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
+import { createContext, useContext, useEffect, useState, useMemo, useCallback, ReactNode } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
+import { cleanupLocalStorage } from '@/lib/stateCleanup';
 
-type UserRole = 'customer' | 'restaurant' | 'delivery_partner' | 'admin' | 'superadmin';
+// Unified UserRole type - matches database enum plus partner roles
+export type UserRole =
+  | 'customer'
+  | 'restaurant'
+  | 'delivery_partner'
+  | 'admin'
+  | 'superadmin'
+  | 'rider'
+  | 'driver'
+  | 'shop'
+  | 'hotel_partner'
+  | 'venue_partner';
 
 interface AuthContextType {
   user: User | null;
@@ -74,35 +86,63 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const fetchSuspensionStatus = async (userId: string) => {
-    const { data } = await supabase
-      .from('profiles')
-      .select('is_suspended' as any)
-      .eq('id', userId)
-      .single();
+    try {
+      const { data } = await supabase
+        .from('profiles')
+        .select('is_suspended')
+        .eq('id', userId)
+        .single();
 
-    if (data) {
-      setIsSuspended((data as any).is_suspended || false);
+      if (data && 'is_suspended' in data) {
+        setIsSuspended(Boolean(data.is_suspended));
+      }
+    } catch (error) {
+      console.error('Failed to fetch suspension status:', error);
+      setIsSuspended(false);
     }
   };
 
-  const hasRole = (role: UserRole) => {
+  // Memoized role checking functions to prevent unnecessary re-renders
+  const hasRole = useCallback((role: UserRole) => {
     return userRoles.includes(role);
-  };
+  }, [userRoles]);
 
-  const isAdmin = () => {
+  const isAdmin = useCallback(() => {
     return userRoles.includes('admin') || userRoles.includes('superadmin');
-  };
+  }, [userRoles]);
 
-  const isSuperAdmin = () => {
+  const isSuperAdmin = useCallback(() => {
     return userRoles.includes('superadmin');
-  };
+  }, [userRoles]);
 
-  const signOut = async () => {
+  // Comprehensive sign out that clears all user state
+  const signOut = useCallback(async () => {
+    // Clear localStorage data to prevent data leaks between users
+    cleanupLocalStorage();
+
+    // Sign out from Supabase
     await supabase.auth.signOut();
-  };
+
+    // Reset local state
+    setUserRoles([]);
+    setIsSuspended(false);
+  }, []);
+
+  // Memoize context value to prevent unnecessary re-renders of consumers
+  const contextValue = useMemo(() => ({
+    user,
+    session,
+    loading,
+    userRoles,
+    isSuspended,
+    hasRole,
+    isAdmin,
+    isSuperAdmin,
+    signOut,
+  }), [user, session, loading, userRoles, isSuspended, hasRole, isAdmin, isSuperAdmin, signOut]);
 
   return (
-    <AuthContext.Provider value={{ user, session, loading, userRoles, isSuspended, hasRole, isAdmin, isSuperAdmin, signOut }}>
+    <AuthContext.Provider value={contextValue}>
       {children}
     </AuthContext.Provider>
   );
