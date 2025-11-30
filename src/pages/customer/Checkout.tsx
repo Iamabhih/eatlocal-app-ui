@@ -8,7 +8,7 @@
 
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Loader2, ShoppingBag, CreditCard, AlertCircle, Clock, CalendarDays, Wallet, Check } from "lucide-react";
+import { Loader2, ShoppingBag, CreditCard, AlertCircle, Clock, CalendarDays, Wallet, Check, Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
@@ -19,6 +19,7 @@ import { AddressSelector } from "@/components/customer/AddressSelector";
 import { FulfillmentSelector } from "@/components/checkout/FulfillmentSelector";
 import { ScheduledOrderSelector } from "@/components/checkout/ScheduledOrderSelector";
 import { SavedPaymentMethods } from "@/components/checkout/SavedPaymentMethods";
+import { TipSelector } from "@/components/checkout/TipSelector";
 import { useAuth } from "@/contexts/AuthContext";
 import { useCart } from "@/hooks/useCart";
 import { useUserWallet, useWalletPayment, formatWalletAmount } from "@/hooks/useWallet";
@@ -49,6 +50,7 @@ const Checkout = () => {
   const [scheduledFor, setScheduledFor] = useState<Date | null>(null);
   const [selectedPaymentMethodId, setSelectedPaymentMethodId] = useState<string | null>(null);
   const [useWalletBalance, setUseWalletBalance] = useState(false);
+  const [tipAmount, setTipAmount] = useState(0);
 
   useEffect(() => {
     if (!user) {
@@ -125,7 +127,8 @@ const Checkout = () => {
   const deliveryFee = fulfillmentType === "delivery" ? restaurant?.delivery_fee || PRICING.DELIVERY_FEE : 0;
   const subtotal = getSubtotal();
   const serviceFee = (subtotal + deliveryFee) * PRICING.SERVICE_FEE_RATE;
-  const totalBeforeWallet = subtotal + deliveryFee + serviceFee;
+  const totalBeforeWalletAndTip = subtotal + deliveryFee + serviceFee;
+  const totalBeforeWallet = totalBeforeWalletAndTip + tipAmount;
 
   // Calculate wallet contribution
   const walletBalance = wallet?.balance || 0;
@@ -291,6 +294,7 @@ const Checkout = () => {
             subtotal: Number(subtotal.toFixed(2)),
             delivery_fee: Number(deliveryFee.toFixed(2)),
             tax: 0,
+            tip: tipAmount > 0 ? Number(tipAmount.toFixed(2)) : null,
             total: Number(totalBeforeWallet.toFixed(2)),
             status: scheduledFor ? "scheduled" : "pending",
             scheduled_for: scheduledFor ? scheduledFor.toISOString() : null,
@@ -545,6 +549,25 @@ const Checkout = () => {
               </CardContent>
             </Card>
 
+            {/* Driver Tip (only for delivery) */}
+            {fulfillmentType === "delivery" && (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Heart className="h-5 w-5 text-red-500" />
+                    Tip Your Driver
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <TipSelector
+                    subtotal={subtotal}
+                    onTipChange={setTipAmount}
+                    selectedTip={tipAmount}
+                  />
+                </CardContent>
+              </Card>
+            )}
+
             {/* Wallet Balance */}
             {walletBalance > 0 && (
               <Card className="border-primary/50 bg-primary/5">
@@ -639,6 +662,15 @@ const Checkout = () => {
                     <span>Service Fee (4.5%)</span>
                     <span>R{serviceFee.toFixed(2)}</span>
                   </div>
+                  {tipAmount > 0 && (
+                    <div className="flex justify-between text-red-600">
+                      <span className="flex items-center gap-1">
+                        <Heart className="h-3 w-3 fill-current" />
+                        Driver Tip
+                      </span>
+                      <span>R{tipAmount.toFixed(2)}</span>
+                    </div>
+                  )}
                   {walletAmountToUse > 0 && (
                     <div className="flex justify-between text-green-600 font-medium">
                       <span className="flex items-center gap-1">

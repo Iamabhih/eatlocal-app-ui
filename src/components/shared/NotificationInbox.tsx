@@ -1,31 +1,23 @@
 import { useState } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Bell, Check, CheckCheck, Package, Tag, AlertCircle, Truck, Star, Gift, X, Loader2 } from 'lucide-react';
+import { Bell, CheckCheck, Package, Tag, AlertCircle, Truck, Star, Gift, CreditCard, Users, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Separator } from '@/components/ui/separator';
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
-import { useAuth } from '@/contexts/AuthContext';
-import { supabase } from '@/integrations/supabase/client';
-import { formatDistanceToNow } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
-
-interface Notification {
-  id: string;
-  user_id: string;
-  title: string;
-  message: string;
-  type: 'order' | 'promo' | 'system' | 'delivery' | 'review' | 'loyalty' | 'alert';
-  is_read: boolean;
-  action_url: string | null;
-  metadata: Record<string, any>;
-  created_at: string;
-}
+import {
+  useNotifications,
+  useUnreadNotificationCount,
+  useMarkAsRead,
+  useMarkAllAsRead,
+  useRealtimeNotifications,
+  Notification,
+  formatNotificationTime,
+} from '@/hooks/useNotifications';
 
 const typeConfig: Record<string, { icon: typeof Bell; color: string }> = {
   order: { icon: Package, color: 'text-blue-500' },
@@ -35,72 +27,26 @@ const typeConfig: Record<string, { icon: typeof Bell; color: string }> = {
   review: { icon: Star, color: 'text-yellow-500' },
   loyalty: { icon: Gift, color: 'text-orange-500' },
   alert: { icon: AlertCircle, color: 'text-red-500' },
+  referral: { icon: Users, color: 'text-pink-500' },
+  payment: { icon: CreditCard, color: 'text-emerald-500' },
 };
 
 export function NotificationInbox() {
-  const { user } = useAuth();
   const navigate = useNavigate();
-  const queryClient = useQueryClient();
   const [isOpen, setIsOpen] = useState(false);
 
-  // Fetch notifications
-  const { data: notifications = [], isLoading } = useQuery({
-    queryKey: ['notifications', user?.id],
-    queryFn: async () => {
-      if (!user) return [];
+  // Use the centralized hooks
+  const { data: notifications = [], isLoading } = useNotifications(20);
+  const { data: unreadCount = 0 } = useUnreadNotificationCount();
+  const markAsReadMutation = useMarkAsRead();
+  const markAllAsReadMutation = useMarkAllAsRead();
 
-      const { data, error } = await supabase
-        .from('notifications')
-        .select('*')
-        .eq('user_id', user.id)
-        .order('created_at', { ascending: false })
-        .limit(20);
-
-      if (error) throw error;
-      return data as Notification[];
-    },
-    enabled: !!user,
-    refetchInterval: 30000, // Refetch every 30 seconds
-  });
-
-  // Mark as read mutation
-  const markAsRead = useMutation({
-    mutationFn: async (notificationId: string) => {
-      const { error } = await supabase
-        .from('notifications')
-        .update({ is_read: true })
-        .eq('id', notificationId);
-
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['notifications'] });
-    },
-  });
-
-  // Mark all as read mutation
-  const markAllAsRead = useMutation({
-    mutationFn: async () => {
-      if (!user) return;
-
-      const { error } = await supabase
-        .from('notifications')
-        .update({ is_read: true })
-        .eq('user_id', user.id)
-        .eq('is_read', false);
-
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['notifications'] });
-    },
-  });
-
-  const unreadCount = notifications.filter(n => !n.is_read).length;
+  // Enable real-time notifications
+  useRealtimeNotifications();
 
   const handleNotificationClick = (notification: Notification) => {
     if (!notification.is_read) {
-      markAsRead.mutate(notification.id);
+      markAsReadMutation.mutate(notification.id);
     }
 
     if (notification.action_url) {
@@ -131,10 +77,10 @@ export function NotificationInbox() {
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => markAllAsRead.mutate()}
-              disabled={markAllAsRead.isPending}
+              onClick={() => markAllAsReadMutation.mutate()}
+              disabled={markAllAsReadMutation.isPending}
             >
-              {markAllAsRead.isPending ? (
+              {markAllAsReadMutation.isPending ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
               ) : (
                 <>
@@ -189,7 +135,7 @@ export function NotificationInbox() {
                           {notification.message}
                         </p>
                         <p className="text-xs text-muted-foreground/70 mt-1">
-                          {formatDistanceToNow(new Date(notification.created_at), { addSuffix: true })}
+                          {formatNotificationTime(notification.created_at)}
                         </p>
                       </div>
                     </div>

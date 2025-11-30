@@ -2,6 +2,14 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
+import {
+  generateSecret,
+  generateBackupCodes,
+  verifyTOTP,
+  generateOtpauthUrl,
+  isValidTokenFormat,
+  isValidBackupCode,
+} from '@/lib/totp';
 
 export interface TwoFactorStatus {
   id: string;
@@ -12,57 +20,6 @@ export interface TwoFactorStatus {
   verified_at: string | null;
   created_at: string;
   updated_at: string;
-}
-
-// Generate a simple TOTP secret (in production, use a proper TOTP library)
-function generateTOTPSecret(): string {
-  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
-  let secret = '';
-  for (let i = 0; i < 32; i++) {
-    secret += chars.charAt(Math.floor(Math.random() * chars.length));
-  }
-  return secret;
-}
-
-// Generate backup codes
-function generateBackupCodes(count = 10): string[] {
-  const codes: string[] = [];
-  for (let i = 0; i < count; i++) {
-    const code = Math.random().toString(36).substring(2, 8).toUpperCase();
-    codes.push(code);
-  }
-  return codes;
-}
-
-// Simple TOTP verification (in production, use a proper TOTP library like otplib)
-function verifyTOTP(secret: string, token: string): boolean {
-  // This is a simplified verification for demo purposes
-  // In production, use a proper TOTP library
-  const timeStep = 30; // 30 seconds
-  const currentTime = Math.floor(Date.now() / 1000 / timeStep);
-
-  // Check current and adjacent time windows
-  for (let i = -1; i <= 1; i++) {
-    const time = currentTime + i;
-    const hmac = simpleHMAC(secret, time.toString());
-    const expectedToken = hmac.substring(0, 6);
-    if (token === expectedToken) {
-      return true;
-    }
-  }
-  return false;
-}
-
-// Simple HMAC for demo (in production, use crypto-js or Web Crypto API)
-function simpleHMAC(secret: string, message: string): string {
-  let hash = 0;
-  const combined = secret + message;
-  for (let i = 0; i < combined.length; i++) {
-    const char = combined.charCodeAt(i);
-    hash = ((hash << 5) - hash) + char;
-    hash = hash & hash;
-  }
-  return Math.abs(hash).toString().padStart(6, '0');
 }
 
 // Hook to get 2FA status
@@ -97,14 +54,14 @@ export function useTwoFactorStatus() {
 export function useSetupTwoFactor() {
   const { user } = useAuth();
   const { toast } = useToast();
-  const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: async () => {
       if (!user) throw new Error('Not authenticated');
 
-      const secret = generateTOTPSecret();
-      const backupCodes = generateBackupCodes();
+      // Generate cryptographically secure secret and backup codes
+      const secret = generateSecret(20);
+      const backupCodes = generateBackupCodes(10);
 
       // Check if 2FA already exists
       const { data: existing } = await supabase
@@ -141,8 +98,8 @@ export function useSetupTwoFactor() {
         if (error) throw error;
       }
 
-      // Return data for QR code generation
-      const otpauthUrl = `otpauth://totp/EatLocal:${user.email}?secret=${secret}&issuer=EatLocal`;
+      // Generate proper OTPAuth URL for QR code
+      const otpauthUrl = generateOtpauthUrl('EatLocal', user.email || '', secret);
 
       return {
         secret,
@@ -170,6 +127,11 @@ export function useVerifyTwoFactor() {
     mutationFn: async (token: string) => {
       if (!user) throw new Error('Not authenticated');
 
+      // Validate token format
+      if (!isValidTokenFormat(token)) {
+        throw new Error('Invalid code format. Please enter 6 digits.');
+      }
+
       // Get the secret
       const { data: twoFactor, error: fetchError } = await supabase
         .from('two_factor_auth')
@@ -179,10 +141,10 @@ export function useVerifyTwoFactor() {
 
       if (fetchError) throw fetchError;
 
-      // Verify the token
-      const isValid = verifyTOTP(twoFactor.secret, token);
+      // Verify the token using RFC 6238 TOTP
+      const isValid = await verifyTOTP(twoFactor.secret, token);
       if (!isValid) {
-        throw new Error('Invalid verification code');
+        throw new Error('Invalid verification code. Please try again.');
       }
 
       // Enable 2FA
@@ -226,7 +188,7 @@ export function useDisableTwoFactor() {
     mutationFn: async (token: string) => {
       if (!user) throw new Error('Not authenticated');
 
-      // Get the secret
+      // Get the secret and backup codes
       const { data: twoFactor, error: fetchError } = await supabase
         .from('two_factor_auth')
         .select('secret, backup_codes')
@@ -235,12 +197,35 @@ export function useDisableTwoFactor() {
 
       if (fetchError) throw fetchError;
 
-      // Verify the token or backup code
-      const isValidToken = verifyTOTP(twoFactor.secret, token);
-      const isValidBackupCode = twoFactor.backup_codes?.includes(token.toUpperCase());
+      // Verify the token (either TOTP or backup code)
+      let isValid = false;
+      let usedBackupCode = false;
 
-      if (!isValidToken && !isValidBackupCode) {
+      // Check if it's a TOTP token (6 digits)
+      if (isValidTokenFormat(token)) {
+        isValid = await verifyTOTP(twoFactor.secret, token);
+      }
+
+      // Check if it's a backup code
+      if (!isValid && isValidBackupCode(token)) {
+        const normalizedToken = token.toUpperCase();
+        usedBackupCode = twoFactor.backup_codes?.includes(normalizedToken) ?? false;
+        isValid = usedBackupCode;
+      }
+
+      if (!isValid) {
         throw new Error('Invalid verification code');
+      }
+
+      // If backup code was used, remove it from the list
+      if (usedBackupCode) {
+        const updatedCodes = twoFactor.backup_codes.filter(
+          (code: string) => code !== token.toUpperCase()
+        );
+        await supabase
+          .from('two_factor_auth')
+          .update({ backup_codes: updatedCodes })
+          .eq('user_id', user.id);
       }
 
       // Disable 2FA
@@ -286,7 +271,7 @@ export function useLoginTwoFactorVerification() {
       userId: string;
       token: string;
     }) => {
-      // Get the secret
+      // Get the secret and backup codes
       const { data: twoFactor, error: fetchError } = await supabase
         .from('two_factor_auth')
         .select('secret, backup_codes, is_enabled')
@@ -299,16 +284,28 @@ export function useLoginTwoFactorVerification() {
         return { verified: true, skipped: true };
       }
 
-      // Verify the token or backup code
-      const isValidToken = verifyTOTP(twoFactor.secret, token);
-      const isValidBackupCode = twoFactor.backup_codes?.includes(token.toUpperCase());
+      // Verify the token (either TOTP or backup code)
+      let isValid = false;
+      let usedBackupCode = false;
 
-      if (!isValidToken && !isValidBackupCode) {
+      // Check if it's a TOTP token (6 digits)
+      if (isValidTokenFormat(token)) {
+        isValid = await verifyTOTP(twoFactor.secret, token);
+      }
+
+      // Check if it's a backup code
+      if (!isValid && isValidBackupCode(token)) {
+        const normalizedToken = token.toUpperCase();
+        usedBackupCode = twoFactor.backup_codes?.includes(normalizedToken) ?? false;
+        isValid = usedBackupCode;
+      }
+
+      if (!isValid) {
         throw new Error('Invalid verification code');
       }
 
       // If backup code was used, remove it from the list
-      if (isValidBackupCode) {
+      if (usedBackupCode) {
         const updatedCodes = twoFactor.backup_codes.filter(
           (code: string) => code !== token.toUpperCase()
         );
@@ -339,4 +336,67 @@ export async function checkTwoFactorRequired(userId: string): Promise<boolean> {
     .single();
 
   return data?.is_enabled ?? false;
+}
+
+// Hook to regenerate backup codes
+export function useRegenerateBackupCodes() {
+  const { user } = useAuth();
+  const { toast } = useToast();
+
+  return useMutation({
+    mutationFn: async (verificationToken: string) => {
+      if (!user) throw new Error('Not authenticated');
+
+      // Get the secret
+      const { data: twoFactor, error: fetchError } = await supabase
+        .from('two_factor_auth')
+        .select('secret, is_enabled')
+        .eq('user_id', user.id)
+        .single();
+
+      if (fetchError) throw fetchError;
+
+      if (!twoFactor.is_enabled) {
+        throw new Error('2FA is not enabled');
+      }
+
+      // Verify the token
+      if (!isValidTokenFormat(verificationToken)) {
+        throw new Error('Invalid code format. Please enter 6 digits.');
+      }
+
+      const isValid = await verifyTOTP(twoFactor.secret, verificationToken);
+      if (!isValid) {
+        throw new Error('Invalid verification code');
+      }
+
+      // Generate new backup codes
+      const newBackupCodes = generateBackupCodes(10);
+
+      const { error } = await supabase
+        .from('two_factor_auth')
+        .update({
+          backup_codes: newBackupCodes,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('user_id', user.id);
+
+      if (error) throw error;
+
+      return newBackupCodes;
+    },
+    onSuccess: () => {
+      toast({
+        title: 'Backup Codes Regenerated',
+        description: 'New backup codes have been generated. Please save them securely.',
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: 'Failed to Regenerate',
+        description: error.message,
+        variant: 'destructive',
+      });
+    },
+  });
 }
