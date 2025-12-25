@@ -66,7 +66,7 @@ export function useGroupOrders() {
       if (!user) return [];
 
       // Get orders where user is host
-      const { data: hostOrders, error: hostError } = await supabase
+      const { data: hostOrders, error: hostError } = await (supabase as any)
         .from('group_orders')
         .select(`
           *,
@@ -84,30 +84,34 @@ export function useGroupOrders() {
       }
 
       // Get orders where user is participant
-      const { data: participantData } = await supabase
+      const { data: participantData } = await (supabase as any)
         .from('group_order_participants')
         .select('group_order_id')
         .eq('user_id', user.id);
 
-      const participantOrderIds = participantData?.map(p => p.group_order_id) || [];
+      const participantOrderIds = participantData?.map((p: any) => p.group_order_id) || [];
 
-      const { data: participantOrders } = await supabase
-        .from('group_orders')
-        .select(`
-          *,
-          restaurant:restaurants(name, image_url),
-          participants:group_order_participants(
-            id, user_id, status, subtotal, share_amount,
-            profile:profiles(full_name, avatar_url)
-          )
-        `)
-        .in('id', participantOrderIds)
-        .neq('host_id', user.id)
-        .order('created_at', { ascending: false });
+      let participantOrders: any[] = [];
+      if (participantOrderIds.length > 0) {
+        const { data } = await (supabase as any)
+          .from('group_orders')
+          .select(`
+            *,
+            restaurant:restaurants(name, image_url),
+            participants:group_order_participants(
+              id, user_id, status, subtotal, share_amount,
+              profile:profiles(full_name, avatar_url)
+            )
+          `)
+          .in('id', participantOrderIds)
+          .neq('host_id', user.id)
+          .order('created_at', { ascending: false });
+        participantOrders = data || [];
+      }
 
       // Combine and deduplicate
-      const allOrders = [...(hostOrders || []), ...(participantOrders || [])];
-      const uniqueOrders = Array.from(new Map(allOrders.map(o => [o.id, o])).values());
+      const allOrders = [...(hostOrders || []), ...participantOrders];
+      const uniqueOrders = Array.from(new Map(allOrders.map((o: any) => [o.id, o])).values());
 
       return uniqueOrders as GroupOrder[];
     },
@@ -126,11 +130,11 @@ export function useGroupOrder(groupOrderId: string | undefined) {
     queryFn: async () => {
       if (!groupOrderId) return null;
 
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('group_orders')
         .select(`
           *,
-          restaurant:restaurants(id, name, image_url, address, city),
+          restaurant:restaurants(id, name, image_url, street_address, city),
           participants:group_order_participants(
             id, user_id, status, subtotal, share_amount, payment_status,
             profile:profiles(full_name, avatar_url),
@@ -176,7 +180,7 @@ export function useCreateGroupOrder() {
     }) => {
       if (!user) throw new Error('Not authenticated');
 
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('group_orders')
         .insert({
           host_id: user.id,
@@ -194,7 +198,7 @@ export function useCreateGroupOrder() {
       if (error) throw error;
 
       // Auto-add host as participant
-      await supabase.from('group_order_participants').insert({
+      await (supabase as any).from('group_order_participants').insert({
         group_order_id: data.id,
         user_id: user.id,
         status: 'joined',
@@ -231,7 +235,7 @@ export function useJoinGroupOrder() {
     mutationFn: async (inviteCode: string) => {
       if (!user) throw new Error('Not authenticated');
 
-      const { data, error } = await supabase.rpc('join_group_order', {
+      const { data, error } = await (supabase as any).rpc('join_group_order', {
         p_invite_code: inviteCode.toUpperCase(),
         p_user_id: user.id,
       });
@@ -286,7 +290,7 @@ export function useAddGroupOrderItem() {
     }) => {
       if (!user) throw new Error('Not authenticated');
 
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('group_order_items')
         .insert({
           group_order_id: groupOrderId,
@@ -318,7 +322,7 @@ export function useRemoveGroupOrderItem() {
 
   return useMutation({
     mutationFn: async ({ itemId, groupOrderId }: { itemId: string; groupOrderId: string }) => {
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from('group_order_items')
         .delete()
         .eq('id', itemId);
@@ -341,7 +345,7 @@ export function useLockGroupOrder() {
 
   return useMutation({
     mutationFn: async (groupOrderId: string) => {
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from('group_orders')
         .update({ status: 'locked', locked_at: new Date().toISOString() })
         .eq('id', groupOrderId);

@@ -104,7 +104,7 @@ export function useCorporateMembership() {
     queryFn: async () => {
       if (!user) return null;
 
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('corporate_employees')
         .select(`
           *,
@@ -134,7 +134,7 @@ export function useCorporateAccount(corporateId: string | undefined) {
     queryFn: async () => {
       if (!corporateId) return null;
 
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('corporate_accounts')
         .select('*')
         .eq('id', corporateId)
@@ -156,7 +156,7 @@ export function useCorporateEmployees(corporateId: string | undefined) {
     queryFn: async () => {
       if (!corporateId) return [];
 
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('corporate_employees')
         .select(`
           *,
@@ -194,7 +194,7 @@ export function useCorporateOrders(
     queryFn: async () => {
       if (!corporateId) return [];
 
-      let query = supabase
+      let query = (supabase as any)
         .from('corporate_orders')
         .select(`
           *,
@@ -248,7 +248,7 @@ export function useCorporateInvoices(corporateId: string | undefined) {
     queryFn: async () => {
       if (!corporateId) return [];
 
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('corporate_invoices')
         .select('*')
         .eq('corporate_id', corporateId)
@@ -279,7 +279,7 @@ export function useCorporateSpendingSummary(corporateId: string | undefined) {
       const monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0);
 
       // Get this month's orders
-      const { data: orders, error } = await supabase
+      const { data: orders, error } = await (supabase as any)
         .from('corporate_orders')
         .select(`
           order:orders(total, status)
@@ -293,11 +293,11 @@ export function useCorporateSpendingSummary(corporateId: string | undefined) {
         throw error;
       }
 
-      const totalSpent = orders?.reduce((sum, o) => sum + (o.order?.total || 0), 0) || 0;
+      const totalSpent = orders?.reduce((sum: number, o: any) => sum + (o.order?.total || 0), 0) || 0;
       const orderCount = orders?.length || 0;
 
       // Get department breakdown
-      const { data: deptOrders } = await supabase
+      const { data: deptOrders } = await (supabase as any)
         .from('corporate_orders')
         .select(`
           department,
@@ -308,13 +308,13 @@ export function useCorporateSpendingSummary(corporateId: string | undefined) {
         .lte('created_at', monthEnd.toISOString());
 
       const departmentBreakdown: Record<string, number> = {};
-      deptOrders?.forEach(o => {
+      deptOrders?.forEach((o: any) => {
         const dept = o.department || 'Unassigned';
         departmentBreakdown[dept] = (departmentBreakdown[dept] || 0) + (o.order?.total || 0);
       });
 
       // Get account for budget info
-      const { data: account } = await supabase
+      const { data: account } = await (supabase as any)
         .from('corporate_accounts')
         .select('monthly_budget')
         .eq('id', corporateId)
@@ -355,7 +355,7 @@ export function useApproveOrder() {
     }) => {
       if (!user) throw new Error('Not authenticated');
 
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from('corporate_orders')
         .update({
           approval_status: approved ? 'approved' : 'rejected',
@@ -391,7 +391,7 @@ export function useUpdateEmployeeAllowance() {
       employeeId: string;
       remainingAllowance: number;
     }) => {
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from('corporate_employees')
         .update({ remaining_allowance: remainingAllowance })
         .eq('id', employeeId);
@@ -416,7 +416,7 @@ export function useAPIKeys(corporateId: string | undefined) {
     queryFn: async () => {
       if (!corporateId) return [];
 
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('api_keys')
         .select('*')
         .eq('corporate_id', corporateId)
@@ -468,7 +468,7 @@ export function useCreateAPIKey() {
       const hashBuffer = await crypto.subtle.digest('SHA-256', data);
       const keyHash = Array.from(new Uint8Array(hashBuffer), b => b.toString(16).padStart(2, '0')).join('');
 
-      const { data: apiKey, error } = await supabase
+      const { data: apiKey, error } = await (supabase as any)
         .from('api_keys')
         .insert({
           corporate_id: corporateId,
@@ -507,7 +507,7 @@ export function useRevokeAPIKey() {
 
   return useMutation({
     mutationFn: async (keyId: string) => {
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from('api_keys')
         .update({ is_active: false })
         .eq('id', keyId);

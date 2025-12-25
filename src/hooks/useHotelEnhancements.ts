@@ -75,14 +75,11 @@ export interface DigitalCheckin {
   created_at: string;
 }
 
-/**
- * Get pricing rules for an entity
- */
 export function usePricingRules(entityType: PricingRule['entity_type'], entityId: string) {
   return useQuery({
     queryKey: ['pricing-rules', entityType, entityId],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('pricing_rules')
         .select('*')
         .eq('entity_type', entityType)
@@ -100,9 +97,6 @@ export function usePricingRules(entityType: PricingRule['entity_type'], entityId
   });
 }
 
-/**
- * Calculate dynamic price
- */
 export function useCalculateDynamicPrice(
   entityType: PricingRule['entity_type'],
   entityId: string,
@@ -110,7 +104,6 @@ export function useCalculateDynamicPrice(
   context?: { date?: Date; occupancy?: number; eventType?: string }
 ) {
   const { data: rules } = usePricingRules(entityType, entityId);
-
   if (!rules || rules.length === 0) return basePrice;
 
   let adjustedPrice = basePrice;
@@ -119,13 +112,10 @@ export function useCalculateDynamicPrice(
   const hour = now.getHours();
 
   for (const rule of rules.filter((r) => r.is_active)) {
-    // Check validity period
     if (rule.valid_from && new Date(rule.valid_from) > now) continue;
     if (rule.valid_to && new Date(rule.valid_to) < now) continue;
 
     let applies = false;
-
-    // Check conditions based on rule type
     if (rule.rule_type === 'time_based') {
       const { days_of_week, hours } = rule.conditions;
       if (days_of_week?.includes(dayOfWeek)) applies = true;
@@ -145,30 +135,21 @@ export function useCalculateDynamicPrice(
       } else {
         adjustedPrice += rule.adjustment_value;
       }
-
-      // Apply limits
-      if (rule.min_price && adjustedPrice < rule.min_price) {
-        adjustedPrice = rule.min_price;
-      }
-      if (rule.max_price && adjustedPrice > rule.max_price) {
-        adjustedPrice = rule.max_price;
-      }
+      if (rule.min_price && adjustedPrice < rule.min_price) adjustedPrice = rule.min_price;
+      if (rule.max_price && adjustedPrice > rule.max_price) adjustedPrice = rule.max_price;
     }
   }
 
   return Math.round(adjustedPrice * 100) / 100;
 }
 
-/**
- * Create pricing rule
- */
 export function useCreatePricingRule() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: async (rule: Omit<PricingRule, 'id' | 'created_at'>) => {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('pricing_rules')
         .insert(rule)
         .select()
@@ -178,22 +159,17 @@ export function useCreatePricingRule() {
       return data;
     },
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({
-        queryKey: ['pricing-rules', variables.entity_type, variables.entity_id],
-      });
+      queryClient.invalidateQueries({ queryKey: ['pricing-rules', variables.entity_type, variables.entity_id] });
       toast({ title: 'Pricing Rule Created' });
     },
   });
 }
 
-/**
- * Get package deals
- */
 export function usePackageDeals(featured?: boolean) {
   return useQuery({
     queryKey: ['package-deals', featured],
     queryFn: async () => {
-      let query = supabase
+      let query = (supabase as any)
         .from('package_deals')
         .select('*')
         .eq('is_active', true)
@@ -201,30 +177,23 @@ export function usePackageDeals(featured?: boolean) {
         .or('available_to.is.null,available_to.gte.' + new Date().toISOString())
         .order('savings_amount', { ascending: false });
 
-      if (featured) {
-        query = query.eq('is_featured', true);
-      }
+      if (featured) query = query.eq('is_featured', true);
 
       const { data, error } = await query;
-
       if (error) {
         if (error.code === '42P01') return [];
         throw error;
       }
-
       return data as PackageDeal[];
     },
   });
 }
 
-/**
- * Get package deal details
- */
 export function usePackageDeal(packageId: string) {
   return useQuery({
     queryKey: ['package-deal', packageId],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('package_deals')
         .select('*')
         .eq('id', packageId)
@@ -237,14 +206,11 @@ export function usePackageDeal(packageId: string) {
   });
 }
 
-/**
- * Get virtual tours for an entity
- */
 export function useVirtualTours(entityType: VirtualTour['entity_type'], entityId: string) {
   return useQuery({
     queryKey: ['virtual-tours', entityType, entityId],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('virtual_tours')
         .select('*')
         .eq('entity_type', entityType)
@@ -255,27 +221,16 @@ export function useVirtualTours(entityType: VirtualTour['entity_type'], entityId
         if (error.code === '42P01') return [];
         throw error;
       }
-
       return data as VirtualTour[];
     },
     enabled: !!entityId,
   });
 }
 
-/**
- * Track virtual tour view
- */
 export function useTrackTourView() {
   return useMutation({
-    mutationFn: async ({
-      tourId,
-      durationSeconds,
-    }: {
-      tourId: string;
-      durationSeconds?: number;
-    }) => {
-      // Increment view count
-      const { data: tour } = await supabase
+    mutationFn: async ({ tourId, durationSeconds }: { tourId: string; durationSeconds?: number }) => {
+      const { data: tour } = await (supabase as any)
         .from('virtual_tours')
         .select('view_count, avg_duration_seconds')
         .eq('id', tourId)
@@ -287,31 +242,24 @@ export function useTrackTourView() {
       let newAvgDuration = tour.avg_duration_seconds;
 
       if (durationSeconds && tour.avg_duration_seconds) {
-        newAvgDuration =
-          (tour.avg_duration_seconds * tour.view_count + durationSeconds) / newViewCount;
+        newAvgDuration = (tour.avg_duration_seconds * tour.view_count + durationSeconds) / newViewCount;
       } else if (durationSeconds) {
         newAvgDuration = durationSeconds;
       }
 
-      await supabase
+      await (supabase as any)
         .from('virtual_tours')
-        .update({
-          view_count: newViewCount,
-          avg_duration_seconds: newAvgDuration,
-        })
+        .update({ view_count: newViewCount, avg_duration_seconds: newAvgDuration })
         .eq('id', tourId);
     },
   });
 }
 
-/**
- * Get digital check-in for a booking
- */
 export function useDigitalCheckin(bookingId: string) {
   return useQuery({
     queryKey: ['digital-checkin', bookingId],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('digital_checkins')
         .select('*')
         .eq('booking_id', bookingId)
@@ -321,28 +269,19 @@ export function useDigitalCheckin(bookingId: string) {
         if (error.code === 'PGRST116' || error.code === '42P01') return null;
         throw error;
       }
-
       return data as DigitalCheckin;
     },
     enabled: !!bookingId,
   });
 }
 
-/**
- * Submit digital check-in
- */
 export function useSubmitDigitalCheckin() {
   const { user } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({
-      bookingId,
-      arrivalTime,
-      specialRequests,
-      idDocument,
-    }: {
+    mutationFn: async ({ bookingId, arrivalTime, specialRequests, idDocument }: {
       bookingId: string;
       arrivalTime?: Date;
       specialRequests?: string;
@@ -357,15 +296,12 @@ export function useSubmitDigitalCheckin() {
         const fileName = `${user.id}_${bookingId}_id.${fileExt}`;
         const storagePath = `checkin-docs/${fileName}`;
 
-        const { error: uploadError } = await supabase.storage
-          .from('private-documents')
-          .upload(storagePath, idDocument);
-
+        const { error: uploadError } = await supabase.storage.from('private-documents').upload(storagePath, idDocument);
         if (uploadError) throw uploadError;
         idDocumentUrl = storagePath;
       }
 
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('digital_checkins')
         .upsert({
           booking_id: bookingId,
@@ -384,23 +320,14 @@ export function useSubmitDigitalCheckin() {
     },
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['digital-checkin', variables.bookingId] });
-      toast({
-        title: 'Check-in Submitted',
-        description: 'Your check-in request is being processed. You will receive your room key shortly.',
-      });
+      toast({ title: 'Check-in Submitted', description: 'Your check-in request is being processed.' });
     },
   });
 }
 
-/**
- * Get mobile room key
- */
 export function useMobileRoomKey(bookingId: string) {
   const { data: checkin } = useDigitalCheckin(bookingId);
-
-  if (!checkin || checkin.status !== 'checked_in') {
-    return null;
-  }
+  if (!checkin || checkin.status !== 'checked_in') return null;
 
   return {
     roomNumber: checkin.room_number,
