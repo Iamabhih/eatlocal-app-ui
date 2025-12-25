@@ -99,7 +99,7 @@ serve(async (req: Request): Promise<Response> => {
   if (isServiceCall) {
     identifier = 'service';
   } else {
-    const authResult = await verifyAuth(authHeader, supabase);
+    const authResult = await verifyAuth(authHeader, supabase as any);
 
     if (!authResult.authenticated) {
       return unauthorizedResponse(authResult.error);

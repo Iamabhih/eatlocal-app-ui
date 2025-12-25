@@ -54,7 +54,7 @@ export function useChatSession() {
       if (!user) return null;
 
       // Check for existing active session
-      const { data: existing, error: fetchError } = await supabase
+      const { data: existing, error: fetchError } = await (supabase as any)
         .from('chat_sessions')
         .select('*')
         .eq('user_id', user.id)
@@ -66,7 +66,7 @@ export function useChatSession() {
       if (existing) return existing as ChatSession;
 
       // Create new session if none exists
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('chat_sessions')
         .insert({
           user_id: user.id,
@@ -96,7 +96,7 @@ export function useChatMessages(sessionId: string | undefined) {
     queryFn: async () => {
       if (!sessionId) return [];
 
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('chat_messages')
         .select('*')
         .eq('session_id', sessionId)
@@ -133,7 +133,7 @@ export function useSendMessage() {
       metadata?: Record<string, any>;
     }) => {
       // Save user message
-      const { data: userMessage, error: userError } = await supabase
+      const { data: userMessage, error: userError } = await (supabase as any)
         .from('chat_messages')
         .insert({
           session_id: sessionId,
@@ -151,7 +151,7 @@ export function useSendMessage() {
       const botResponse = await processBotResponse(content, sessionId);
 
       // Save bot response
-      const { data: botMessage, error: botError } = await supabase
+      const { data: botMessage, error: botError } = await (supabase as any)
         .from('chat_messages')
         .insert({
           session_id: sessionId,
@@ -308,7 +308,7 @@ async function processBotResponse(
         escalate: true,
       };
       // Escalate session
-      await supabase
+      await (supabase as any)
         .from('chat_sessions')
         .update({ status: 'escalated' })
         .eq('id', sessionId);
@@ -353,7 +353,7 @@ async function processBotResponse(
  * Search FAQ for relevant answer
  */
 async function searchFAQ(query: string): Promise<string | null> {
-  const { data, error } = await supabase
+  const { data, error } = await (supabase as any)
     .from('faq_entries')
     .select('*')
     .eq('is_active', true);
@@ -365,11 +365,11 @@ async function searchFAQ(query: string): Promise<string | null> {
 
   let bestMatch: { entry: FAQEntry; score: number } | null = null;
 
-  for (const entry of data) {
+  for (const entry of data as FAQEntry[]) {
     let score = 0;
 
     // Check keywords
-    for (const keyword of entry.keywords) {
+    for (const keyword of entry.keywords || []) {
       if (lowerQuery.includes(keyword.toLowerCase())) {
         score += 2;
       }
@@ -405,7 +405,7 @@ export function useCloseSession() {
       sessionId: string;
       rating?: number;
     }) => {
-      const startTime = await supabase
+      const startTime = await (supabase as any)
         .from('chat_sessions')
         .select('created_at')
         .eq('id', sessionId)
@@ -415,7 +415,7 @@ export function useCloseSession() {
         ? Math.round((Date.now() - new Date(startTime.data.created_at).getTime()) / 1000)
         : null;
 
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from('chat_sessions')
         .update({
           status: 'closed',
@@ -440,7 +440,7 @@ export function useFAQ(category?: string) {
   return useQuery({
     queryKey: ['faq', category],
     queryFn: async () => {
-      let query = supabase
+      let query = (supabase as any)
         .from('faq_entries')
         .select('*')
         .eq('is_active', true)
@@ -475,10 +475,10 @@ export function useRateFAQ() {
       helpful: boolean;
     }) => {
       const column = helpful ? 'helpful_count' : 'not_helpful_count';
-      await supabase.rpc('increment_column', {
-        table_name: 'faq_entries',
-        column_name: column,
-        row_id: faqId,
+      await (supabase as any).rpc('increment_column', {
+        p_table_name: 'faq_entries',
+        p_column_name: column,
+        p_row_id: faqId,
       });
     },
   });
