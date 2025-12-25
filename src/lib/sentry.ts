@@ -2,10 +2,10 @@
  * Sentry Error Tracking & Monitoring
  *
  * Centralized error tracking for production monitoring
+ * Updated for @sentry/react v10+ API
  */
 
 import * as Sentry from "@sentry/react";
-import { BrowserTracing } from "@sentry/tracing";
 
 const SENTRY_DSN = import.meta.env.VITE_SENTRY_DSN;
 const APP_ENV = import.meta.env.VITE_APP_ENV || 'development';
@@ -25,19 +25,21 @@ export function initSentry() {
     dsn: SENTRY_DSN,
     environment: APP_ENV,
 
-    // Performance monitoring
+    // Performance monitoring with modern v10+ API
     integrations: [
-      new BrowserTracing({
-        // Track route changes
-        routingInstrumentation: Sentry.reactRouterV6Instrumentation(
-          window.history,
-          window.location
-        ),
+      Sentry.browserTracingIntegration(),
+      Sentry.replayIntegration({
+        maskAllText: false,
+        blockAllMedia: false,
       }),
     ],
 
     // Performance Monitoring - sample 10% of transactions in production
     tracesSampleRate: IS_PRODUCTION ? 0.1 : 1.0,
+
+    // Session Replay - capture 10% of sessions, 100% on error
+    replaysSessionSampleRate: IS_PRODUCTION ? 0.1 : 0,
+    replaysOnErrorSampleRate: 1.0,
 
     // Capture 100% of errors
     sampleRate: 1.0,
