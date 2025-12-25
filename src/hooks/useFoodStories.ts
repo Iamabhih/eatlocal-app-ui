@@ -77,7 +77,7 @@ export function useFeed(limit: number = 20) {
     queryFn: async ({ pageParam = 0 }) => {
       if (!user) return { stories: [], nextOffset: null };
 
-      const { data, error } = await supabase.rpc('get_user_feed', {
+      const { data, error } = await (supabase as any).rpc('get_user_feed', {
         p_user_id: user.id,
         p_limit: limit,
         p_offset: pageParam,
@@ -88,9 +88,10 @@ export function useFeed(limit: number = 20) {
         throw error;
       }
 
+      const stories = (data || []) as FeedStory[];
       return {
-        stories: data as FeedStory[],
-        nextOffset: data.length === limit ? pageParam + limit : null,
+        stories,
+        nextOffset: stories.length === limit ? pageParam + limit : null,
       };
     },
     getNextPageParam: (lastPage) => lastPage.nextOffset,
@@ -106,7 +107,7 @@ export function useStory(storyId: string) {
   return useQuery({
     queryKey: ['story', storyId],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('food_stories')
         .select(`
           *,
@@ -135,7 +136,7 @@ export function useMyStories() {
     queryFn: async () => {
       if (!user) return [];
 
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('food_stories')
         .select(`
           *,
@@ -163,7 +164,7 @@ export function useUserStories(userId: string) {
   return useQuery({
     queryKey: ['user-stories', userId],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('food_stories')
         .select(`
           *,
@@ -243,7 +244,7 @@ export function useCreateStory() {
       }
 
       // Create story
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('food_stories')
         .insert({
           user_id: user.id,
@@ -295,7 +296,7 @@ export function useDeleteStory() {
 
   return useMutation({
     mutationFn: async (storyId: string) => {
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from('food_stories')
         .delete()
         .eq('id', storyId);
@@ -330,7 +331,7 @@ export function useLikeStory() {
     }) => {
       if (!user) throw new Error('Not authenticated');
 
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('story_likes')
         .insert({
           story_id: storyId,
@@ -343,7 +344,7 @@ export function useLikeStory() {
       if (error) {
         if (error.code === '23505') {
           // Already liked, unlike it
-          await supabase
+          await (supabase as any)
             .from('story_likes')
             .delete()
             .eq('story_id', storyId)
@@ -354,10 +355,10 @@ export function useLikeStory() {
       }
 
       // Update like count
-      await supabase.rpc('increment_column', {
-        table_name: 'food_stories',
-        column_name: 'like_count',
-        row_id: storyId,
+      await (supabase as any).rpc('increment_column', {
+        p_table_name: 'food_stories',
+        p_column_name: 'like_count',
+        p_row_id: storyId,
       });
 
       return { liked: true, data };
@@ -385,7 +386,7 @@ export function useRecordStoryView() {
     }) => {
       if (!user) return;
 
-      await supabase.from('story_views').upsert(
+      await (supabase as any).from('story_views').upsert(
         {
           story_id: storyId,
           viewer_id: user.id,
@@ -396,10 +397,10 @@ export function useRecordStoryView() {
       );
 
       // Increment view count
-      await supabase.rpc('increment_column', {
-        table_name: 'food_stories',
-        column_name: 'view_count',
-        row_id: storyId,
+      await (supabase as any).rpc('increment_column', {
+        p_table_name: 'food_stories',
+        p_column_name: 'view_count',
+        p_row_id: storyId,
       });
     },
   });
@@ -412,7 +413,7 @@ export function useStoryComments(storyId: string) {
   return useQuery({
     queryKey: ['story-comments', storyId],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('story_comments')
         .select(`
           *,
@@ -451,7 +452,7 @@ export function useAddComment() {
     }) => {
       if (!user) throw new Error('Not authenticated');
 
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('story_comments')
         .insert({
           story_id: storyId,
@@ -465,10 +466,10 @@ export function useAddComment() {
       if (error) throw error;
 
       // Update comment count
-      await supabase.rpc('increment_column', {
-        table_name: 'food_stories',
-        column_name: 'comment_count',
-        row_id: storyId,
+      await (supabase as any).rpc('increment_column', {
+        p_table_name: 'food_stories',
+        p_column_name: 'comment_count',
+        p_row_id: storyId,
       });
 
       return data;
@@ -492,7 +493,7 @@ export function useFollowUser() {
       if (!user) throw new Error('Not authenticated');
       if (user.id === followingId) throw new Error('Cannot follow yourself');
 
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('user_follows')
         .insert({
           follower_id: user.id,
@@ -505,7 +506,7 @@ export function useFollowUser() {
       if (error) {
         if (error.code === '23505') {
           // Already following, unfollow
-          await supabase
+          await (supabase as any)
             .from('user_follows')
             .delete()
             .eq('follower_id', user.id)
@@ -535,7 +536,7 @@ export function useFollowing() {
     queryFn: async () => {
       if (!user) return [];
 
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('user_follows')
         .select(`
           *,
@@ -566,7 +567,7 @@ export function useFollowers() {
     queryFn: async () => {
       if (!user) return [];
 
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('user_follows')
         .select(`
           *,
@@ -591,7 +592,7 @@ export function useFollowers() {
  */
 export function useIsFollowing(userId: string) {
   const { data: following } = useFollowing();
-  return following?.some(f => f.following_id === userId) || false;
+  return following?.some((f: any) => f.following_id === userId) || false;
 }
 
 /**
@@ -605,7 +606,7 @@ export function useCollections() {
     queryFn: async () => {
       if (!user) return [];
 
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('food_collections')
         .select('*')
         .eq('user_id', user.id)
@@ -642,7 +643,7 @@ export function useCreateCollection() {
     }) => {
       if (!user) throw new Error('Not authenticated');
 
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('food_collections')
         .insert({
           user_id: user.id,
@@ -685,7 +686,7 @@ export function useAddToCollection() {
       restaurantId?: string;
       notes?: string;
     }) => {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('collection_items')
         .insert({
           collection_id: collectionId,
@@ -702,10 +703,10 @@ export function useAddToCollection() {
       }
 
       // Update item count
-      await supabase.rpc('increment_column', {
-        table_name: 'food_collections',
-        column_name: 'item_count',
-        row_id: collectionId,
+      await (supabase as any).rpc('increment_column', {
+        p_table_name: 'food_collections',
+        p_column_name: 'item_count',
+        p_row_id: collectionId,
       });
 
       return data;

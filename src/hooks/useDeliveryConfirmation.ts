@@ -48,7 +48,7 @@ export function useDeliveryConfirmation(orderId: string | undefined) {
     queryFn: async () => {
       if (!orderId) return null;
 
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('delivery_confirmations')
         .select('*')
         .eq('order_id', orderId)
@@ -122,29 +122,37 @@ export function useCreateDeliveryConfirmation() {
       if (latitude && longitude) {
         const { data: order } = await supabase
           .from('orders')
-          .select('delivery_address')
+          .select('delivery_address_id')
           .eq('id', orderId)
           .single();
 
-        if (order?.delivery_address?.latitude && order?.delivery_address?.longitude) {
-          // Haversine formula
-          const R = 6371000; // Earth radius in meters
-          const lat1 = latitude * Math.PI / 180;
-          const lat2 = order.delivery_address.latitude * Math.PI / 180;
-          const dLat = (order.delivery_address.latitude - latitude) * Math.PI / 180;
-          const dLon = (order.delivery_address.longitude - longitude) * Math.PI / 180;
+        if (order?.delivery_address_id) {
+          const { data: address } = await supabase
+            .from('customer_addresses')
+            .select('latitude, longitude')
+            .eq('id', order.delivery_address_id)
+            .single();
 
-          const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-            Math.cos(lat1) * Math.cos(lat2) *
-            Math.sin(dLon / 2) * Math.sin(dLon / 2);
-          const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+          if (address?.latitude && address?.longitude) {
+            // Haversine formula
+            const R = 6371000; // Earth radius in meters
+            const lat1 = latitude * Math.PI / 180;
+            const lat2 = address.latitude * Math.PI / 180;
+            const dLat = (address.latitude - latitude) * Math.PI / 180;
+            const dLon = (address.longitude - longitude) * Math.PI / 180;
 
-          distanceFromAddress = Math.round(R * c);
+            const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+              Math.cos(lat1) * Math.cos(lat2) *
+              Math.sin(dLon / 2) * Math.sin(dLon / 2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+            distanceFromAddress = Math.round(R * c);
+          }
         }
       }
 
       // Create confirmation
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('delivery_confirmations')
         .insert({
           order_id: orderId,
@@ -206,7 +214,7 @@ export function useVerifyDeliveryCode() {
 
   return useMutation({
     mutationFn: async ({ orderId, code }: { orderId: string; code: string }) => {
-      const { data: confirmation, error: fetchError } = await supabase
+      const { data: confirmation, error: fetchError } = await (supabase as any)
         .from('delivery_confirmations')
         .select('*')
         .eq('order_id', orderId)
@@ -220,7 +228,7 @@ export function useVerifyDeliveryCode() {
         throw new Error('Invalid verification code');
       }
 
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from('delivery_confirmations')
         .update({
           code_verified: true,
@@ -293,14 +301,14 @@ export function useReportDeliveryIssue() {
       }
 
       // Get confirmation ID if exists
-      const { data: confirmation } = await supabase
+      const { data: confirmation } = await (supabase as any)
         .from('delivery_confirmations')
         .select('id')
         .eq('order_id', orderId)
         .single();
 
       // Create issue
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('delivery_issues')
         .insert({
           order_id: orderId,
@@ -345,7 +353,7 @@ export function useDeliveryIssues() {
     queryFn: async () => {
       if (!user) return [];
 
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('delivery_issues')
         .select(`
           *,
