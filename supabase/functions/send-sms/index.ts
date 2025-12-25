@@ -211,7 +211,7 @@ serve(async (req: Request): Promise<Response> => {
       success: smsResult.success,
       session_id: crypto.randomUUID(),
       page_url: '/api/send-sms'
-    }).catch(() => { /* ignore */ });
+    }).then(() => {}, () => { /* ignore */ });
 
     if (!smsResult.success) {
       return new Response(
@@ -239,7 +239,7 @@ serve(async (req: Request): Promise<Response> => {
       error_message: errorMessage,
       severity: 'medium',
       metadata: { identifier }
-    }).catch(() => { /* ignore */ });
+    }).then(() => {}, () => { /* ignore */ });
 
     return new Response(
       JSON.stringify({ error: 'Failed to send SMS' }),

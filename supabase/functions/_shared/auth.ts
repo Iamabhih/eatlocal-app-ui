@@ -64,9 +64,9 @@ export async function verifyAuth(
  * Check if user has required role
  */
 export function hasRole(authResult: AuthResult, requiredRole: string): boolean {
-  return authResult.roles?.includes(requiredRole) ||
+  return (authResult.roles?.includes(requiredRole) ||
          authResult.roles?.includes('admin') ||
-         authResult.roles?.includes('superadmin');
+         authResult.roles?.includes('superadmin')) ?? false;
 }
 
 /**

@@ -174,7 +174,7 @@ serve(async (req) => {
       success: true,
       session_id: crypto.randomUUID(),
       page_url: '/api/match-ride'
-    }).catch(() => { /* ignore logging errors */ });
+    }).then(() => {}, () => { /* ignore logging errors */ });
 
     return new Response(
       JSON.stringify({
@@ -199,7 +199,7 @@ serve(async (req) => {
       error_message: errorMessage,
       severity: 'medium',
       metadata: { userId: identifier }
-    }).catch(() => { /* ignore logging errors */ });
+    }).then(() => {}, () => { /* ignore logging errors */ });
 
     return new Response(
       JSON.stringify({ error: 'Failed to match ride. Please try again.' }),

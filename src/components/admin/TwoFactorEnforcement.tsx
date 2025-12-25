@@ -13,15 +13,14 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { TwoFactorSetup } from './TwoFactorSetup';
 import { useAuth } from '@/contexts/AuthContext';
-import { useTwoFactor } from '@/hooks/useTwoFactor';
+import { useTwoFactorStatus } from '@/hooks/useTwoFactor';
 
 export function TwoFactorEnforcement() {
   const { user, userRoles } = useAuth();
-  const { data: twoFactorStatus, isLoading } = useTwoFactor();
+  const { data: twoFactorStatus, isLoading } = useTwoFactorStatus();
   const [showSetup, setShowSetup] = useState(false);
 
   // Check if user is admin/superadmin
@@ -41,8 +40,8 @@ export function TwoFactorEnforcement() {
   }
 
   return (
-    <Dialog open={showSetup} onOpenChange={setShowSetup}>
-      <DialogContent className="sm:max-w-[600px]" hideClose>
+    <Dialog open={showSetup} onOpenChange={() => {}}>
+      <DialogContent className="sm:max-w-[600px]">
         <DialogHeader>
           <div className="flex items-center gap-2 text-orange-600">
             <Shield className="h-6 w-6" />
@@ -62,7 +61,7 @@ export function TwoFactorEnforcement() {
           </AlertDescription>
         </Alert>
 
-        <TwoFactorSetup onComplete={() => setShowSetup(false)} />
+        <TwoFactorSetup />
       </DialogContent>
     </Dialog>
   );
