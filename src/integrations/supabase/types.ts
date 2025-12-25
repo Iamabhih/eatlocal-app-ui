@@ -89,6 +89,89 @@ export type Database = {
         }
         Relationships: []
       }
+      chat_messages: {
+        Row: {
+          confidence_score: number | null
+          content: string
+          created_at: string | null
+          id: string
+          intent_detected: string | null
+          message_type: string
+          metadata: Json | null
+          sender_type: string
+          session_id: string
+        }
+        Insert: {
+          confidence_score?: number | null
+          content: string
+          created_at?: string | null
+          id?: string
+          intent_detected?: string | null
+          message_type?: string
+          metadata?: Json | null
+          sender_type: string
+          session_id: string
+        }
+        Update: {
+          confidence_score?: number | null
+          content?: string
+          created_at?: string | null
+          id?: string
+          intent_detected?: string | null
+          message_type?: string
+          metadata?: Json | null
+          sender_type?: string
+          session_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "chat_messages_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "chat_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      chat_sessions: {
+        Row: {
+          closed_at: string | null
+          created_at: string | null
+          escalated_to: string | null
+          id: string
+          order_id: string | null
+          resolution_time_seconds: number | null
+          satisfaction_rating: number | null
+          session_type: string
+          status: string
+          user_id: string | null
+        }
+        Insert: {
+          closed_at?: string | null
+          created_at?: string | null
+          escalated_to?: string | null
+          id?: string
+          order_id?: string | null
+          resolution_time_seconds?: number | null
+          satisfaction_rating?: number | null
+          session_type?: string
+          status?: string
+          user_id?: string | null
+        }
+        Update: {
+          closed_at?: string | null
+          created_at?: string | null
+          escalated_to?: string | null
+          id?: string
+          order_id?: string | null
+          resolution_time_seconds?: number | null
+          satisfaction_rating?: number | null
+          session_type?: string
+          status?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       customer_addresses: {
         Row: {
           city: string
@@ -814,6 +897,45 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      faq_entries: {
+        Row: {
+          answer: string
+          category: string
+          created_at: string | null
+          helpful_count: number | null
+          id: string
+          is_active: boolean | null
+          keywords: string[] | null
+          not_helpful_count: number | null
+          question: string
+          updated_at: string | null
+        }
+        Insert: {
+          answer: string
+          category: string
+          created_at?: string | null
+          helpful_count?: number | null
+          id?: string
+          is_active?: boolean | null
+          keywords?: string[] | null
+          not_helpful_count?: number | null
+          question: string
+          updated_at?: string | null
+        }
+        Update: {
+          answer?: string
+          category?: string
+          created_at?: string | null
+          helpful_count?: number | null
+          id?: string
+          is_active?: boolean | null
+          keywords?: string[] | null
+          not_helpful_count?: number | null
+          question?: string
+          updated_at?: string | null
+        }
+        Relationships: []
       }
       hotel_bookings: {
         Row: {
@@ -3519,6 +3641,10 @@ export type Database = {
           _user_id: string
         }
         Returns: boolean
+      }
+      increment_column: {
+        Args: { p_column_name: string; p_row_id: string; p_table_name: string }
+        Returns: undefined
       }
       increment_helpful_count: {
         Args: { review_id: string }

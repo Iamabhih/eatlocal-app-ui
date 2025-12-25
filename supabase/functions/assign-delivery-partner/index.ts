@@ -139,9 +139,9 @@ serve(async (req) => {
     }
 
     // Get restaurant location (pickup point)
-    const restaurant = order.restaurants as { latitude: number; longitude: number } | null;
-    const restaurantLat = restaurant?.latitude;
-    const restaurantLon = restaurant?.longitude;
+    const restaurantData = order.restaurants as unknown as { latitude: number; longitude: number } | null;
+    const restaurantLat = restaurantData?.latitude;
+    const restaurantLon = restaurantData?.longitude;
 
     if (!restaurantLat || !restaurantLon) {
       return new Response(
