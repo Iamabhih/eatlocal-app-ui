@@ -77,7 +77,7 @@ export function useInventory(restaurantId: string) {
   return useQuery({
     queryKey: ['inventory', restaurantId],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('inventory_items')
         .select(`
           *,
@@ -104,7 +104,7 @@ export function useLowStockItems(restaurantId: string) {
   return useQuery({
     queryKey: ['inventory', 'low-stock', restaurantId],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('inventory_items')
         .select('*')
         .eq('restaurant_id', restaurantId)
@@ -131,7 +131,7 @@ export function useCreateInventoryItem() {
 
   return useMutation({
     mutationFn: async (item: Omit<InventoryItem, 'id' | 'is_low_stock' | 'created_at' | 'updated_at'>) => {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('inventory_items')
         .insert(item)
         .select()
@@ -163,7 +163,7 @@ export function useUpdateInventoryItem() {
       id: string;
       restaurantId: string;
     } & Partial<InventoryItem>) => {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('inventory_items')
         .update(updates)
         .eq('id', id)
@@ -209,7 +209,7 @@ export function useRecordStockMovement() {
       referenceId?: string;
     }) => {
       // Record the movement
-      const { error: movementError } = await supabase
+      const { error: movementError } = await (supabase as any)
         .from('stock_movements')
         .insert({
           inventory_item_id: inventoryItemId,
@@ -226,7 +226,7 @@ export function useRecordStockMovement() {
       if (movementError) throw movementError;
 
       // Update current stock
-      const { data: item } = await supabase
+      const { data: item } = await (supabase as any)
         .from('inventory_items')
         .select('current_stock')
         .eq('id', inventoryItemId)
@@ -234,7 +234,7 @@ export function useRecordStockMovement() {
 
       const newStock = (item?.current_stock || 0) + quantity;
 
-      const { error: updateError } = await supabase
+      const { error: updateError } = await (supabase as any)
         .from('inventory_items')
         .update({
           current_stock: newStock,
@@ -262,7 +262,7 @@ export function useStockMovements(inventoryItemId: string, limit: number = 50) {
   return useQuery({
     queryKey: ['stock-movements', inventoryItemId, limit],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('stock_movements')
         .select(`
           *,
@@ -317,7 +317,7 @@ export function useStartMenuImport() {
         .getPublicUrl(storagePath);
 
       // Create import job
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('menu_imports')
         .insert({
           restaurant_id: restaurantId,
@@ -350,7 +350,7 @@ export function useMenuImports(restaurantId: string) {
   return useQuery({
     queryKey: ['menu-imports', restaurantId],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('menu_imports')
         .select('*')
         .eq('restaurant_id', restaurantId)
@@ -374,7 +374,7 @@ export function useOrderBatches(restaurantId: string, status?: OrderBatch['statu
   return useQuery({
     queryKey: ['order-batches', restaurantId, status],
     queryFn: async () => {
-      let query = supabase
+      let query = (supabase as any)
         .from('order_batches')
         .select(`
           *,
@@ -420,7 +420,7 @@ export function useCreateOrderBatch() {
       // Create batch
       const batchNumber = `B${Date.now().toString(36).toUpperCase()}`;
 
-      const { data: batch, error: batchError } = await supabase
+      const { data: batch, error: batchError } = await (supabase as any)
         .from('order_batches')
         .insert({
           restaurant_id: restaurantId,
@@ -440,7 +440,7 @@ export function useCreateOrderBatch() {
         sequence_number: index + 1,
       }));
 
-      const { error: ordersError } = await supabase
+      const { error: ordersError } = await (supabase as any)
         .from('batch_orders')
         .insert(batchOrders);
 
@@ -479,7 +479,7 @@ export function useUpdateBatchStatus() {
         updates.completed_at = new Date().toISOString();
       }
 
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from('order_batches')
         .update(updates)
         .eq('id', batchId);
@@ -499,14 +499,14 @@ export function usePredictPrepTime(restaurantId: string, itemCount: number) {
   return useQuery({
     queryKey: ['prep-time-prediction', restaurantId, itemCount],
     queryFn: async () => {
-      const { data, error } = await supabase.rpc('predict_prep_time', {
+      const { data, error } = await (supabase as any).rpc('predict_prep_time', {
         p_restaurant_id: restaurantId,
         p_item_count: itemCount,
       });
 
       if (error) {
-        // Default prediction if function doesn't exist
-        return 15 + itemCount * 3;
+        if (error.code === '42883') return 15; // Default prep time if function doesn't exist
+        throw error;
       }
 
       return data as number;
@@ -515,18 +515,25 @@ export function usePredictPrepTime(restaurantId: string, itemCount: number) {
   });
 }
 
+// Movement type options for forms
 export const MOVEMENT_TYPES = [
-  { value: 'purchase', label: 'Purchase', description: 'Stock received from supplier' },
-  { value: 'sale', label: 'Sale', description: 'Sold to customer (automatic)' },
-  { value: 'adjustment', label: 'Adjustment', description: 'Stock count correction' },
-  { value: 'waste', label: 'Waste', description: 'Expired or damaged stock' },
-  { value: 'transfer', label: 'Transfer', description: 'Moved to another location' },
+  { value: 'purchase', label: 'Purchase (Stock In)' },
+  { value: 'sale', label: 'Sale (Stock Out)' },
+  { value: 'adjustment', label: 'Adjustment' },
+  { value: 'waste', label: 'Waste / Spoilage' },
+  { value: 'transfer', label: 'Transfer' },
 ] as const;
 
+// Common stock units
 export const STOCK_UNITS = [
-  { value: 'each', label: 'Each' },
+  { value: 'unit', label: 'Unit' },
   { value: 'kg', label: 'Kilogram (kg)' },
   { value: 'g', label: 'Gram (g)' },
-  { value: 'l', label: 'Litre (l)' },
-  { value: 'ml', label: 'Millilitre (ml)' },
+  { value: 'l', label: 'Liter (L)' },
+  { value: 'ml', label: 'Milliliter (mL)' },
+  { value: 'box', label: 'Box' },
+  { value: 'case', label: 'Case' },
+  { value: 'pack', label: 'Pack' },
+  { value: 'bottle', label: 'Bottle' },
+  { value: 'can', label: 'Can' },
 ] as const;

@@ -410,7 +410,7 @@ export function useApiConfigurations(category?: string) {
   return useQuery({
     queryKey: ['api-configurations', category],
     queryFn: async () => {
-      let query = supabase
+      let query = (supabase as any)
         .from('api_configurations')
         .select('*')
         .order('service_category', { ascending: true });
@@ -443,7 +443,7 @@ export function useUpdateApiConfiguration() {
       id: string;
       updates: Partial<Omit<ApiConfiguration, 'id' | 'created_at' | 'updated_at'>>;
     }) => {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('api_configurations')
         .update(updates)
         .eq('id', id)
@@ -470,7 +470,7 @@ export function useTestApiConnection() {
       await new Promise((resolve) => setTimeout(resolve, 1500));
       const testResult = Math.random() > 0.2;
 
-      await supabase
+      await (supabase as any)
         .from('api_configurations')
         .update({
           last_tested_at: new Date().toISOString(),
@@ -499,7 +499,7 @@ export function useCommissionRates(entityType?: string) {
   return useQuery({
     queryKey: ['commission-rates', entityType],
     queryFn: async () => {
-      let query = supabase
+      let query = (supabase as any)
         .from('commission_rates')
         .select('*')
         .eq('is_active', true)
@@ -533,7 +533,7 @@ export function useUpdateCommissionRate() {
       id: string;
       updates: Partial<Omit<CommissionRate, 'id' | 'created_at' | 'updated_at'>>;
     }) => {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('commission_rates')
         .update(updates)
         .eq('id', id)
@@ -556,7 +556,7 @@ export function useCreateCommissionRate() {
 
   return useMutation({
     mutationFn: async (rate: Omit<CommissionRate, 'id' | 'created_at' | 'updated_at'>) => {
-      const { data, error } = await supabase.from('commission_rates').insert(rate).select().single();
+      const { data, error } = await (supabase as any).from('commission_rates').insert(rate).select().single();
 
       if (error) throw error;
       return data;
@@ -576,7 +576,7 @@ export function usePlatformFees(category?: string) {
   return useQuery({
     queryKey: ['platform-fees', category],
     queryFn: async () => {
-      let query = supabase.from('platform_fees').select('*').order('fee_category', { ascending: true });
+      let query = (supabase as any).from('platform_fees').select('*').order('fee_category', { ascending: true });
 
       if (category) {
         query = query.eq('fee_category', category);
@@ -606,7 +606,7 @@ export function useUpdatePlatformFee() {
       id: string;
       updates: Partial<Omit<PlatformFee, 'id' | 'created_at' | 'updated_at'>>;
     }) => {
-      const { data, error } = await supabase.from('platform_fees').update(updates).eq('id', id).select().single();
+      const { data, error } = await (supabase as any).from('platform_fees').update(updates).eq('id', id).select().single();
 
       if (error) throw error;
       return data;
@@ -624,7 +624,7 @@ export function useCreatePlatformFee() {
 
   return useMutation({
     mutationFn: async (fee: Omit<PlatformFee, 'id' | 'created_at' | 'updated_at'>) => {
-      const { data, error } = await supabase.from('platform_fees').insert(fee).select().single();
+      const { data, error } = await (supabase as any).from('platform_fees').insert(fee).select().single();
 
       if (error) throw error;
       return data;
@@ -644,7 +644,7 @@ export function useFeatureFlags() {
   return useQuery({
     queryKey: ['feature-flags'],
     queryFn: async () => {
-      const { data, error } = await supabase.from('feature_flags').select('*').order('flag_name', { ascending: true });
+      const { data, error } = await (supabase as any).from('feature_flags').select('*').order('flag_name', { ascending: true });
 
       if (error) {
         if (error.code === '42P01') return [];
@@ -660,14 +660,14 @@ export function useFeatureFlag(flagKey: string) {
   return useQuery({
     queryKey: ['feature-flag', flagKey],
     queryFn: async () => {
-      const { data, error } = await supabase.from('feature_flags').select('*').eq('flag_key', flagKey).single();
+      const { data, error } = await (supabase as any).from('feature_flags').select('*').eq('flag_key', flagKey).maybeSingle();
 
       if (error) {
-        if (error.code === 'PGRST116' || error.code === '42P01') return null;
+        if (error.code === '42P01') return null;
         throw error;
       }
 
-      return data as FeatureFlag;
+      return data as FeatureFlag | null;
     },
     enabled: !!flagKey,
   });
@@ -685,7 +685,7 @@ export function useUpdateFeatureFlag() {
       id: string;
       updates: Partial<Omit<FeatureFlag, 'id' | 'created_at' | 'updated_at'>>;
     }) => {
-      const { data, error } = await supabase.from('feature_flags').update(updates).eq('id', id).select().single();
+      const { data, error } = await (supabase as any).from('feature_flags').update(updates).eq('id', id).select().single();
 
       if (error) throw error;
       return data;
@@ -704,7 +704,7 @@ export function useCreateFeatureFlag() {
 
   return useMutation({
     mutationFn: async (flag: Omit<FeatureFlag, 'id' | 'created_at' | 'updated_at'>) => {
-      const { data, error } = await supabase.from('feature_flags').insert(flag).select().single();
+      const { data, error } = await (supabase as any).from('feature_flags').insert(flag).select().single();
 
       if (error) throw error;
       return data;
@@ -748,7 +748,7 @@ export function useSystemSettings(category?: string) {
   return useQuery({
     queryKey: ['system-settings', category],
     queryFn: async () => {
-      let query = supabase.from('system_settings').select('*').order('category', { ascending: true });
+      let query = (supabase as any).from('system_settings').select('*').order('category', { ascending: true });
 
       if (category) {
         query = query.eq('category', category);
@@ -770,14 +770,14 @@ export function useSystemSetting(key: string) {
   return useQuery({
     queryKey: ['system-setting', key],
     queryFn: async () => {
-      const { data, error } = await supabase.from('system_settings').select('*').eq('setting_key', key).single();
+      const { data, error } = await (supabase as any).from('system_settings').select('*').eq('setting_key', key).maybeSingle();
 
       if (error) {
-        if (error.code === 'PGRST116' || error.code === '42P01') return null;
+        if (error.code === '42P01') return null;
         throw error;
       }
 
-      return data as SystemSetting;
+      return data as SystemSetting | null;
     },
     enabled: !!key,
   });
@@ -789,7 +789,7 @@ export function useUpdateSystemSetting() {
 
   return useMutation({
     mutationFn: async ({ key, value }: { key: string; value: string }) => {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('system_settings')
         .update({ setting_value: value })
         .eq('setting_key', key)
@@ -815,7 +815,7 @@ export function useApprovalWorkflows() {
   return useQuery({
     queryKey: ['approval-workflows'],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('approval_workflows')
         .select('*')
         .order('workflow_name', { ascending: true });
@@ -842,7 +842,7 @@ export function useUpdateApprovalWorkflow() {
       id: string;
       updates: Partial<Omit<ApprovalWorkflow, 'id' | 'created_at' | 'updated_at'>>;
     }) => {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('approval_workflows')
         .update(updates)
         .eq('id', id)
@@ -867,7 +867,7 @@ export function useApprovalQueue(status?: string) {
   return useQuery({
     queryKey: ['approval-queue', status],
     queryFn: async () => {
-      let query = supabase
+      let query = (supabase as any)
         .from('approval_queue')
         .select('*')
         .order('priority', { ascending: true })
@@ -898,7 +898,7 @@ export function useApproveRequest() {
     mutationFn: async ({ id, notes }: { id: string; notes?: string }) => {
       if (!user) throw new Error('Not authenticated');
 
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('approval_queue')
         .update({
           status: 'approved',
@@ -929,7 +929,7 @@ export function useRejectRequest() {
     mutationFn: async ({ id, reason }: { id: string; reason: string }) => {
       if (!user) throw new Error('Not authenticated');
 
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('approval_queue')
         .update({
           status: 'rejected',
@@ -959,7 +959,7 @@ export function useVerificationRequirements(entityType?: string) {
   return useQuery({
     queryKey: ['verification-requirements', entityType],
     queryFn: async () => {
-      let query = supabase
+      let query = (supabase as any)
         .from('verification_requirements')
         .select('*')
         .order('entity_type', { ascending: true });
@@ -992,7 +992,7 @@ export function useUpdateVerificationRequirement() {
       id: string;
       updates: Partial<Omit<VerificationRequirement, 'id' | 'created_at' | 'updated_at'>>;
     }) => {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('verification_requirements')
         .update(updates)
         .eq('id', id)
@@ -1017,7 +1017,7 @@ export function useOperationalLimits(category?: string) {
   return useQuery({
     queryKey: ['operational-limits', category],
     queryFn: async () => {
-      let query = supabase
+      let query = (supabase as any)
         .from('operational_limits')
         .select('*')
         .order('limit_category', { ascending: true });
@@ -1050,7 +1050,7 @@ export function useUpdateOperationalLimit() {
       id: string;
       updates: Partial<Omit<OperationalLimit, 'id' | 'created_at' | 'updated_at'>>;
     }) => {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('operational_limits')
         .update(updates)
         .eq('id', id)
@@ -1075,7 +1075,7 @@ export function useServiceRegions(activeOnly = true) {
   return useQuery({
     queryKey: ['service-regions', activeOnly],
     queryFn: async () => {
-      let query = supabase.from('service_regions').select('*').order('region_name', { ascending: true });
+      let query = (supabase as any).from('service_regions').select('*').order('region_name', { ascending: true });
 
       if (activeOnly) {
         query = query.eq('is_active', true);
@@ -1105,7 +1105,7 @@ export function useUpdateServiceRegion() {
       id: string;
       updates: Partial<Omit<ServiceRegion, 'id' | 'created_at' | 'updated_at'>>;
     }) => {
-      const { data, error } = await supabase.from('service_regions').update(updates).eq('id', id).select().single();
+      const { data, error } = await (supabase as any).from('service_regions').update(updates).eq('id', id).select().single();
 
       if (error) throw error;
       return data;
@@ -1123,7 +1123,7 @@ export function useCreateServiceRegion() {
 
   return useMutation({
     mutationFn: async (region: Omit<ServiceRegion, 'id' | 'created_at' | 'updated_at'>) => {
-      const { data, error } = await supabase.from('service_regions').insert(region).select().single();
+      const { data, error } = await (supabase as any).from('service_regions').insert(region).select().single();
 
       if (error) throw error;
       return data;
@@ -1143,7 +1143,7 @@ export function usePayoutConfigs() {
   return useQuery({
     queryKey: ['payout-configs'],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('payout_config')
         .select('*')
         .order('entity_type', { ascending: true });
@@ -1170,7 +1170,7 @@ export function useUpdatePayoutConfig() {
       id: string;
       updates: Partial<Omit<PayoutConfig, 'id' | 'created_at' | 'updated_at'>>;
     }) => {
-      const { data, error } = await supabase.from('payout_config').update(updates).eq('id', id).select().single();
+      const { data, error } = await (supabase as any).from('payout_config').update(updates).eq('id', id).select().single();
 
       if (error) throw error;
       return data;
@@ -1190,7 +1190,7 @@ export function useSurgePricingConfigs() {
   return useQuery({
     queryKey: ['surge-pricing-configs'],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('surge_pricing_config')
         .select('*')
         .order('service_type', { ascending: true });
@@ -1217,7 +1217,7 @@ export function useUpdateSurgePricing() {
       id: string;
       updates: Partial<Omit<SurgePricingConfig, 'id' | 'created_at' | 'updated_at'>>;
     }) => {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('surge_pricing_config')
         .update(updates)
         .eq('id', id)
@@ -1242,7 +1242,7 @@ export function useNotificationTemplates(channel?: string) {
   return useQuery({
     queryKey: ['notification-templates', channel],
     queryFn: async () => {
-      let query = supabase
+      let query = (supabase as any)
         .from('notification_templates')
         .select('*')
         .order('template_name', { ascending: true });
@@ -1275,7 +1275,7 @@ export function useUpdateNotificationTemplate() {
       id: string;
       updates: Partial<Omit<NotificationTemplate, 'id' | 'created_at' | 'updated_at'>>;
     }) => {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('notification_templates')
         .update(updates)
         .eq('id', id)
@@ -1300,7 +1300,7 @@ export function useSupportCategories() {
   return useQuery({
     queryKey: ['support-categories'],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('support_categories')
         .select('*')
         .order('sort_order', { ascending: true });
@@ -1323,7 +1323,7 @@ export function useConfigAuditLog(tableName?: string, limit = 100) {
   return useQuery({
     queryKey: ['config-audit-log', tableName, limit],
     queryFn: async () => {
-      let query = supabase
+      let query = (supabase as any)
         .from('config_audit_log')
         .select('*')
         .order('created_at', { ascending: false })
@@ -1354,10 +1354,10 @@ export function usePlatformOverview() {
     queryKey: ['platform-overview'],
     queryFn: async () => {
       const [pendingApprovals, activeFeatures, enabledServices, activeRegions] = await Promise.all([
-        supabase.from('approval_queue').select('id', { count: 'exact' }).eq('status', 'pending'),
-        supabase.from('feature_flags').select('id', { count: 'exact' }).eq('is_enabled', true),
-        supabase.from('api_configurations').select('id', { count: 'exact' }).eq('is_enabled', true),
-        supabase.from('service_regions').select('id', { count: 'exact' }).eq('is_active', true),
+        (supabase as any).from('approval_queue').select('id', { count: 'exact' }).eq('status', 'pending'),
+        (supabase as any).from('feature_flags').select('id', { count: 'exact' }).eq('is_enabled', true),
+        (supabase as any).from('api_configurations').select('id', { count: 'exact' }).eq('is_enabled', true),
+        (supabase as any).from('service_regions').select('id', { count: 'exact' }).eq('is_active', true),
       ]);
 
       return {
