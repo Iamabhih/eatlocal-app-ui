@@ -56,7 +56,7 @@ export function useReviewPhotos(reviewId: string, reviewType: ReviewType) {
   return useQuery({
     queryKey: ['review-photos', reviewId, reviewType],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('review_photos')
         .select('*')
         .eq('review_id', reviewId)
@@ -113,7 +113,7 @@ export function useUploadReviewPhoto() {
         .getPublicUrl(storagePath);
 
       // Create photo record
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('review_photos')
         .insert({
           review_id: reviewId,
@@ -156,7 +156,7 @@ export function useReviewResponse(reviewId: string, reviewType: ReviewType) {
   return useQuery({
     queryKey: ['review-response', reviewId, reviewType],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('review_responses')
         .select(`
           *,
@@ -164,14 +164,14 @@ export function useReviewResponse(reviewId: string, reviewType: ReviewType) {
         `)
         .eq('review_id', reviewId)
         .eq('review_type', reviewType)
-        .single();
+        .maybeSingle();
 
       if (error) {
-        if (error.code === 'PGRST116' || error.code === '42P01') return null;
+        if (error.code === '42P01') return null;
         throw error;
       }
 
-      return data as ReviewResponse;
+      return data as ReviewResponse | null;
     },
     enabled: !!reviewId,
   });
@@ -199,7 +199,7 @@ export function useRespondToReview() {
     }) => {
       if (!user) throw new Error('Not authenticated');
 
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('review_responses')
         .insert({
           review_id: reviewId,
@@ -246,7 +246,7 @@ export function useVoteReview() {
       if (!user) throw new Error('Not authenticated');
 
       // Try to insert, if duplicate update
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('review_votes')
         .upsert(
           {
@@ -280,7 +280,7 @@ export function useReviewVoteCounts(reviewId: string, reviewType: ReviewType) {
   return useQuery({
     queryKey: ['review-votes', reviewId, reviewType],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('review_votes')
         .select('vote_type')
         .eq('review_id', reviewId)
@@ -291,19 +291,19 @@ export function useReviewVoteCounts(reviewId: string, reviewType: ReviewType) {
         throw error;
       }
 
-      const helpful = data.filter((v) => v.vote_type === 'helpful').length;
-      const not_helpful = data.filter((v) => v.vote_type === 'not_helpful').length;
+      const helpful = data.filter((v: any) => v.vote_type === 'helpful').length;
+      const not_helpful = data.filter((v: any) => v.vote_type === 'not_helpful').length;
 
       // Get user's vote if logged in
       let userVote = null;
       if (user) {
-        const userVoteData = await supabase
+        const userVoteData = await (supabase as any)
           .from('review_votes')
           .select('vote_type')
           .eq('review_id', reviewId)
           .eq('review_type', reviewType)
           .eq('user_id', user.id)
-          .single();
+          .maybeSingle();
 
         userVote = userVoteData.data?.vote_type || null;
       }
@@ -335,7 +335,7 @@ export function useFlagReview() {
     }) => {
       if (!user) throw new Error('Not authenticated');
 
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('review_moderation')
         .insert({
           review_id: reviewId,
@@ -367,15 +367,15 @@ export function useIsVerifiedReview(reviewId: string, reviewType: ReviewType) {
   return useQuery({
     queryKey: ['verified-review', reviewId, reviewType],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('verified_reviews')
         .select('id')
         .eq('review_id', reviewId)
         .eq('review_type', reviewType)
-        .single();
+        .maybeSingle();
 
       if (error) {
-        if (error.code === 'PGRST116' || error.code === '42P01') return false;
+        if (error.code === '42P01') return false;
         throw error;
       }
 

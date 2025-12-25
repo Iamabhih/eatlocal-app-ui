@@ -80,7 +80,7 @@ export function useInvoices() {
     queryFn: async () => {
       if (!user) return [];
 
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('invoices')
         .select('*')
         .eq('customer_id', user.id)
@@ -104,7 +104,7 @@ export function useInvoice(invoiceId: string) {
   return useQuery({
     queryKey: ['invoice', invoiceId],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('invoices')
         .select(`
           *,
@@ -152,15 +152,15 @@ export function useGenerateInvoice() {
       if (orderError) throw orderError;
 
       // Generate invoice number
-      const { data: invoiceNumber } = await supabase.rpc('generate_invoice_number');
+      const { data: invoiceNumber } = await (supabase as any).rpc('generate_invoice_number');
 
       // Calculate tax
       const taxRate = 0.15; // 15% VAT
-      const subtotal = order.subtotal || order.total - (order.delivery_fee || 0) - (order.service_fee || 0);
+      const subtotal = order.subtotal || order.total - (order.delivery_fee || 0);
       const taxAmount = subtotal * taxRate;
 
       // Create line items from order items
-      const lineItems = order.order_items?.map((item: any) => ({
+      const lineItems = (order as any).order_items?.map((item: any) => ({
         description: item.menu_item?.name || 'Item',
         quantity: item.quantity,
         unit_price: item.unit_price || item.menu_item?.price || 0,
@@ -168,7 +168,7 @@ export function useGenerateInvoice() {
       })) || [];
 
       // Create invoice
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('invoices')
         .insert({
           invoice_number: invoiceNumber || `INV-${Date.now()}`,
@@ -177,8 +177,8 @@ export function useGenerateInvoice() {
           line_items: lineItems,
           subtotal,
           delivery_fee: order.delivery_fee || 0,
-          service_fee: order.service_fee || 0,
-          discount_amount: order.discount_amount || 0,
+          service_fee: 0,
+          discount_amount: 0,
           tax_rate: taxRate,
           tax_amount: taxAmount,
           total: order.total,
@@ -218,7 +218,7 @@ export function useSubscriptionPlans(planType?: 'customer' | 'restaurant' | 'dri
   return useQuery({
     queryKey: ['subscription-plans', planType],
     queryFn: async () => {
-      let query = supabase
+      let query = (supabase as any)
         .from('subscription_plans')
         .select('*')
         .eq('is_active', true)
@@ -251,7 +251,7 @@ export function useMySubscription() {
     queryFn: async () => {
       if (!user) return null;
 
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('user_subscriptions')
         .select(`
           *,
@@ -259,14 +259,14 @@ export function useMySubscription() {
         `)
         .eq('user_id', user.id)
         .eq('status', 'active')
-        .single();
+        .maybeSingle();
 
       if (error) {
-        if (error.code === 'PGRST116' || error.code === '42P01') return null;
+        if (error.code === '42P01') return null;
         throw error;
       }
 
-      return data as Subscription;
+      return data as Subscription | null;
     },
     enabled: !!user,
   });
@@ -298,7 +298,7 @@ export function useSubscribe() {
         periodEnd.setFullYear(periodEnd.getFullYear() + 1);
       }
 
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('user_subscriptions')
         .insert({
           user_id: user.id,
@@ -334,7 +334,7 @@ export function useCancelSubscription() {
 
   return useMutation({
     mutationFn: async (subscriptionId: string) => {
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from('user_subscriptions')
         .update({
           cancel_at_period_end: true,
@@ -361,7 +361,7 @@ export function useTaxRates(category?: string) {
   return useQuery({
     queryKey: ['tax-rates', category],
     queryFn: async () => {
-      let query = supabase
+      let query = (supabase as any)
         .from('tax_rates')
         .select('*')
         .lte('effective_from', new Date().toISOString())
