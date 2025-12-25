@@ -85,7 +85,7 @@ export function useVerificationRequests() {
     queryFn: async () => {
       if (!user) return [];
 
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('verification_requests')
         .select('*')
         .eq('user_id', user.id)
@@ -170,7 +170,7 @@ export function useSubmitVerification() {
       }
 
       // Create verification request
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('verification_requests')
         .insert({
           user_id: user.id,
@@ -213,7 +213,7 @@ export function useBackgroundChecks() {
     queryFn: async () => {
       if (!user) return [];
 
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('background_checks')
         .select('*')
         .eq('user_id', user.id)
@@ -237,7 +237,7 @@ export function useVehicleInspections(driverId: string) {
   return useQuery({
     queryKey: ['vehicle-inspections', driverId],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('vehicle_inspections')
         .select('*')
         .eq('driver_id', driverId)
@@ -277,7 +277,7 @@ export function useScheduleInspection() {
       scheduledTime?: string;
       location?: string;
     }) => {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('vehicle_inspections')
         .insert({
           driver_id: driverId,
@@ -315,7 +315,7 @@ export function useInsuranceRecords() {
     queryFn: async () => {
       if (!user) return [];
 
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('insurance_records')
         .select('*')
         .eq('user_id', user.id)
@@ -379,7 +379,7 @@ export function useAddInsurance() {
         documentUrl = storagePath;
       }
 
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('insurance_records')
         .insert({
           user_id: user.id,

@@ -70,7 +70,7 @@ export async function trackEvent(event: AnalyticsEvent) {
     const userId = await getUserId();
 
     // Track to Supabase for custom analytics
-    const { error } = await supabase.from('user_interaction_logs').insert({
+    const { error } = await (supabase as any).from('user_interaction_logs').insert({
       user_id: userId,
       interaction_type: event.event_name,
       page_url: event.page_url || window.location.pathname,
