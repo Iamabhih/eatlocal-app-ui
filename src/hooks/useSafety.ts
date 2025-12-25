@@ -84,7 +84,7 @@ export function useFoodSafetyRating(restaurantId: string) {
   return useQuery({
     queryKey: ['food-safety-rating', restaurantId],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('food_safety_ratings')
         .select('*')
         .eq('restaurant_id', restaurantId)
@@ -109,7 +109,7 @@ export function useFoodSafetyHistory(restaurantId: string) {
   return useQuery({
     queryKey: ['food-safety-history', restaurantId],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('food_safety_ratings')
         .select('*')
         .eq('restaurant_id', restaurantId)
@@ -133,7 +133,7 @@ export function useMenuItemAllergens(menuItemId: string) {
   return useQuery({
     queryKey: ['menu-item-allergens', menuItemId],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('menu_item_allergens')
         .select('*')
         .eq('menu_item_id', menuItemId);
@@ -167,7 +167,7 @@ export function useAllergenFreeItems(restaurantId: string, excludeAllergens: All
       if (!items) return [];
 
       // Get allergens for these items
-      const { data: allergens, error: allergensError } = await supabase
+      const { data: allergens, error: allergensError } = await (supabase as any)
         .from('menu_item_allergens')
         .select('menu_item_id, allergen_type, severity')
         .in(
@@ -214,7 +214,7 @@ export function useAddAllergen() {
       severity: MenuItemAllergen['severity'];
       notes?: string;
     }) => {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('menu_item_allergens')
         .insert({
           menu_item_id: menuItemId,
@@ -252,7 +252,7 @@ export function useCarbonSummary(year?: number, month?: number) {
     queryFn: async () => {
       if (!user) return null;
 
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('user_carbon_summary')
         .select('*')
         .eq('user_id', user.id)
@@ -282,7 +282,7 @@ export function useCarbonHistory(months: number = 12) {
     queryFn: async () => {
       if (!user) return [];
 
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('user_carbon_summary')
         .select('*')
         .eq('user_id', user.id)
@@ -325,7 +325,7 @@ export function usePurchaseCarbonOffset() {
       const currentDate = new Date();
 
       // Update user's carbon summary
-      const { data: existing } = await supabase
+      const { data: existing } = await (supabase as any)
         .from('user_carbon_summary')
         .select('*')
         .eq('user_id', user.id)
@@ -334,14 +334,14 @@ export function usePurchaseCarbonOffset() {
         .single();
 
       if (existing) {
-        await supabase
+        await (supabase as any)
           .from('user_carbon_summary')
           .update({
             carbon_offset_kg: (existing.carbon_offset_kg || 0) + carbonKg,
           })
           .eq('id', existing.id);
       } else {
-        await supabase.from('user_carbon_summary').insert({
+        await (supabase as any).from('user_carbon_summary').insert({
           user_id: user.id,
           year: currentDate.getFullYear(),
           month: currentDate.getMonth() + 1,
@@ -391,7 +391,7 @@ export function useUserAllergenPreferences() {
     queryFn: async () => {
       if (!user) return [];
 
-      const { data } = await supabase
+      const { data } = await (supabase as any)
         .from('user_taste_profiles')
         .select('dietary_restrictions')
         .eq('user_id', user.id)

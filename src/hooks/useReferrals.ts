@@ -50,7 +50,7 @@ export function useReferralCode() {
       if (!user) return null;
 
       // Check if referral code exists in database
-      const { data: existingCode, error: fetchError } = await supabase
+      const { data: existingCode, error: fetchError } = await (supabase as any)
         .from('referral_codes')
         .select('*')
         .eq('user_id', user.id)
@@ -71,7 +71,7 @@ export function useReferralCode() {
       // Generate new code and store in database
       const newCode = generateReferralCode(user.id);
 
-      const { data: newCodeData, error: insertError } = await supabase
+      const { data: newCodeData, error: insertError } = await (supabase as any)
         .from('referral_codes')
         .insert({
           user_id: user.id,
@@ -116,7 +116,7 @@ export function useReferralStats() {
       if (!user) return null;
 
       // Get user's referral code info
-      const { data: codeData } = await supabase
+      const { data: codeData } = await (supabase as any)
         .from('referral_codes')
         .select('id, code, current_uses, referrer_reward_value')
         .eq('user_id', user.id)
@@ -124,7 +124,7 @@ export function useReferralStats() {
         .single();
 
       // Get referrals made by this user
-      const { data: referrals } = await supabase
+      const { data: referrals } = await (supabase as any)
         .from('referrals')
         .select(`
           id,
@@ -140,7 +140,7 @@ export function useReferralStats() {
       // Get referee profile names
       let recentReferrals: Array<{ name: string; date: string; status: 'pending' | 'completed'; reward: number }> = [];
       if (referrals && referrals.length > 0) {
-        const refereeIds = referrals.map(r => r.referee_id);
+        const refereeIds = referrals.map((r: any) => r.referee_id);
         const { data: profiles } = await supabase
           .from('profiles')
           .select('id, full_name')
@@ -148,7 +148,7 @@ export function useReferralStats() {
 
         const profileMap = new Map(profiles?.map(p => [p.id, p.full_name]) || []);
 
-        recentReferrals = referrals.map(r => ({
+        recentReferrals = referrals.map((r: any) => ({
           name: profileMap.get(r.referee_id) || 'Anonymous',
           date: r.created_at,
           status: r.status === 'rewarded' ? 'completed' as const : 'pending' as const,
@@ -157,14 +157,14 @@ export function useReferralStats() {
       }
 
       // Get bonuses earned
-      const { data: bonuses } = await supabase
+      const { data: bonuses } = await (supabase as any)
         .from('referral_bonuses')
         .select('reward_value, status')
         .eq('user_id', user.id)
         .eq('bonus_type', 'referrer');
 
-      const totalRewardsEarned = bonuses?.filter(b => b.status === 'credited').reduce((sum, b) => sum + Number(b.reward_value), 0) || 0;
-      const pendingRewards = bonuses?.filter(b => b.status === 'pending').reduce((sum, b) => sum + Number(b.reward_value), 0) || 0;
+      const totalRewardsEarned = bonuses?.filter((b: any) => b.status === 'credited').reduce((sum: number, b: any) => sum + Number(b.reward_value), 0) || 0;
+      const pendingRewards = bonuses?.filter((b: any) => b.status === 'pending').reduce((sum: number, b: any) => sum + Number(b.reward_value), 0) || 0;
 
       return {
         totalReferrals: codeData?.current_uses || 0,
@@ -191,7 +191,7 @@ export function useApplyReferralCode() {
       if (!user) throw new Error('Not authenticated');
 
       // Call the database function to apply referral code
-      const { data, error } = await supabase.rpc('apply_referral_code', {
+      const { data, error } = await (supabase as any).rpc('apply_referral_code', {
         p_referee_id: user.id,
         p_code: code.toUpperCase(),
       });
@@ -200,8 +200,8 @@ export function useApplyReferralCode() {
         throw new Error(error.message);
       }
 
-      if (!data.success) {
-        throw new Error(data.error || 'Failed to apply referral code');
+      if (!data?.success) {
+        throw new Error(data?.error || 'Failed to apply referral code');
       }
 
       // Also store in user metadata for reference

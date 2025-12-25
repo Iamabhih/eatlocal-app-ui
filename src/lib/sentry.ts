@@ -139,7 +139,8 @@ export function setTag(key: string, value: string) {
  * Track performance
  */
 export function startTransaction(name: string, op: string) {
-  return Sentry.startTransaction({ name, op });
+  // Sentry.startTransaction is deprecated, use startInactiveSpan instead
+  return Sentry.startInactiveSpan({ name, op });
 }
 
 /**

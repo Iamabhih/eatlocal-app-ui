@@ -55,7 +55,7 @@ export default function RestaurantPromotions() {
   const { data: promotions, isLoading } = useQuery({
     queryKey: ['promotions', restaurant?.id],
     queryFn: async () => {
-      const { data } = await supabase
+      const { data } = await (supabase as any)
         .from('promo_codes')
         .select('*')
         .eq('restaurant_id', restaurant?.id)
@@ -370,7 +370,7 @@ export default function RestaurantPromotions() {
                       Usage
                     </p>
                     <p className="font-medium">
-                      {promo.times_used} / {promo.usage_limit || '∞'}
+                      {(promo as any).times_used || promo.usage_count || 0} / {promo.usage_limit || '∞'}
                     </p>
                   </div>
                   <div>
@@ -379,8 +379,8 @@ export default function RestaurantPromotions() {
                       Valid Until
                     </p>
                     <p className="font-medium">
-                      {promo.valid_until
-                        ? format(new Date(promo.valid_until), 'PP')
+                      {(promo as any).valid_until || promo.end_date
+                        ? format(new Date((promo as any).valid_until || promo.end_date), 'PP')
                         : 'No expiry'}
                     </p>
                   </div>
