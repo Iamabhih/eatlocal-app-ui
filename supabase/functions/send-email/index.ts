@@ -392,7 +392,7 @@ serve(async (req: Request): Promise<Response> => {
       error_message: errorMessage,
       severity: 'medium',
       metadata: { identifier }
-    }).catch(() => { /* ignore logging errors */ });
+    }).then(() => {}, () => { /* ignore logging errors */ });
 
     return new Response(
       JSON.stringify({ error: errorMessage }),

@@ -106,7 +106,7 @@ async function sendSms(to: string, body: string): Promise<{ success: boolean; si
 
 // Create in-app notification
 async function createInAppNotification(
-  supabase: ReturnType<typeof createClient>,
+  supabase: any,
   userId: string,
   title: string,
   body: string,
@@ -119,8 +119,8 @@ async function createInAppNotification(
       title,
       message: body,
       type: data.type || 'general',
-      read: false,
-      link: data.link || null,
+      is_read: false,
+      action_url: data.link || null,
       metadata: data,
     })
     .select('id')
@@ -130,11 +130,11 @@ async function createInAppNotification(
     return { success: false, error: error.message };
   }
 
-  return { success: true, id: notification.id };
+  return { success: true, id: notification?.id };
 }
 
 // Process a batch of notifications
-async function processNotifications(supabase: ReturnType<typeof createClient>, batchSize: number = 50): Promise<{
+async function processNotifications(supabase: any, batchSize: number = 50): Promise<{
   processed: number;
   succeeded: number;
   failed: number;
@@ -188,38 +188,40 @@ async function processNotifications(supabase: ReturnType<typeof createClient>, b
     try {
       switch (job.channel) {
         case 'email':
-          if (!job.email && job.user_id) {
+          let emailAddress = job.email;
+          if (!emailAddress && job.user_id) {
             // Get user email
             const { data: profile } = await supabase
               .from('profiles')
               .select('email')
               .eq('id', job.user_id)
               .single();
-            job.email = profile?.email;
+            emailAddress = profile?.email;
           }
 
-          if (!job.email) {
+          if (!emailAddress) {
             result = { success: false, error: 'No email address' };
           } else {
-            result = await sendEmail(job.email, renderedSubject || 'Notification', renderedBody);
+            result = await sendEmail(emailAddress, renderedSubject || 'Notification', renderedBody);
           }
           break;
 
         case 'sms':
-          if (!job.phone && job.user_id) {
+          let phoneNumber = job.phone;
+          if (!phoneNumber && job.user_id) {
             // Get user phone
             const { data: profile } = await supabase
               .from('profiles')
               .select('phone')
               .eq('id', job.user_id)
               .single();
-            job.phone = profile?.phone;
+            phoneNumber = profile?.phone;
           }
 
-          if (!job.phone) {
+          if (!phoneNumber) {
             result = { success: false, error: 'No phone number' };
           } else {
-            result = await sendSms(job.phone, renderedBody);
+            result = await sendSms(phoneNumber, renderedBody);
           }
           break;
 
@@ -325,7 +327,7 @@ serve(async (req: Request): Promise<Response> => {
   const isServiceCall = authHeader?.includes(supabaseKey);
 
   if (!isServiceCall) {
-    const authResult = await verifyAuth(authHeader, supabase);
+    const authResult = await verifyAuth(authHeader, supabase as any);
 
     if (!authResult.authenticated) {
       return new Response(
@@ -367,7 +369,7 @@ serve(async (req: Request): Promise<Response> => {
       success: results.failed === 0,
       session_id: crypto.randomUUID(),
       page_url: '/api/process-notifications',
-    }).catch(() => { /* ignore */ });
+    }).then(() => {}, () => { /* ignore */ });
 
     console.log(`Processed: ${results.processed}, Succeeded: ${results.succeeded}, Failed: ${results.failed}`);
 

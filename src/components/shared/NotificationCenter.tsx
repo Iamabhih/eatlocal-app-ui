@@ -4,7 +4,7 @@
  * Displays a bell icon with unread count and dropdown with recent notifications
  */
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Bell, X, Check, ExternalLink } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -15,7 +15,12 @@ import {
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import { useNotifications } from '@/hooks/useNotifications';
+import { 
+  useNotifications, 
+  useMarkAsRead, 
+  useMarkAllAsRead, 
+  useDeleteNotification 
+} from '@/hooks/useNotifications';
 import { formatDistanceToNow } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
 
@@ -23,13 +28,10 @@ export function NotificationCenter() {
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
 
-  const {
-    data: notifications,
-    isLoading,
-    markAsRead,
-    markAllAsRead,
-    deleteNotification,
-  } = useNotifications({ limit: 5 });
+  const { data: notifications, isLoading } = useNotifications(5);
+  const markAsRead = useMarkAsRead();
+  const markAllAsRead = useMarkAllAsRead();
+  const deleteNotification = useDeleteNotification();
 
   const unreadCount = notifications?.filter((n) => !n.is_read).length || 0;
 
@@ -40,8 +42,8 @@ export function NotificationCenter() {
     }
 
     // Navigate if URL provided
-    if (notification.data?.url) {
-      navigate(notification.data.url);
+    if (notification.action_url) {
+      navigate(notification.action_url);
       setIsOpen(false);
     }
   };
@@ -52,7 +54,7 @@ export function NotificationCenter() {
         return '🛍️';
       case 'delivery':
         return '🚚';
-      case 'promotion':
+      case 'promo':
         return '🎉';
       case 'review':
         return '⭐';
@@ -136,7 +138,7 @@ export function NotificationCenter() {
                             addSuffix: true,
                           })}
                         </span>
-                        {notification.data?.url && (
+                        {notification.action_url && (
                           <ExternalLink className="h-3 w-3 text-muted-foreground" />
                         )}
                       </div>

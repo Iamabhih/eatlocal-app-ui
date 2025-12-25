@@ -139,8 +139,9 @@ serve(async (req) => {
     }
 
     // Get restaurant location (pickup point)
-    const restaurantLat = order.restaurants?.latitude;
-    const restaurantLon = order.restaurants?.longitude;
+    const restaurant = order.restaurants as { latitude: number; longitude: number } | null;
+    const restaurantLat = restaurant?.latitude;
+    const restaurantLon = restaurant?.longitude;
 
     if (!restaurantLat || !restaurantLon) {
       return new Response(
@@ -291,7 +292,7 @@ serve(async (req) => {
   } catch (error) {
     console.error("Assignment error:", error);
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ error: (error as Error).message }),
       {
         status: 500,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
