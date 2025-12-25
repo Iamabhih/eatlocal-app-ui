@@ -57,7 +57,7 @@ export function useAchievements() {
   return useQuery({
     queryKey: ['achievements'],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('achievements')
         .select('*')
         .eq('is_active', true)
@@ -84,7 +84,7 @@ export function useUserAchievements() {
     queryFn: async () => {
       if (!user) return [];
 
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('user_achievements')
         .select(`
           *,
@@ -151,12 +151,12 @@ export function useCheckAchievements() {
     mutationFn: async () => {
       if (!user) throw new Error('Not authenticated');
 
-      const { data, error } = await supabase.rpc('check_achievements', {
+      const { data, error } = await (supabase as any).rpc('check_achievements', {
         p_user_id: user.id,
       });
 
       if (error) throw error;
-      return data;
+      return data as { newly_earned?: any[] };
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['user-achievements'] });
@@ -185,7 +185,7 @@ export function useClaimAchievementReward() {
       if (!user) throw new Error('Not authenticated');
 
       // Get the achievement details
-      const { data: userAchievement, error: fetchError } = await supabase
+      const { data: userAchievement, error: fetchError } = await (supabase as any)
         .from('user_achievements')
         .select('*, achievement:achievements(*)')
         .eq('user_id', user.id)
@@ -201,14 +201,14 @@ export function useClaimAchievementReward() {
       // Apply reward based on type
       if (achievement.reward_type === 'credit' && achievement.reward_value) {
         // Add wallet credit
-        const { data: wallet } = await supabase
+        const { data: wallet } = await (supabase as any)
           .from('wallets')
           .select('id')
           .eq('user_id', user.id)
           .single();
 
         if (wallet) {
-          await supabase.from('wallet_transactions').insert({
+          await (supabase as any).from('wallet_transactions').insert({
             wallet_id: wallet.id,
             amount: achievement.reward_value,
             type: 'credit',
@@ -217,14 +217,14 @@ export function useClaimAchievementReward() {
             reference_id: achievementId,
           });
 
-          await supabase
+          await (supabase as any)
             .from('wallets')
-            .update({ balance: supabase.rpc('increment', { x: achievement.reward_value }) })
+            .update({ balance: wallet.balance + achievement.reward_value })
             .eq('id', wallet.id);
         }
       } else if (achievement.reward_type === 'points' && achievement.reward_value) {
         // Add loyalty points
-        await supabase
+        await (supabase as any)
           .from('loyalty_points')
           .insert({
             user_id: user.id,
@@ -235,7 +235,7 @@ export function useClaimAchievementReward() {
       }
 
       // Mark reward as claimed
-      const { error: updateError } = await supabase
+      const { error: updateError } = await (supabase as any)
         .from('user_achievements')
         .update({
           reward_claimed: true,
@@ -279,7 +279,7 @@ export function useLeaderboard(
     queryKey: ['leaderboard', type, period],
     queryFn: async () => {
       // Get latest snapshot for this type/period
-      const { data: snapshot, error } = await supabase
+      const { data: snapshot, error } = await (supabase as any)
         .from('leaderboard_snapshots')
         .select('rankings')
         .eq('leaderboard_type', type)

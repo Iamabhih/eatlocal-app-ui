@@ -94,7 +94,7 @@ export function useDailyMetrics({
   return useQuery({
     queryKey: ['daily-metrics', entityType, entityId, startDate.toISOString(), endDate.toISOString()],
     queryFn: async () => {
-      let query = supabase
+      let query = (supabase as any)
         .from('daily_metrics')
         .select('*')
         .eq('entity_type', entityType)
@@ -168,7 +168,7 @@ export function useScheduledReports() {
   return useQuery({
     queryKey: ['scheduled-reports', user?.id],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('scheduled_reports')
         .select('*')
         .order('created_at', { ascending: false });
@@ -210,7 +210,7 @@ export function useCreateScheduledReport() {
         nextRun.setDate(report.day_of_month || 1);
       }
 
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('scheduled_reports')
         .insert({
           ...report,
@@ -240,7 +240,7 @@ export function useExperiments(status?: ABExperiment['status']) {
   return useQuery({
     queryKey: ['experiments', status],
     queryFn: async () => {
-      let query = supabase
+      let query = (supabase as any)
         .from('ab_experiments')
         .select('*')
         .order('created_at', { ascending: false });
@@ -272,7 +272,7 @@ export function useExperimentAssignment(experimentId: string) {
     queryFn: async () => {
       if (!user) return null;
 
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('experiment_assignments')
         .select('*')
         .eq('experiment_id', experimentId)
@@ -302,7 +302,7 @@ export function useAssignToExperiment() {
       if (!user) throw new Error('Not authenticated');
 
       // Get experiment to determine variant
-      const { data: experiment } = await supabase
+      const { data: experiment } = await (supabase as any)
         .from('ab_experiments')
         .select('variants')
         .eq('id', experimentId)
@@ -324,7 +324,7 @@ export function useAssignToExperiment() {
         }
       }
 
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('experiment_assignments')
         .insert({
           experiment_id: experimentId,
@@ -357,7 +357,7 @@ export function useTrackConversion() {
       assignmentId: string;
       conversionValue?: number;
     }) => {
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from('experiment_assignments')
         .update({
           converted: true,
