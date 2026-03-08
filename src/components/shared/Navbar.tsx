@@ -396,18 +396,39 @@ const Navbar = ({ type = "customer" }: NavbarProps) => {
                   Explore Map
                 </Button>
               </Link>
-              {user ? (
+
+              {user && (
                 <>
+                  <div className="border-t my-2" />
+                  <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider px-3 pt-1">Account</p>
+                  <Link to="/dashboard" onClick={() => setMobileMenuOpen(false)}>
+                    <Button variant="ghost" className="w-full justify-start rounded-xl">
+                      <Search className="h-4 w-4 mr-2" />
+                      Dashboard
+                    </Button>
+                  </Link>
                   <Link to="/orders" onClick={() => setMobileMenuOpen(false)}>
                     <Button variant="ghost" className="w-full justify-start rounded-xl">
                       <Package className="h-4 w-4 mr-2" />
                       My Orders
                     </Button>
                   </Link>
+                  <Link to="/rides/my-rides" onClick={() => setMobileMenuOpen(false)}>
+                    <Button variant="ghost" className="w-full justify-start rounded-xl">
+                      <Car className="h-4 w-4 mr-2" />
+                      My Rides
+                    </Button>
+                  </Link>
                   <Link to="/favorites" onClick={() => setMobileMenuOpen(false)}>
                     <Button variant="ghost" className="w-full justify-start rounded-xl">
                       <Heart className="h-4 w-4 mr-2" />
                       Favorites
+                    </Button>
+                  </Link>
+                  <Link to="/notifications" onClick={() => setMobileMenuOpen(false)}>
+                    <Button variant="ghost" className="w-full justify-start rounded-xl">
+                      <Bell className="h-4 w-4 mr-2" />
+                      Notifications
                     </Button>
                   </Link>
                   <Link to="/profile" onClick={() => setMobileMenuOpen(false)}>
