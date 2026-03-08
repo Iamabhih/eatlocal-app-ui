@@ -517,9 +517,7 @@ export default function AdminOrders() {
                 )}
               </CardContent>
             </Card>
-          </main>
-        </div>
-      </div>
+      </Card>
 
       {/* Order Details Sheet */}
       <Sheet open={showOrderSheet} onOpenChange={setShowOrderSheet}>

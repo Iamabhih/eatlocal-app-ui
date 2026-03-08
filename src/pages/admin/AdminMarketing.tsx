@@ -651,6 +651,7 @@ export default function AdminMarketing() {
                   </CardContent>
                 </Card>
               </TabsContent>
+            </Tabs>
     </div>
   );
 }
