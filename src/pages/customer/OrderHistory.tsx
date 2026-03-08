@@ -77,10 +77,13 @@ const OrderHistory = () => {
           status,
           total,
           created_at,
+          restaurant_id,
           restaurant:restaurants(name, image_url),
           order_items(
             quantity,
-            menu_item:menu_items(name)
+            unit_price,
+            menu_item_id,
+            menu_item:menu_items(name, id)
           )
         `)
         .eq("customer_id", user.id)

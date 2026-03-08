@@ -156,14 +156,49 @@ const DeliveryDashboard = () => {
                   </div>
 
                   <div className="flex gap-2">
-                    <Button variant="outline" className="flex-1">
-                      <MapPin className="h-4 w-4 mr-2" />
-                      Navigate
+                    <Button
+                      variant="outline"
+                      className="flex-1"
+                      onClick={() => {
+                        const addr = currentDelivery.delivery_address;
+                        const dest = addr ? `${addr.street_address}, ${addr.city}` : '';
+                        window.open(`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(dest)}`, '_blank');
+                      }}
+                    >
+                      <Navigation className="h-4 w-4 mr-2" />
+                      Google Maps
                     </Button>
-                    <Button variant="outline" className="flex-1">
-                      Call Customer
+                    <Button
+                      variant="outline"
+                      className="flex-1"
+                      onClick={() => {
+                        const addr = currentDelivery.delivery_address;
+                        const dest = addr ? `${addr.street_address}, ${addr.city}` : '';
+                        window.open(`https://waze.com/ul?q=${encodeURIComponent(dest)}&navigate=yes`, '_blank');
+                      }}
+                    >
+                      <MapPin className="h-4 w-4 mr-2" />
+                      Waze
                     </Button>
                   </div>
+
+                  {currentDelivery.status === 'picked_up' && (
+                    <Button
+                      className="w-full mt-2"
+                      onClick={() => setShowProofOfDelivery(currentDelivery.id)}
+                    >
+                      Complete Delivery
+                    </Button>
+                  )}
+
+                  {showProofOfDelivery === currentDelivery.id && (
+                    <div className="mt-4">
+                      <ProofOfDelivery
+                        orderId={currentDelivery.id}
+                        onComplete={() => setShowProofOfDelivery(null)}
+                      />
+                    </div>
+                  )}
                 </div>
               </CardContent>
             </Card>
