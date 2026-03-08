@@ -388,9 +388,7 @@ export default function AdminUsers() {
                 )}
               </CardContent>
             </Card>
-          </main>
-        </div>
-      </div>
+    </div>
 
       {/* User Details Dialog */}
       <Dialog open={showUserDetails} onOpenChange={setShowUserDetails}>
