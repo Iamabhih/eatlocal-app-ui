@@ -11,6 +11,7 @@ import { ProofOfDelivery } from "@/components/delivery/ProofOfDelivery";
 import { useState } from "react";
 
 const DeliveryDashboard = () => {
+  const [showProofOfDelivery, setShowProofOfDelivery] = useState<string | null>(null);
   const { orders } = useDeliveryOrders();
   const { totalToday, deliveriesToday } = useDeliveryEarnings();
 
