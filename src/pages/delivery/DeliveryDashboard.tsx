@@ -1,4 +1,4 @@
-import { MapPin, DollarSign, Clock, TrendingUp, Package, Star } from "lucide-react";
+import { MapPin, DollarSign, Clock, TrendingUp, Package, Star, Navigation, Phone } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -7,6 +7,8 @@ import { Label } from "@/components/ui/label";
 import deliveryHero from "@/assets/delivery-partner-hero.jpg";
 import { useDeliveryOrders } from "@/hooks/useDeliveryOrders";
 import { useDeliveryEarnings } from "@/hooks/useDeliveryEarnings";
+import { ProofOfDelivery } from "@/components/delivery/ProofOfDelivery";
+import { useState } from "react";
 
 const DeliveryDashboard = () => {
   const { orders } = useDeliveryOrders();
