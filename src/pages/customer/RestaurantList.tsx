@@ -75,6 +75,8 @@ const RestaurantList = () => {
   const [sortBy, setSortBy] = useState<SortOption>("rating");
   const [sortDirection, setSortDirection] = useState<SortDirection>("desc");
   const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const ITEMS_PER_PAGE = 12;
   const [filters, setFilters] = useState<FilterState>({
     priceRange: [0, 100],
     dietary: [],
@@ -182,6 +184,16 @@ const RestaurantList = () => {
     });
     return sorted;
   }, [filteredRestaurants, sortBy, sortDirection]);
+
+  // Pagination
+  const totalPages = Math.ceil(sortedRestaurants.length / ITEMS_PER_PAGE);
+  const paginatedRestaurants = useMemo(() => {
+    const start = (currentPage - 1) * ITEMS_PER_PAGE;
+    return sortedRestaurants.slice(start, start + ITEMS_PER_PAGE);
+  }, [sortedRestaurants, currentPage]);
+
+  // Reset page when filters change
+  useMemo(() => { setCurrentPage(1); }, [searchQuery, selectedCategory, filters, showFavoritesOnly, sortBy, sortDirection]);
 
   const activeFiltersCount = useMemo(() => {
     let count = 0;
@@ -550,36 +562,87 @@ const RestaurantList = () => {
                 </div>
               ))}
             </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {sortedRestaurants.map((restaurant, index) => (
-                <div
-                  key={restaurant.id}
-                  className="animate-slide-up"
-                  style={{ animationDelay: `${index * 50}ms` }}
-                >
-                  <RestaurantCard
-                    id={restaurant.id}
-                    name={restaurant.name}
-                    image={restaurant.image}
-                    rating={restaurant.rating}
-                    deliveryTime={`${restaurant.deliveryTime} min`}
-                    deliveryFee={`R${restaurant.deliveryFee.toFixed(2)}`}
-                    categories={restaurant.categories}
-                    isOpen={restaurant.isOpen}
-                    isFavorite={isFavorite(restaurant.id)}
-                    onFavoriteToggle={() => toggleFavorite(restaurant.id)}
-                    trending={index < 3}
-                    matchedDish={
-                      searchQuery && restaurant.menuItems?.find(m =>
-                        m.name.toLowerCase().includes(searchQuery.toLowerCase())
-                      )?.name
-                    }
-                  />
+          ) : sortedRestaurants.length > 0 ? (
+            <>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                {paginatedRestaurants.map((restaurant, index) => (
+                  <div
+                    key={restaurant.id}
+                    className="animate-slide-up"
+                    style={{ animationDelay: `${index * 50}ms` }}
+                  >
+                    <RestaurantCard
+                      id={restaurant.id}
+                      name={restaurant.name}
+                      image={restaurant.image}
+                      rating={restaurant.rating}
+                      deliveryTime={`${restaurant.deliveryTime} min`}
+                      deliveryFee={`R${restaurant.deliveryFee.toFixed(2)}`}
+                      categories={restaurant.categories}
+                      isOpen={restaurant.isOpen}
+                      isFavorite={isFavorite(restaurant.id)}
+                      onFavoriteToggle={() => toggleFavorite(restaurant.id)}
+                      trending={index < 3}
+                      matchedDish={
+                        searchQuery && restaurant.menuItems?.find(m =>
+                          m.name.toLowerCase().includes(searchQuery.toLowerCase())
+                        )?.name
+                      }
+                    />
+                  </div>
+                ))}
+              </div>
+
+              {/* Pagination */}
+              {totalPages > 1 && (
+                <div className="flex items-center justify-center gap-2 mt-8">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                    disabled={currentPage === 1}
+                    className="rounded-xl"
+                  >
+                    Previous
+                  </Button>
+                  <div className="flex items-center gap-1">
+                    {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                      let page: number;
+                      if (totalPages <= 5) {
+                        page = i + 1;
+                      } else if (currentPage <= 3) {
+                        page = i + 1;
+                      } else if (currentPage >= totalPages - 2) {
+                        page = totalPages - 4 + i;
+                      } else {
+                        page = currentPage - 2 + i;
+                      }
+                      return (
+                        <Button
+                          key={page}
+                          variant={currentPage === page ? "default" : "ghost"}
+                          size="sm"
+                          onClick={() => setCurrentPage(page)}
+                          className="w-9 h-9 rounded-xl"
+                        >
+                          {page}
+                        </Button>
+                      );
+                    })}
+                  </div>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                    disabled={currentPage === totalPages}
+                    className="rounded-xl"
+                  >
+                    Next
+                  </Button>
                 </div>
-              ))}
-            </div>
-          )}
+              )}
+            </>
+          ) : null}
 
           {sortedRestaurants.length === 0 && !isLoading && (
             <div className="text-center py-16 animate-fade-in">

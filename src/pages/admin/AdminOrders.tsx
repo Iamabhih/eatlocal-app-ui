@@ -95,6 +95,10 @@ export default function AdminOrders() {
     to: undefined,
   });
 
+  // Pagination
+  const [currentPage, setCurrentPage] = useState(1);
+  const ORDERS_PER_PAGE = 25;
+
   // Selected order
   const [selectedOrder, setSelectedOrder] = useState<any>(null);
   const [showOrderSheet, setShowOrderSheet] = useState(false);
@@ -454,7 +458,7 @@ export default function AdminOrders() {
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {filteredOrders.map((order) => (
+                      {filteredOrders.slice((currentPage - 1) * ORDERS_PER_PAGE, currentPage * ORDERS_PER_PAGE).map((order) => (
                         <TableRow
                           key={order.id}
                           className="cursor-pointer hover:bg-muted/50"
@@ -503,6 +507,22 @@ export default function AdminOrders() {
                       ))}
                     </TableBody>
                   </Table>
+                )}
+                {/* Pagination */}
+                {filteredOrders.length > ORDERS_PER_PAGE && (
+                  <div className="flex items-center justify-between mt-4 pt-4 border-t">
+                    <p className="text-sm text-muted-foreground">
+                      Showing {((currentPage - 1) * ORDERS_PER_PAGE) + 1}-{Math.min(currentPage * ORDERS_PER_PAGE, filteredOrders.length)} of {filteredOrders.length}
+                    </p>
+                    <div className="flex gap-2">
+                      <Button variant="outline" size="sm" onClick={() => setCurrentPage(p => Math.max(1, p - 1))} disabled={currentPage === 1}>
+                        Previous
+                      </Button>
+                      <Button variant="outline" size="sm" onClick={() => setCurrentPage(p => p + 1)} disabled={currentPage * ORDERS_PER_PAGE >= filteredOrders.length}>
+                        Next
+                      </Button>
+                    </div>
+                  </div>
                 )}
               </CardContent>
             </Card>

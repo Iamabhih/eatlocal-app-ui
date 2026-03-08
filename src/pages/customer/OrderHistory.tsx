@@ -63,6 +63,8 @@ const OrderHistory = () => {
   const { toast } = useToast();
   const [searchQuery, setSearchQuery] = useState("");
   const [activeTab, setActiveTab] = useState("all");
+  const [currentPage, setCurrentPage] = useState(1);
+  const ORDERS_PER_PAGE = 10;
 
   const { data: orders, isLoading } = useQuery<Order[]>({
     queryKey: ["customer-orders", user?.id],
@@ -112,6 +114,12 @@ const OrderHistory = () => {
     }
     return matchesSearch;
   });
+
+  const totalPages = Math.ceil((filteredOrders?.length || 0) / ORDERS_PER_PAGE);
+  const paginatedOrders = filteredOrders?.slice(
+    (currentPage - 1) * ORDERS_PER_PAGE,
+    currentPage * ORDERS_PER_PAGE
+  );
 
   const handleReorder = (order: Order, e: React.MouseEvent) => {
     e.preventDefault();
@@ -201,7 +209,7 @@ const OrderHistory = () => {
               </CardContent>
             </Card>
           ) : (
-            filteredOrders?.map((order) => (
+            paginatedOrders?.map((order) => (
               <Link key={order.id} to={`/orders/${order.id}`}>
                 <Card className="hover:shadow-md transition-shadow cursor-pointer">
                   <CardContent className="p-4">
@@ -276,6 +284,31 @@ const OrderHistory = () => {
                 </Card>
               </Link>
             ))
+          )}
+
+          {/* Pagination */}
+          {totalPages > 1 && (
+            <div className="flex items-center justify-center gap-2 mt-6">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                disabled={currentPage === 1}
+              >
+                Previous
+              </Button>
+              <span className="text-sm text-muted-foreground">
+                Page {currentPage} of {totalPages}
+              </span>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                disabled={currentPage === totalPages}
+              >
+                Next
+              </Button>
+            </div>
           )}
         </div>
       </div>
