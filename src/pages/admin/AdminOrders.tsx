@@ -95,6 +95,10 @@ export default function AdminOrders() {
     to: undefined,
   });
 
+  // Pagination
+  const [currentPage, setCurrentPage] = useState(1);
+  const ORDERS_PER_PAGE = 25;
+
   // Selected order
   const [selectedOrder, setSelectedOrder] = useState<any>(null);
   const [showOrderSheet, setShowOrderSheet] = useState(false);
