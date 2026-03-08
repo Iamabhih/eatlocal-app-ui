@@ -336,8 +336,8 @@ const OrderTracking = () => {
               orderId={order.id}
               deliveryPartnerId={order.delivery_partner_id}
               restaurantLocation={{
-                lat: -26.2041,
-                lng: 28.0473,
+                lat: restaurant?.latitude ?? -26.2041,
+                lng: restaurant?.longitude ?? 28.0473,
               }}
               deliveryLocation={deliveryAddress}
             />

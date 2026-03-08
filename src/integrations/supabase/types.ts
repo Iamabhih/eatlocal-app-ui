@@ -1733,6 +1733,7 @@ export type Database = {
           pickup_code: string | null
           pickup_time: string | null
           platform_commission: number
+          proof_of_delivery_url: string | null
           ready_at: string | null
           restaurant_id: string
           scheduled_for: string | null
@@ -1768,6 +1769,7 @@ export type Database = {
           pickup_code?: string | null
           pickup_time?: string | null
           platform_commission?: number
+          proof_of_delivery_url?: string | null
           ready_at?: string | null
           restaurant_id: string
           scheduled_for?: string | null
@@ -1803,6 +1805,7 @@ export type Database = {
           pickup_code?: string | null
           pickup_time?: string | null
           platform_commission?: number
+          proof_of_delivery_url?: string | null
           ready_at?: string | null
           restaurant_id?: string
           scheduled_for?: string | null
