@@ -461,7 +461,6 @@ export default function AdminDeliveryPartners() {
                 )}
               </CardContent>
             </Card>
-      </Card>
 
       {/* Partner Details Dialog */}
       <Dialog open={showDetailsDialog} onOpenChange={setShowDetailsDialog}>
