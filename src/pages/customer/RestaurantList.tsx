@@ -75,6 +75,8 @@ const RestaurantList = () => {
   const [sortBy, setSortBy] = useState<SortOption>("rating");
   const [sortDirection, setSortDirection] = useState<SortDirection>("desc");
   const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const ITEMS_PER_PAGE = 12;
   const [filters, setFilters] = useState<FilterState>({
     priceRange: [0, 100],
     dietary: [],
