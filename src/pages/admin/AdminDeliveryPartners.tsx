@@ -204,15 +204,9 @@ export default function AdminDeliveryPartners() {
       toast.error('Failed to process payout: ' + error.message);
     },
   });
-
   return (
-    <SidebarProvider>
-      <div className="min-h-screen flex w-full">
-        <AdminSidebar />
-        <div className="flex-1 flex flex-col">
-          <header className="h-12 flex items-center border-b px-4">
-            <SidebarTrigger />
-          </header>
+    <>
+      <div>
           <main className="flex-1 p-6 bg-muted/30">
             <h1 className="text-3xl font-bold mb-6">Delivery Partners</h1>
 
