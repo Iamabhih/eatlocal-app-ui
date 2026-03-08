@@ -458,7 +458,7 @@ export default function AdminOrders() {
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {filteredOrders.map((order) => (
+                      {filteredOrders.slice((currentPage - 1) * ORDERS_PER_PAGE, currentPage * ORDERS_PER_PAGE).map((order) => (
                         <TableRow
                           key={order.id}
                           className="cursor-pointer hover:bg-muted/50"
