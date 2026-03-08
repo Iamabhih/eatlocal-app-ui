@@ -63,6 +63,8 @@ const OrderHistory = () => {
   const { toast } = useToast();
   const [searchQuery, setSearchQuery] = useState("");
   const [activeTab, setActiveTab] = useState("all");
+  const [currentPage, setCurrentPage] = useState(1);
+  const ORDERS_PER_PAGE = 10;
 
   const { data: orders, isLoading } = useQuery<Order[]>({
     queryKey: ["customer-orders", user?.id],
