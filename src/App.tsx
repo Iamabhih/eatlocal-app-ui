@@ -89,6 +89,7 @@ const RestaurantPortalLayout = lazy(() => import("./components/restaurant/Restau
 const RestaurantDashboard = lazy(() => import("./pages/restaurant/RestaurantDashboard"));
 const RestaurantOrders = lazy(() => import("./pages/restaurant/RestaurantOrders"));
 const RestaurantMenu = lazy(() => import("./pages/restaurant/RestaurantMenu"));
+const KitchenDisplay = lazy(() => import("./pages/restaurant/KitchenDisplay"));
 
 // Lazy-loaded: Delivery Partner Portal
 const DeliveryPortalLayout = lazy(() => import("./components/delivery/DeliveryPortalLayout"));
