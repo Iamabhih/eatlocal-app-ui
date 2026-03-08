@@ -535,14 +535,14 @@ function AppContent() {
           <Route path="/delivery/map" element={
             <RouteErrorBoundary fallbackTitle="Delivery Map Error">
               <Suspense fallback={<PageLoader />}>
-                <DeliveryDashboard />
+                <DeliveryMap />
               </Suspense>
             </RouteErrorBoundary>
           } />
           <Route path="/delivery/profile" element={
             <RouteErrorBoundary fallbackTitle="Delivery Profile Error">
               <Suspense fallback={<PageLoader />}>
-                <DeliveryDashboard />
+                <DeliveryProfile />
               </Suspense>
             </RouteErrorBoundary>
           } />
