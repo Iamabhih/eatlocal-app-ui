@@ -33,8 +33,13 @@ export function ReviewForm({ restaurantId, orderId, restaurantName, onSuccess, o
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (rating === 0) {
-      return;
+    if (rating === 0) return;
+
+    // Upload photos first
+    const imageUrls: string[] = [];
+    for (const file of photoFiles) {
+      const result = await upload(file, { bucket: 'review-images', path: restaurantId });
+      if (result) imageUrls.push(result.url);
     }
 
     createReview.mutate({
@@ -45,10 +50,9 @@ export function ReviewForm({ restaurantId, orderId, restaurantName, onSuccess, o
       delivery_rating: deliveryRating || rating,
       review_text: reviewText || undefined,
       is_anonymous: isAnonymous,
+      images: imageUrls.length > 0 ? imageUrls : undefined,
     }, {
-      onSuccess: () => {
-        onSuccess?.();
-      },
+      onSuccess: () => onSuccess?.(),
     });
   };
 
