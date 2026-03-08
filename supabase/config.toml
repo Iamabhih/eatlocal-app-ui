@@ -5,3 +5,9 @@ verify_jwt = true
 
 [functions.payfast-webhook]
 verify_jwt = false
+
+[functions.ai-chatbot]
+verify_jwt = false
+
+[functions.assign-delivery-partner]
+verify_jwt = true
