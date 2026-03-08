@@ -449,7 +449,8 @@ const Navbar = ({ type = "customer" }: NavbarProps) => {
                     Sign Out
                   </Button>
                 </>
-              ) : (
+              )}
+              {!user && (
                 <Link to="/auth?role=customer" onClick={() => setMobileMenuOpen(false)}>
                   <Button variant="ghost" className="w-full justify-start rounded-xl">
                     <User className="h-4 w-4 mr-2" />
