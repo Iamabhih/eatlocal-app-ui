@@ -168,7 +168,7 @@ const RestaurantDetail = () => {
                                     )}
                                     <Button
                                       size="sm"
-                                      onClick={() => handleAddToCart(item)}
+                                      onClick={() => setCustomizeItem(item)}
                                       className="bg-primary hover:bg-primary/90"
                                     >
                                       <Plus className="h-4 w-4" />
