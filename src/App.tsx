@@ -12,6 +12,7 @@ import { SkipLink } from "@/components/shared/SkipLink";
 import { loggingService } from "@/services/loggingService";
 import { RestaurantChangeModal } from "@/components/customer/RestaurantChangeModal";
 import { PanicButton } from "@/components/shared/PanicButton";
+import { ChatbotWidget } from "@/components/shared/ChatbotWidget";
 import { QUERY_CACHE } from "@/lib/constants";
 import { logger } from "@/lib/logger";
 import { useNetworkStatus } from "@/hooks/useNetworkStatus";
