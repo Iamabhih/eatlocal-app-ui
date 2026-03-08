@@ -115,6 +115,12 @@ const OrderHistory = () => {
     return matchesSearch;
   });
 
+  const totalPages = Math.ceil((filteredOrders?.length || 0) / ORDERS_PER_PAGE);
+  const paginatedOrders = filteredOrders?.slice(
+    (currentPage - 1) * ORDERS_PER_PAGE,
+    currentPage * ORDERS_PER_PAGE
+  );
+
   const handleReorder = (order: Order, e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
