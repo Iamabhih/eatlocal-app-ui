@@ -11,3 +11,6 @@ verify_jwt = false
 
 [functions.assign-delivery-partner]
 verify_jwt = true
+
+[functions.send-push]
+verify_jwt = true

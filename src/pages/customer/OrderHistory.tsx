@@ -241,6 +241,17 @@ const OrderHistory = () => {
                             <span className="font-semibold">
                               R{order.total?.toFixed(2)}
                             </span>
+                            {order.status === 'delivered' && (
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                className="h-7 text-xs"
+                                onClick={(e) => handleReorder(order, e)}
+                              >
+                                <RotateCcw className="h-3 w-3 mr-1" />
+                                Reorder
+                              </Button>
+                            )}
                             <ChevronRight className="h-4 w-4 text-muted-foreground" />
                           </div>
                         </div>
