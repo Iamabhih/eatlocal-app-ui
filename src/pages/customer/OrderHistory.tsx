@@ -113,6 +113,21 @@ const OrderHistory = () => {
     return matchesSearch;
   });
 
+  const handleReorder = (order: Order, e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    for (const item of order.order_items) {
+      addItem({
+        menuItemId: item.menu_item_id,
+        name: item.menu_item?.name || 'Item',
+        price: item.unit_price,
+        restaurantId: order.restaurant_id,
+        restaurantName: order.restaurant?.name || 'Restaurant',
+      });
+    }
+    toast({ title: 'Items added to cart', description: `${order.order_items.length} items from ${order.restaurant?.name}` });
+  };
+
   if (isLoading) {
     return (
       <div className="bg-background">
