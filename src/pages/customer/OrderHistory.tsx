@@ -59,6 +59,8 @@ const statusLabels: Record<string, string> = {
 
 const OrderHistory = () => {
   const { user } = useAuth();
+  const { addItem } = useCart();
+  const { toast } = useToast();
   const [searchQuery, setSearchQuery] = useState("");
   const [activeTab, setActiveTab] = useState("all");
 
