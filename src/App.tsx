@@ -12,6 +12,7 @@ import { SkipLink } from "@/components/shared/SkipLink";
 import { loggingService } from "@/services/loggingService";
 import { RestaurantChangeModal } from "@/components/customer/RestaurantChangeModal";
 import { PanicButton } from "@/components/shared/PanicButton";
+import { ChatbotWidget } from "@/components/shared/ChatbotWidget";
 import { QUERY_CACHE } from "@/lib/constants";
 import { logger } from "@/lib/logger";
 import { useNetworkStatus } from "@/hooks/useNetworkStatus";
@@ -61,8 +62,6 @@ const BookRide = lazy(() => import("./pages/rider/BookRide"));
 const MyRides = lazy(() => import("./pages/rider/MyRides"));
 const RideTracking = lazy(() => import("./pages/rider/RideTracking"));
 
-// Lazy-loaded: Driver Portal
-const DriverPendingOrders = lazy(() => import("./pages/driver/DriverPendingOrders"));
 
 // Lazy-loaded: Legal & Support Pages
 const Terms = lazy(() => import("./pages/legal/Terms"));
@@ -90,12 +89,20 @@ const RestaurantDashboard = lazy(() => import("./pages/restaurant/RestaurantDash
 const RestaurantOrders = lazy(() => import("./pages/restaurant/RestaurantOrders"));
 const RestaurantMenu = lazy(() => import("./pages/restaurant/RestaurantMenu"));
 const KitchenDisplay = lazy(() => import("./pages/restaurant/KitchenDisplay"));
+const RestaurantSettings = lazy(() => import("./pages/restaurant/RestaurantSettings"));
+const RestaurantPromotions = lazy(() => import("./pages/restaurant/RestaurantPromotions"));
 
 // Lazy-loaded: Delivery Partner Portal
 const DeliveryPortalLayout = lazy(() => import("./components/delivery/DeliveryPortalLayout"));
 const DeliveryDashboard = lazy(() => import("./pages/delivery/DeliveryDashboard"));
 const DeliveryOrders = lazy(() => import("./pages/delivery/DeliveryOrders"));
 const DeliveryEarnings = lazy(() => import("./pages/delivery/DeliveryEarnings"));
+const DeliveryProfile = lazy(() => import("./pages/delivery/DeliveryProfile"));
+const DeliveryMap = lazy(() => import("./pages/delivery/DeliveryMap"));
+
+// Lazy-loaded: Driver Portal
+const DriverPendingOrders = lazy(() => import("./pages/driver/DriverPendingOrders"));
+const DriverRegistration = lazy(() => import("./pages/driver/DriverRegistration"));
 
 // Lazy-loaded: Admin Portal
 const AdminDashboard = lazy(() => import("./pages/admin/AdminDashboard"));
@@ -344,6 +351,13 @@ function AppContent() {
             </Suspense>
           </RouteErrorBoundary>
         } />
+        <Route path="/driver/registration" element={
+          <RouteErrorBoundary fallbackTitle="Driver Registration Error">
+            <Suspense fallback={<PageLoader />}>
+              <DriverRegistration />
+            </Suspense>
+          </RouteErrorBoundary>
+        } />
 
         {/* ============================================ */}
         {/* HOTELS MODULE - Accommodation Booking (with CustomerLayout) */}
@@ -484,7 +498,14 @@ function AppContent() {
           <Route path="/restaurant/settings" element={
             <RouteErrorBoundary fallbackTitle="Restaurant Settings Error">
               <Suspense fallback={<PageLoader />}>
-                <RestaurantDashboard />
+                <RestaurantSettings />
+              </Suspense>
+            </RouteErrorBoundary>
+          } />
+          <Route path="/restaurant/promotions" element={
+            <RouteErrorBoundary fallbackTitle="Restaurant Promotions Error">
+              <Suspense fallback={<PageLoader />}>
+                <RestaurantPromotions />
               </Suspense>
             </RouteErrorBoundary>
           } />
@@ -522,14 +543,14 @@ function AppContent() {
           <Route path="/delivery/map" element={
             <RouteErrorBoundary fallbackTitle="Delivery Map Error">
               <Suspense fallback={<PageLoader />}>
-                <DeliveryDashboard />
+                <DeliveryMap />
               </Suspense>
             </RouteErrorBoundary>
           } />
           <Route path="/delivery/profile" element={
             <RouteErrorBoundary fallbackTitle="Delivery Profile Error">
               <Suspense fallback={<PageLoader />}>
-                <DeliveryDashboard />
+                <DeliveryProfile />
               </Suspense>
             </RouteErrorBoundary>
           } />
@@ -733,6 +754,7 @@ const App = () => (
           <AuthProvider>
             <RestaurantChangeModal />
             <PanicButton variant="floating" size="md" />
+            <ChatbotWidget />
             <main id="main-content">
               <AppContent />
             </main>

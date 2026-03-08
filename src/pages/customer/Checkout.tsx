@@ -308,14 +308,18 @@ const Checkout = () => {
       if (orderError) throw orderError;
 
       // Create order items
-      const orderItems = items.map((item) => ({
-        order_id: order.id,
-        menu_item_id: item.menuItemId,
-        quantity: item.quantity,
-        unit_price: Number(item.price.toFixed(2)),
-        subtotal: Number((item.price * item.quantity).toFixed(2)),
-        special_instructions: item.specialInstructions,
-      }));
+      const orderItems = items.map((item) => {
+        const optionsTotal = (item.selectedOptions || []).reduce((s, o) => s + o.priceModifier, 0);
+        const unitPrice = item.price + optionsTotal;
+        return {
+          order_id: order.id,
+          menu_item_id: item.menuItemId,
+          quantity: item.quantity,
+          unit_price: Number(unitPrice.toFixed(2)),
+          subtotal: Number((unitPrice * item.quantity).toFixed(2)),
+          special_instructions: item.specialInstructions,
+        };
+      });
 
       const { data: insertedOrderItems, error: itemsError } = await supabase
         .from("order_items")

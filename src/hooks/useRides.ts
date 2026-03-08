@@ -13,6 +13,7 @@ export interface CreateRideRequest {
   service_tier: string;
   estimated_distance_km: number;
   estimated_duration_minutes: number;
+  estimated_fare?: number;
   special_instructions?: string;
 }
 
@@ -94,9 +95,9 @@ export function useRides() {
           estimated_distance_km: rideData.estimated_distance_km,
           estimated_duration_minutes: rideData.estimated_duration_minutes,
           special_instructions: rideData.special_instructions,
-          base_fare: 0,
-          subtotal: 0,
-          total: 0,
+          base_fare: rideData.estimated_fare || 0,
+          subtotal: rideData.estimated_fare || 0,
+          total: rideData.estimated_fare || 0,
         } as any)
         .select()
         .single();
