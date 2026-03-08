@@ -28,12 +28,10 @@ const Cart = () => {
   const { toast } = useToast();
   const validatePromoMutation = useValidatePromoCode();
 
-  // Check cart expiry on mount
   useEffect(() => {
     checkExpiry();
   }, [checkExpiry]);
 
-  // Get restaurant ID from cart items
   const restaurantId = items.length > 0 ? items[0].restaurantId : undefined;
 
   const applyPromoCode = async () => {
@@ -69,7 +67,6 @@ const Cart = () => {
     setPromoDiscount(0);
   };
 
-  // Recalculate discount when cart changes
   useEffect(() => {
     if (appliedPromo) {
       const subtotal = getCartTotal();
@@ -168,7 +165,7 @@ const Cart = () => {
             {/* Cart Items */}
             <div className="space-y-4">
               {items.map((item) => (
-                <Card key={item.menuItemId} className="shadow-card">
+                <Card key={item.id} className="shadow-card">
                   <CardContent className="p-4">
                     <div className="flex gap-4">
                       {item.image_url && (
@@ -179,27 +176,43 @@ const Cart = () => {
                         />
                       )}
                       <div className="flex-1">
-                        <div className="flex items-start justify-between mb-2">
+                        <div className="flex items-start justify-between mb-1">
                           <div>
                             <h3 className="font-semibold">{item.name}</h3>
-                            <p className="text-sm text-muted-foreground">{item.restaurantName}</p>
+                            {/* Selected Options */}
+                            {item.selectedOptions && item.selectedOptions.length > 0 && (
+                              <div className="flex flex-wrap gap-1 mt-1">
+                                {item.selectedOptions.map((opt) => (
+                                  <Badge key={opt.optionId} variant="outline" className="text-xs font-normal">
+                                    {opt.name}
+                                    {opt.priceModifier > 0 && ` +R${opt.priceModifier.toFixed(2)}`}
+                                  </Badge>
+                                ))}
+                              </div>
+                            )}
+                            {/* Special Instructions */}
+                            {item.specialInstructions && (
+                              <p className="text-xs text-muted-foreground italic mt-1">
+                                "{item.specialInstructions}"
+                              </p>
+                            )}
                           </div>
                           <Button
                             variant="ghost"
                             size="sm"
-                            onClick={() => updateQuantity(item.menuItemId, 0)}
+                            onClick={() => updateQuantity(item.id, 0)}
                             className="text-destructive hover:text-destructive"
                           >
                             <Trash2 className="h-4 w-4" />
                           </Button>
                         </div>
 
-                        <div className="flex items-center justify-between">
+                        <div className="flex items-center justify-between mt-2">
                           <div className="flex items-center gap-3">
                             <Button
                               variant="outline"
                               size="sm"
-                              onClick={() => removeItem(item.menuItemId)}
+                              onClick={() => removeItem(item.id)}
                             >
                               <Minus className="h-4 w-4" />
                             </Button>
@@ -213,6 +226,8 @@ const Cart = () => {
                                 image_url: item.image_url,
                                 restaurantId: item.restaurantId,
                                 restaurantName: item.restaurantName,
+                                selectedOptions: item.selectedOptions,
+                                specialInstructions: item.specialInstructions,
                               })}
                               className="bg-primary hover:bg-primary/90"
                             >
