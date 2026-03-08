@@ -6,7 +6,7 @@ export const FEATURE_FLAGS = {
   REAL_TIME_TRACKING: true,
   
   // Optional features (can disable if issues arise)
-  PUSH_NOTIFICATIONS: false, // Enable post-launch
+  PUSH_NOTIFICATIONS: true,
   PROMO_CODES: true,
   LIVE_CHAT_SUPPORT: false, // Enable after launch
   

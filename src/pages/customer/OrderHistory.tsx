@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { Package, Clock, MapPin, ChevronRight, Search, Filter, Loader2 } from "lucide-react";
+import { Package, Clock, MapPin, ChevronRight, Search, Filter, Loader2, RotateCcw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -10,6 +10,18 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { format } from "date-fns";
+import { useCart } from "@/hooks/useCart";
+import { useToast } from "@/hooks/use-toast";
+
+interface OrderItem {
+  quantity: number;
+  unit_price: number;
+  menu_item_id: string;
+  menu_item: {
+    name: string;
+    id: string;
+  };
+}
 
 interface Order {
   id: string;
@@ -17,16 +29,12 @@ interface Order {
   status: string;
   total: number;
   created_at: string;
+  restaurant_id: string;
   restaurant: {
     name: string;
     image_url: string;
   };
-  order_items: {
-    quantity: number;
-    menu_item: {
-      name: string;
-    };
-  }[];
+  order_items: OrderItem[];
 }
 
 const statusColors: Record<string, string> = {
@@ -51,6 +59,8 @@ const statusLabels: Record<string, string> = {
 
 const OrderHistory = () => {
   const { user } = useAuth();
+  const { addItem } = useCart();
+  const { toast } = useToast();
   const [searchQuery, setSearchQuery] = useState("");
   const [activeTab, setActiveTab] = useState("all");
 
@@ -67,10 +77,13 @@ const OrderHistory = () => {
           status,
           total,
           created_at,
+          restaurant_id,
           restaurant:restaurants(name, image_url),
           order_items(
             quantity,
-            menu_item:menu_items(name)
+            unit_price,
+            menu_item_id,
+            menu_item:menu_items(name, id)
           )
         `)
         .eq("customer_id", user.id)
@@ -99,6 +112,21 @@ const OrderHistory = () => {
     }
     return matchesSearch;
   });
+
+  const handleReorder = (order: Order, e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    for (const item of order.order_items) {
+      addItem({
+        menuItemId: item.menu_item_id,
+        name: item.menu_item?.name || 'Item',
+        price: item.unit_price,
+        restaurantId: order.restaurant_id,
+        restaurantName: order.restaurant?.name || 'Restaurant',
+      });
+    }
+    toast({ title: 'Items added to cart', description: `${order.order_items.length} items from ${order.restaurant?.name}` });
+  };
 
   if (isLoading) {
     return (
@@ -228,6 +256,17 @@ const OrderHistory = () => {
                             <span className="font-semibold">
                               R{order.total?.toFixed(2)}
                             </span>
+                            {order.status === 'delivered' && (
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                className="h-7 text-xs"
+                                onClick={(e) => handleReorder(order, e)}
+                              >
+                                <RotateCcw className="h-3 w-3 mr-1" />
+                                Reorder
+                              </Button>
+                            )}
                             <ChevronRight className="h-4 w-4 text-muted-foreground" />
                           </div>
                         </div>

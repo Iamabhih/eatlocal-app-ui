@@ -1,11 +1,12 @@
-import { useState } from 'react';
-import { Star, Camera, X } from 'lucide-react';
+import { useState, useRef } from 'react';
+import { Star, Camera, X, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { useCreateReview } from '@/hooks/useRatingsReviews';
+import { useImageUpload } from '@/hooks/useImageUpload';
 
 interface ReviewFormProps {
   restaurantId: string;
@@ -22,14 +23,23 @@ export function ReviewForm({ restaurantId, orderId, restaurantName, onSuccess, o
   const [hoverRating, setHoverRating] = useState(0);
   const [reviewText, setReviewText] = useState('');
   const [isAnonymous, setIsAnonymous] = useState(false);
+  const [photoPreviews, setPhotoPreviews] = useState<string[]>([]);
+  const [photoFiles, setPhotoFiles] = useState<File[]>([]);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const { upload, isUploading } = useImageUpload();
 
   const createReview = useCreateReview();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (rating === 0) {
-      return;
+    if (rating === 0) return;
+
+    // Upload photos first
+    const imageUrls: string[] = [];
+    for (const file of photoFiles) {
+      const result = await upload(file, { bucket: 'review-images', path: restaurantId });
+      if (result) imageUrls.push(result.url);
     }
 
     createReview.mutate({
@@ -40,10 +50,9 @@ export function ReviewForm({ restaurantId, orderId, restaurantName, onSuccess, o
       delivery_rating: deliveryRating || rating,
       review_text: reviewText || undefined,
       is_anonymous: isAnonymous,
+      images: imageUrls.length > 0 ? imageUrls : undefined,
     }, {
-      onSuccess: () => {
-        onSuccess?.();
-      },
+      onSuccess: () => onSuccess?.(),
     });
   };
 
@@ -153,7 +162,56 @@ export function ReviewForm({ restaurantId, orderId, restaurantName, onSuccess, o
             </p>
           </div>
 
-          {/* Anonymous Option */}
+          {/* Photo Upload */}
+          <div className="space-y-2">
+            <Label>Add Photos (Optional)</Label>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              multiple
+              className="hidden"
+              onChange={(e) => {
+                const files = Array.from(e.target.files || []);
+                setPhotoFiles(prev => [...prev, ...files].slice(0, 4));
+                files.forEach(f => {
+                  const reader = new FileReader();
+                  reader.onload = (ev) => setPhotoPreviews(prev => [...prev, ev.target?.result as string].slice(0, 4));
+                  reader.readAsDataURL(f);
+                });
+              }}
+            />
+            <div className="flex gap-2 flex-wrap">
+              {photoPreviews.map((src, i) => (
+                <div key={i} className="relative w-20 h-20 rounded-lg overflow-hidden">
+                  <img src={src} alt="" className="w-full h-full object-cover" />
+                  <button
+                    type="button"
+                    className="absolute top-1 right-1 bg-destructive text-destructive-foreground rounded-full p-0.5"
+                    onClick={() => {
+                      setPhotoPreviews(prev => prev.filter((_, j) => j !== i));
+                      setPhotoFiles(prev => prev.filter((_, j) => j !== i));
+                    }}
+                  >
+                    <X className="h-3 w-3" />
+                  </button>
+                </div>
+              ))}
+              {photoPreviews.length < 4 && (
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="w-20 h-20 flex flex-col gap-1"
+                  onClick={() => fileInputRef.current?.click()}
+                >
+                  <Camera className="h-5 w-5" />
+                  <span className="text-[10px]">Photo</span>
+                </Button>
+              )}
+            </div>
+          </div>
+
+
           <div className="flex items-center space-x-2">
             <Checkbox
               id="anonymous"

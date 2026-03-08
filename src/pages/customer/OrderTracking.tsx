@@ -34,6 +34,8 @@ interface Restaurant {
   street_address: string;
   city: string;
   state: string;
+  latitude: number | null;
+  longitude: number | null;
 }
 
 interface DeliveryLocation {
@@ -80,10 +82,10 @@ const OrderTracking = () => {
       if (orderError) throw orderError;
       setOrder(orderData);
 
-      // Fetch restaurant
+      // Fetch restaurant with coordinates
       const { data: restaurantData, error: restaurantError} = await supabase
         .from('restaurants')
-        .select('name, phone, street_address, city, state')
+        .select('name, phone, street_address, city, state, latitude, longitude')
         .eq('id', orderData.restaurant_id)
         .single();
 
@@ -334,8 +336,8 @@ const OrderTracking = () => {
               orderId={order.id}
               deliveryPartnerId={order.delivery_partner_id}
               restaurantLocation={{
-                lat: -26.2041,
-                lng: 28.0473,
+                lat: restaurant?.latitude ?? -26.2041,
+                lng: restaurant?.longitude ?? 28.0473,
               }}
               deliveryLocation={deliveryAddress}
             />
