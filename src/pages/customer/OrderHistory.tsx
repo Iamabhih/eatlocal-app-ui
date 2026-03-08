@@ -203,7 +203,7 @@ const OrderHistory = () => {
               </CardContent>
             </Card>
           ) : (
-            filteredOrders?.map((order) => (
+            paginatedOrders?.map((order) => (
               <Link key={order.id} to={`/orders/${order.id}`}>
                 <Card className="hover:shadow-md transition-shadow cursor-pointer">
                   <CardContent className="p-4">
