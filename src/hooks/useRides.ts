@@ -13,6 +13,7 @@ export interface CreateRideRequest {
   service_tier: string;
   estimated_distance_km: number;
   estimated_duration_minutes: number;
+  estimated_fare?: number;
   special_instructions?: string;
 }
 
