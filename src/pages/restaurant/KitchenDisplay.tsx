@@ -145,7 +145,7 @@ const KitchenDisplay = () => {
       </head><body>
       <h2>Order #${order.order_number}</h2>
       <p>${new Date(order.created_at).toLocaleString()}</p>
-      <p><strong>${order.fulfillment_type?.toUpperCase() || 'DELIVERY'}</strong></p>
+      <p><strong>${((order as any).fulfillment_type || 'DELIVERY').toUpperCase()}</strong></p>
       <hr/>
       ${items}
       <hr/>
