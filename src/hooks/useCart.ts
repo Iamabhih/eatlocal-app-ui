@@ -189,7 +189,10 @@ export const useCart = create<CartState>()(
       },
 
       getSubtotal: () => {
-        return get().items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+        return get().items.reduce((sum, item) => {
+          const optionsTotal = (item.selectedOptions || []).reduce((s, o) => s + o.priceModifier, 0);
+          return sum + (item.price + optionsTotal) * item.quantity;
+        }, 0);
       },
 
       getTax: () => 0,

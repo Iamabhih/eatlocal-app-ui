@@ -95,6 +95,7 @@ export default function BookRide() {
       service_tier: serviceTier,
       estimated_distance_km: distance / 1000,
       estimated_duration_minutes: Math.round(duration / 60),
+      estimated_fare: estimatedFare,
       special_instructions: specialInstructions,
     }, {
       onSuccess: () => {
