@@ -30,7 +30,7 @@ export function ReviewForm({ restaurantId, orderId, restaurantName, onSuccess, o
 
   const createReview = useCreateReview();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (rating === 0) return;
