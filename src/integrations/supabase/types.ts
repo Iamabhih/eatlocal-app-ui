@@ -1327,6 +1327,97 @@ export type Database = {
           },
         ]
       }
+      menu_item_option_groups: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          id: string
+          is_active: boolean | null
+          is_required: boolean
+          max_selections: number | null
+          menu_item_id: string
+          min_selections: number | null
+          name: string
+          sort_order: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          is_required?: boolean
+          max_selections?: number | null
+          menu_item_id: string
+          min_selections?: number | null
+          name: string
+          sort_order?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          is_required?: boolean
+          max_selections?: number | null
+          menu_item_id?: string
+          min_selections?: number | null
+          name?: string
+          sort_order?: number | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "menu_item_option_groups_menu_item_id_fkey"
+            columns: ["menu_item_id"]
+            isOneToOne: false
+            referencedRelation: "menu_items"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      menu_item_options: {
+        Row: {
+          created_at: string | null
+          id: string
+          is_available: boolean | null
+          is_default: boolean | null
+          name: string
+          option_group_id: string
+          price_modifier: number
+          sort_order: number | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          is_available?: boolean | null
+          is_default?: boolean | null
+          name: string
+          option_group_id: string
+          price_modifier?: number
+          sort_order?: number | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          is_available?: boolean | null
+          is_default?: boolean | null
+          name?: string
+          option_group_id?: string
+          price_modifier?: number
+          sort_order?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "menu_item_options_option_group_id_fkey"
+            columns: ["option_group_id"]
+            isOneToOne: false
+            referencedRelation: "menu_item_option_groups"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       menu_items: {
         Row: {
           barcode: string | null
@@ -1347,6 +1438,7 @@ export type Database = {
           product_type: string | null
           quantity_in_stock: number | null
           restaurant_id: string
+          search_vector: unknown
           updated_at: string
         }
         Insert: {
@@ -1368,6 +1460,7 @@ export type Database = {
           product_type?: string | null
           quantity_in_stock?: number | null
           restaurant_id: string
+          search_vector?: unknown
           updated_at?: string
         }
         Update: {
@@ -1389,6 +1482,7 @@ export type Database = {
           product_type?: string | null
           quantity_in_stock?: number | null
           restaurant_id?: string
+          search_vector?: unknown
           updated_at?: string
         }
         Relationships: [
@@ -1443,6 +1537,48 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      order_item_options: {
+        Row: {
+          created_at: string | null
+          id: string
+          option_id: string
+          option_name: string
+          order_item_id: string
+          price_modifier: number
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          option_id: string
+          option_name: string
+          order_item_id: string
+          price_modifier?: number
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          option_id?: string
+          option_name?: string
+          order_item_id?: string
+          price_modifier?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "order_item_options_option_id_fkey"
+            columns: ["option_id"]
+            isOneToOne: false
+            referencedRelation: "menu_item_options"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "order_item_options_order_item_id_fkey"
+            columns: ["order_item_id"]
+            isOneToOne: false
+            referencedRelation: "order_items"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       order_items: {
         Row: {
@@ -2145,10 +2281,12 @@ export type Database = {
           longitude: number | null
           minimum_order: number | null
           name: string
+          opening_hours: Json | null
           owner_id: string
           phone: string
           pickup_instructions: string | null
           rating: number | null
+          search_vector: unknown
           state: string
           street_address: string
           supports_delivery: boolean | null
@@ -2179,10 +2317,12 @@ export type Database = {
           longitude?: number | null
           minimum_order?: number | null
           name: string
+          opening_hours?: Json | null
           owner_id: string
           phone: string
           pickup_instructions?: string | null
           rating?: number | null
+          search_vector?: unknown
           state: string
           street_address: string
           supports_delivery?: boolean | null
@@ -2213,10 +2353,12 @@ export type Database = {
           longitude?: number | null
           minimum_order?: number | null
           name?: string
+          opening_hours?: Json | null
           owner_id?: string
           phone?: string
           pickup_instructions?: string | null
           rating?: number | null
+          search_vector?: unknown
           state?: string
           street_address?: string
           supports_delivery?: boolean | null
