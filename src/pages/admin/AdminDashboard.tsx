@@ -7,6 +7,7 @@ import { AdminSidebar } from '@/components/admin/AdminSidebar';
 import { useOutletContext } from 'react-router-dom';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { SystemStatus } from '@/components/admin/SystemStatus';
+import { DemoDataManager } from '@/components/admin/DemoDataManager';
 
 export default function AdminDashboard() {
   const { isSuperadmin } = useOutletContext<{ isSuperadmin: boolean }>();
