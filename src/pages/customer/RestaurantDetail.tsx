@@ -17,7 +17,7 @@ const RestaurantDetail = () => {
   const navigate = useNavigate();
   const { data: restaurant, isLoading: restaurantLoading } = useRestaurant(id!);
   const { data: menu = [], isLoading: menuLoading } = useRestaurantMenu(id!);
-  const { addItem, removeItem, getItemQuantity, getCartTotal, getTotalItems } = useCart();
+  const { addItem, removeItem, getItemQuantity, getCartTotal, getTotalItems, items } = useCart();
   const { addRecent } = useRecentlyViewed();
   const [customizeItem, setCustomizeItem] = useState<any>(null);
 
@@ -44,7 +44,7 @@ const RestaurantDetail = () => {
     );
   }
 
-  const handleAddToCart = (menuItem: any) => {
+  const handleQuickAdd = (menuItem: any) => {
     addItem({
       restaurantId: restaurant.id,
       restaurantName: restaurant.name,
@@ -52,11 +52,16 @@ const RestaurantDetail = () => {
       name: menuItem.name,
       price: Number(menuItem.price),
       image_url: menuItem.image_url,
+      selectedOptions: [],
     });
   };
 
   const handleRemoveFromCart = (menuItemId: string) => {
-    removeItem(menuItemId);
+    // Find the last cart item for this menuItemId and remove one
+    const cartItemsForMenu = items.filter(i => i.menuItemId === menuItemId);
+    if (cartItemsForMenu.length > 0) {
+      removeItem(cartItemsForMenu[cartItemsForMenu.length - 1].id);
+    }
   };
 
   const cartTotal = getCartTotal();
@@ -270,11 +275,11 @@ const RestaurantDetail = () => {
                 restaurantId: restaurant!.id,
                 restaurantName: restaurant!.name,
                 menuItemId: customized.menuItemId,
-                name: customized.name + (customized.selectedOptions.length > 0
-                  ? ` (${customized.selectedOptions.map(o => o.name).join(', ')})`
-                  : ''),
+                name: customized.name,
                 price: customized.price,
                 image_url: customizeItem.image_url,
+                selectedOptions: customized.selectedOptions,
+                specialInstructions: customized.specialInstructions,
               });
             }
           }}

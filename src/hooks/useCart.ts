@@ -1,6 +1,12 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
+export interface SelectedOption {
+  optionId: string;
+  name: string;
+  priceModifier: number;
+}
+
 export interface CartItem {
   id: string;
   menuItemId: string;
@@ -11,6 +17,16 @@ export interface CartItem {
   specialInstructions?: string;
   restaurantId: string;
   restaurantName: string;
+  selectedOptions?: SelectedOption[];
+}
+
+/** Composite key: menuItemId + sorted option IDs */
+function getCartItemKey(menuItemId: string, selectedOptions?: SelectedOption[]): string {
+  const optionKey = (selectedOptions || [])
+    .map(o => o.optionId)
+    .sort()
+    .join(',');
+  return `${menuItemId}::${optionKey}`;
 }
 
 interface CartState {
@@ -21,19 +37,16 @@ interface CartState {
   showRestaurantChangeModal: boolean;
   pendingItem: Omit<CartItem, 'id' | 'quantity'> | null;
 
-  // Actions
   addItem: (item: Omit<CartItem, 'id' | 'quantity'>) => void;
-  removeItem: (menuItemId: string) => void;
-  updateQuantity: (menuItemId: string, quantity: number) => void;
-  updateInstructions: (menuItemId: string, instructions: string) => void;
+  removeItem: (itemId: string) => void;
+  updateQuantity: (itemId: string, quantity: number) => void;
+  updateInstructions: (itemId: string, instructions: string) => void;
   clearCart: () => void;
 
-  // Restaurant change modal
   setShowRestaurantChangeModal: (show: boolean) => void;
   setPendingItem: (item: Omit<CartItem, 'id' | 'quantity'> | null) => void;
   confirmRestaurantChange: () => void;
 
-  // Getters
   getItemQuantity: (menuItemId: string) => number;
   getSubtotal: () => number;
   getTax: () => number;
@@ -42,12 +55,11 @@ interface CartState {
   getTotalItems: () => number;
   getCartTotal: () => number;
 
-  // Utility
   checkExpiry: () => void;
 }
 
-const CART_EXPIRY_TIME = 24 * 60 * 60 * 1000; // 24 hours
-const SERVICE_FEE_RATE = 0.045; // 4.5% service fee
+const CART_EXPIRY_TIME = 24 * 60 * 60 * 1000;
+const SERVICE_FEE_RATE = 0.045;
 
 export const useCart = create<CartState>()(
   persist(
@@ -61,28 +73,22 @@ export const useCart = create<CartState>()(
 
       addItem: (item) => {
         const state = get();
-
-        // Check expiry first
         state.checkExpiry();
 
-        // Check if adding from different restaurant
         if (state.restaurantId && state.restaurantId !== item.restaurantId) {
-          set({
-            pendingItem: item,
-            showRestaurantChangeModal: true,
-          });
+          set({ pendingItem: item, showRestaurantChangeModal: true });
           return;
         }
 
-        // Check if item already exists
-        const existingItem = state.items.find(i => i.menuItemId === item.menuItemId);
+        const key = getCartItemKey(item.menuItemId, item.selectedOptions);
+        const existingItem = state.items.find(
+          i => getCartItemKey(i.menuItemId, i.selectedOptions) === key
+        );
 
         if (existingItem) {
           set({
             items: state.items.map(i =>
-              i.menuItemId === item.menuItemId
-                ? { ...i, quantity: i.quantity + 1 }
-                : i
+              i.id === existingItem.id ? { ...i, quantity: i.quantity + 1 } : i
             ),
             cartExpiry: Date.now() + CART_EXPIRY_TIME,
           });
@@ -96,14 +102,13 @@ export const useCart = create<CartState>()(
         }
       },
 
-      removeItem: (menuItemId) => {
+      removeItem: (itemId) => {
         const state = get();
-        const existingItem = state.items.find(i => i.menuItemId === menuItemId);
-
+        const existingItem = state.items.find(i => i.id === itemId);
         if (!existingItem) return;
 
         if (existingItem.quantity === 1) {
-          const newItems = state.items.filter(i => i.menuItemId !== menuItemId);
+          const newItems = state.items.filter(i => i.id !== itemId);
           set({
             items: newItems,
             restaurantId: newItems.length > 0 ? state.restaurantId : null,
@@ -113,15 +118,15 @@ export const useCart = create<CartState>()(
         } else {
           set({
             items: state.items.map(i =>
-              i.menuItemId === menuItemId ? { ...i, quantity: i.quantity - 1 } : i
+              i.id === itemId ? { ...i, quantity: i.quantity - 1 } : i
             ),
           });
         }
       },
 
-      updateQuantity: (menuItemId, quantity) => {
+      updateQuantity: (itemId, quantity) => {
         if (quantity <= 0) {
-          const newItems = get().items.filter(i => i.menuItemId !== menuItemId);
+          const newItems = get().items.filter(i => i.id !== itemId);
           set({
             items: newItems,
             restaurantId: newItems.length > 0 ? get().restaurantId : null,
@@ -132,15 +137,15 @@ export const useCart = create<CartState>()(
         }
         set({
           items: get().items.map(i =>
-            i.menuItemId === menuItemId ? { ...i, quantity } : i
+            i.id === itemId ? { ...i, quantity } : i
           ),
         });
       },
 
-      updateInstructions: (menuItemId, instructions) => {
+      updateInstructions: (itemId, instructions) => {
         set({
           items: get().items.map(i =>
-            i.menuItemId === menuItemId ? { ...i, specialInstructions: instructions } : i
+            i.id === itemId ? { ...i, specialInstructions: instructions } : i
           ),
         });
       },
@@ -158,14 +163,10 @@ export const useCart = create<CartState>()(
 
       setShowRestaurantChangeModal: (show) => {
         set({ showRestaurantChangeModal: show });
-        if (!show) {
-          set({ pendingItem: null });
-        }
+        if (!show) set({ pendingItem: null });
       },
 
-      setPendingItem: (item) => {
-        set({ pendingItem: item });
-      },
+      setPendingItem: (item) => set({ pendingItem: item }),
 
       confirmRestaurantChange: () => {
         const { pendingItem } = get();
@@ -182,20 +183,19 @@ export const useCart = create<CartState>()(
       },
 
       getItemQuantity: (menuItemId) => {
-        return get().items.find(i => i.menuItemId === menuItemId)?.quantity || 0;
+        return get().items
+          .filter(i => i.menuItemId === menuItemId)
+          .reduce((sum, i) => sum + i.quantity, 0);
       },
 
       getSubtotal: () => {
         return get().items.reduce((sum, item) => sum + item.price * item.quantity, 0);
       },
 
-      getTax: () => {
-        return 0; // No tax/VAT charged per requirements
-      },
+      getTax: () => 0,
 
       getServiceFee: () => {
-        const subtotal = get().getSubtotal();
-        return subtotal * SERVICE_FEE_RATE; // 4.5% service fee
+        return get().getSubtotal() * SERVICE_FEE_RATE;
       },
 
       getTotal: (deliveryFee: number) => {
@@ -206,24 +206,18 @@ export const useCart = create<CartState>()(
         return get().items.reduce((total, item) => total + item.quantity, 0);
       },
 
-      getCartTotal: () => {
-        return get().getSubtotal();
-      },
+      getCartTotal: () => get().getSubtotal(),
 
       checkExpiry: () => {
         const { cartExpiry, items } = get();
-        if (cartExpiry && items.length > 0) {
-          const now = Date.now();
-          if (now >= cartExpiry) {
-            // Cart expired, clear it
-            get().clearCart();
-          }
+        if (cartExpiry && items.length > 0 && Date.now() >= cartExpiry) {
+          get().clearCart();
         }
       },
     }),
     {
       name: 'smash-cart-storage',
-      version: 2, // Increment version to force migration from old storage
+      version: 3,
     }
   )
 );

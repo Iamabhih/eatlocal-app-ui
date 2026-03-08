@@ -317,9 +317,46 @@ const Checkout = () => {
         special_instructions: item.specialInstructions,
       }));
 
-      const { error: itemsError } = await supabase.from("order_items").insert(orderItems);
+      const { data: insertedOrderItems, error: itemsError } = await supabase
+        .from("order_items")
+        .insert(orderItems)
+        .select("id");
 
       if (itemsError) throw itemsError;
+
+      // Persist selected options to order_item_options
+      if (insertedOrderItems) {
+        const allOptionInserts: Array<{
+          order_item_id: string;
+          option_id: string;
+          option_name: string;
+          price_modifier: number;
+        }> = [];
+
+        items.forEach((item, index) => {
+          if (item.selectedOptions && item.selectedOptions.length > 0 && insertedOrderItems[index]) {
+            item.selectedOptions.forEach((opt) => {
+              allOptionInserts.push({
+                order_item_id: insertedOrderItems[index].id,
+                option_id: opt.optionId,
+                option_name: opt.name,
+                price_modifier: opt.priceModifier,
+              });
+            });
+          }
+        });
+
+        if (allOptionInserts.length > 0) {
+          const { error: optionsError } = await supabase
+            .from("order_item_options")
+            .insert(allOptionInserts);
+
+          if (optionsError) {
+            logger.error("Error saving order item options:", optionsError);
+            // Non-fatal: order still goes through
+          }
+        }
+      }
 
       // Process wallet payment if applicable
       if (walletAmountToUse > 0) {
