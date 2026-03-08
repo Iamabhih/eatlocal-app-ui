@@ -26,6 +26,7 @@ import { useState } from "react";
 const navItems = [
   { path: "/restaurant/dashboard", icon: LayoutDashboard, label: "Dashboard" },
   { path: "/restaurant/orders", icon: ClipboardList, label: "Orders", showBadge: true },
+  { path: "/restaurant/kitchen", icon: ChefHat, label: "Kitchen (KDS)" },
   { path: "/restaurant/menu", icon: UtensilsCrossed, label: "Menu" },
   { path: "/restaurant/analytics", icon: BarChart3, label: "Analytics" },
   { path: "/restaurant/settings", icon: Settings, label: "Settings" },

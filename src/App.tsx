@@ -467,6 +467,13 @@ function AppContent() {
               </Suspense>
             </RouteErrorBoundary>
           } />
+          <Route path="/restaurant/kitchen" element={
+            <RouteErrorBoundary fallbackTitle="Kitchen Display Error">
+              <Suspense fallback={<PageLoader />}>
+                <KitchenDisplay />
+              </Suspense>
+            </RouteErrorBoundary>
+          } />
           <Route path="/restaurant/analytics" element={
             <RouteErrorBoundary fallbackTitle="Restaurant Analytics Error">
               <Suspense fallback={<PageLoader />}>
