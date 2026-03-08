@@ -107,6 +107,9 @@ export default function AdminDashboard() {
 
             {/* System Status */}
             <SystemStatus />
+
+            {/* Demo Data Manager */}
+            <DemoDataManager />
           </main>
         </div>
       </div>
