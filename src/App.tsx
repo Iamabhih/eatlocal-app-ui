@@ -350,6 +350,13 @@ function AppContent() {
             </Suspense>
           </RouteErrorBoundary>
         } />
+        <Route path="/driver/registration" element={
+          <RouteErrorBoundary fallbackTitle="Driver Registration Error">
+            <Suspense fallback={<PageLoader />}>
+              <DriverRegistration />
+            </Suspense>
+          </RouteErrorBoundary>
+        } />
 
         {/* ============================================ */}
         {/* HOTELS MODULE - Accommodation Booking (with CustomerLayout) */}
