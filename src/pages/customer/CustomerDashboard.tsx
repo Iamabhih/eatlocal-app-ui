@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
 import {
   Package,
   Hotel,
@@ -25,70 +26,11 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Progress } from '@/components/ui/progress';
+import { Skeleton } from '@/components/ui/skeleton';
 import { useAuth } from '@/contexts/AuthContext';
+import { supabase } from '@/integrations/supabase/client';
 import { formatDistanceToNow } from 'date-fns';
 import { formatCurrency } from '@/lib/utils';
-
-// Mock data for dashboard
-const recentOrders = [
-  {
-    id: '1',
-    type: 'food',
-    name: "Nando's Sandton",
-    date: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000),
-    status: 'delivered',
-    total: 245.00,
-    image: '/placeholder.svg',
-  },
-  {
-    id: '2',
-    type: 'food',
-    name: 'Steers Rosebank',
-    date: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000),
-    status: 'delivered',
-    total: 189.50,
-    image: '/placeholder.svg',
-  },
-];
-
-const upcomingBookings = [
-  {
-    id: '1',
-    type: 'hotel',
-    name: 'Cape Grace Hotel',
-    date: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000),
-    endDate: new Date(Date.now() + 17 * 24 * 60 * 60 * 1000),
-    status: 'confirmed',
-    location: 'Cape Town, Western Cape',
-    image: '/placeholder.svg',
-  },
-  {
-    id: '2',
-    type: 'venue',
-    name: 'Wine Tasting Experience',
-    date: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
-    status: 'confirmed',
-    location: 'Stellenbosch, Western Cape',
-    image: '/placeholder.svg',
-  },
-  {
-    id: '3',
-    type: 'ride',
-    name: 'Airport Transfer',
-    date: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000),
-    status: 'scheduled',
-    location: 'OR Tambo to Sandton',
-    image: '/placeholder.svg',
-  },
-];
-
-const loyaltyStats = {
-  points: 2450,
-  tier: 'Gold',
-  nextTier: 'Platinum',
-  pointsToNext: 550,
-  totalSpent: 12500,
-};
 
 const quickActions = [
   { icon: Utensils, label: 'Order Food', path: '/restaurants', color: 'text-orange-500' },
@@ -104,6 +46,99 @@ export function CustomerDashboard() {
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useState('overview');
 
+  // Fetch recent orders
+  const { data: recentOrders = [], isLoading: ordersLoading } = useQuery({
+    queryKey: ['dashboard-orders', user?.id],
+    queryFn: async () => {
+      if (!user) return [];
+      const { data, error } = await supabase
+        .from('orders')
+        .select('id, order_number, status, total, created_at, restaurant:restaurants(name)')
+        .eq('customer_id', user.id)
+        .order('created_at', { ascending: false })
+        .limit(5);
+      if (error) throw error;
+      return data || [];
+    },
+    enabled: !!user,
+  });
+
+  // Fetch upcoming hotel bookings
+  const { data: hotelBookings = [] } = useQuery({
+    queryKey: ['dashboard-hotel-bookings', user?.id],
+    queryFn: async () => {
+      if (!user) return [];
+      const { data, error } = await supabase
+        .from('hotel_bookings')
+        .select('id, booking_number, status, check_in_date, check_out_date, hotel:hotels(name, city)')
+        .eq('guest_id', user.id)
+        .gte('check_in_date', new Date().toISOString().split('T')[0])
+        .order('check_in_date', { ascending: true })
+        .limit(5);
+      if (error) throw error;
+      return data || [];
+    },
+    enabled: !!user,
+  });
+
+  // Fetch upcoming experience bookings
+  const { data: experienceBookings = [] } = useQuery({
+    queryKey: ['dashboard-experience-bookings', user?.id],
+    queryFn: async () => {
+      if (!user) return [];
+      const { data, error } = await supabase
+        .from('experience_bookings')
+        .select('id, booking_number, status, booking_date, experience:experiences(name)')
+        .eq('guest_id', user.id)
+        .gte('booking_date', new Date().toISOString().split('T')[0])
+        .order('booking_date', { ascending: true })
+        .limit(5);
+      if (error) throw error;
+      return data || [];
+    },
+    enabled: !!user,
+  });
+
+  // Fetch loyalty data
+  const { data: loyalty } = useQuery({
+    queryKey: ['dashboard-loyalty', user?.id],
+    queryFn: async () => {
+      if (!user) return null;
+      const { data, error } = await supabase
+        .from('user_loyalty')
+        .select('*, tier:loyalty_tiers(*)')
+        .eq('user_id', user.id)
+        .single();
+      if (error) return null;
+      return data;
+    },
+    enabled: !!user,
+  });
+
+  const loyaltyPoints = loyalty?.current_points || 0;
+  const loyaltyTierName = (loyalty?.tier as any)?.name || 'Bronze';
+  const loyaltyTierColor = (loyalty?.tier as any)?.badge_color || '#CD7F32';
+
+  // Combine bookings for "upcoming" view
+  const upcomingBookings = [
+    ...hotelBookings.map((b: any) => ({
+      id: b.id,
+      type: 'hotel' as const,
+      name: b.hotel?.name || 'Hotel Booking',
+      date: new Date(b.check_in_date),
+      status: b.status,
+      location: b.hotel?.city || '',
+    })),
+    ...experienceBookings.map((b: any) => ({
+      id: b.id,
+      type: 'experience' as const,
+      name: b.experience?.name || 'Experience',
+      date: new Date(b.booking_date),
+      status: b.status,
+      location: '',
+    })),
+  ].sort((a, b) => a.date.getTime() - b.date.getTime());
+
   const getStatusBadge = (status: string) => {
     const statusConfig: Record<string, { variant: 'default' | 'secondary' | 'outline' | 'destructive'; label: string }> = {
       delivered: { variant: 'default', label: 'Delivered' },
@@ -112,7 +147,7 @@ export function CustomerDashboard() {
       pending: { variant: 'outline', label: 'Pending' },
       cancelled: { variant: 'destructive', label: 'Cancelled' },
     };
-    const config = statusConfig[status] || { variant: 'outline', label: status };
+    const config = statusConfig[status] || { variant: 'outline' as const, label: status };
     return <Badge variant={config.variant}>{config.label}</Badge>;
   };
 
@@ -152,7 +187,7 @@ export function CustomerDashboard() {
           <Button variant="outline" size="icon" onClick={() => navigate('/profile')}>
             <Settings className="h-4 w-4" />
           </Button>
-          <Button variant="outline" size="icon">
+          <Button variant="outline" size="icon" onClick={() => navigate('/notifications')}>
             <Bell className="h-4 w-4" />
           </Button>
         </div>
@@ -167,7 +202,7 @@ export function CustomerDashboard() {
             onClick={() => navigate(action.path)}
           >
             <CardContent className="p-4 text-center">
-              <div className={`h-10 w-10 rounded-full bg-muted flex items-center justify-center mx-auto mb-2`}>
+              <div className="h-10 w-10 rounded-full bg-muted flex items-center justify-center mx-auto mb-2">
                 <action.icon className={`h-5 w-5 ${action.color}`} />
               </div>
               <p className="text-sm font-medium">{action.label}</p>
@@ -220,8 +255,12 @@ export function CustomerDashboard() {
                               day: 'numeric',
                             })}
                           </span>
-                          <MapPin className="h-3 w-3 ml-2" />
-                          <span className="truncate">{booking.location}</span>
+                          {booking.location && (
+                            <>
+                              <MapPin className="h-3 w-3 ml-2" />
+                              <span className="truncate">{booking.location}</span>
+                            </>
+                          )}
                         </div>
                       </div>
                       {getStatusBadge(booking.status)}
@@ -245,21 +284,14 @@ export function CustomerDashboard() {
                 <div className="flex items-center justify-between">
                   <CardTitle className="text-white">Smash Rewards</CardTitle>
                   <Badge variant="secondary" className="bg-white/20 text-white">
-                    {loyaltyStats.tier}
+                    {loyaltyTierName}
                   </Badge>
                 </div>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
-                  <p className="text-3xl font-bold">{loyaltyStats.points.toLocaleString()}</p>
+                  <p className="text-3xl font-bold">{loyaltyPoints.toLocaleString()}</p>
                   <p className="text-white/80 text-sm">Available points</p>
-                </div>
-                <div className="space-y-2">
-                  <div className="flex justify-between text-sm">
-                    <span className="text-white/80">Progress to {loyaltyStats.nextTier}</span>
-                    <span>{loyaltyStats.pointsToNext} points left</span>
-                  </div>
-                  <Progress value={((3000 - loyaltyStats.pointsToNext) / 3000) * 100} className="h-2 bg-white/20" />
                 </div>
                 <Button variant="secondary" className="w-full" onClick={() => setActiveTab('rewards')}>
                   <Gift className="mr-2 h-4 w-4" />
@@ -282,30 +314,52 @@ export function CustomerDashboard() {
               </Button>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
-                {recentOrders.map((order) => (
-                  <div
-                    key={order.id}
-                    className="flex items-center gap-4 p-3 rounded-lg border hover:bg-muted/50 cursor-pointer"
-                    onClick={() => navigate(`/orders/${order.id}`)}
-                  >
-                    <div className="h-12 w-12 rounded-lg bg-muted flex items-center justify-center">
-                      <Utensils className="h-5 w-5 text-orange-500" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="font-medium">{order.name}</p>
-                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                        <Clock className="h-3 w-3" />
-                        <span>{formatDistanceToNow(order.date, { addSuffix: true })}</span>
+              {ordersLoading ? (
+                <div className="space-y-4">
+                  {[1, 2].map(i => (
+                    <div key={i} className="flex items-center gap-4 p-3">
+                      <Skeleton className="h-12 w-12 rounded-lg" />
+                      <div className="flex-1 space-y-2">
+                        <Skeleton className="h-4 w-32" />
+                        <Skeleton className="h-3 w-24" />
                       </div>
                     </div>
-                    <div className="text-right">
-                      <p className="font-medium">{formatCurrency(order.total)}</p>
-                      {getStatusBadge(order.status)}
+                  ))}
+                </div>
+              ) : recentOrders.length > 0 ? (
+                <div className="space-y-4">
+                  {recentOrders.map((order: any) => (
+                    <div
+                      key={order.id}
+                      className="flex items-center gap-4 p-3 rounded-lg border hover:bg-muted/50 cursor-pointer"
+                      onClick={() => navigate(`/orders/${order.id}`)}
+                    >
+                      <div className="h-12 w-12 rounded-lg bg-muted flex items-center justify-center">
+                        <Utensils className="h-5 w-5 text-orange-500" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="font-medium">{order.restaurant?.name || `Order ${order.order_number}`}</p>
+                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                          <Clock className="h-3 w-3" />
+                          <span>{formatDistanceToNow(new Date(order.created_at), { addSuffix: true })}</span>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <p className="font-medium">{formatCurrency(order.total)}</p>
+                        {getStatusBadge(order.status)}
+                      </div>
                     </div>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-8 text-muted-foreground">
+                  <Package className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                  <p>No orders yet</p>
+                  <Button variant="link" onClick={() => navigate('/restaurants')}>
+                    Order now
+                  </Button>
+                </div>
+              )}
             </CardContent>
           </Card>
         </TabsContent>
@@ -317,33 +371,40 @@ export function CustomerDashboard() {
               <CardDescription>All your past food orders</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
-                {recentOrders.map((order) => (
-                  <div
-                    key={order.id}
-                    className="flex items-center gap-4 p-4 rounded-lg border hover:bg-muted/50 cursor-pointer"
-                    onClick={() => navigate(`/orders/${order.id}`)}
-                  >
-                    <div className="h-16 w-16 rounded-lg bg-muted flex items-center justify-center">
-                      <Utensils className="h-8 w-8 text-orange-500" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="font-semibold text-lg">{order.name}</p>
-                      <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                        <span className="flex items-center gap-1">
-                          <Clock className="h-3 w-3" />
-                          {order.date.toLocaleDateString('en-ZA')}
-                        </span>
+              {recentOrders.length > 0 ? (
+                <div className="space-y-4">
+                  {recentOrders.map((order: any) => (
+                    <div
+                      key={order.id}
+                      className="flex items-center gap-4 p-4 rounded-lg border hover:bg-muted/50 cursor-pointer"
+                      onClick={() => navigate(`/orders/${order.id}`)}
+                    >
+                      <div className="h-16 w-16 rounded-lg bg-muted flex items-center justify-center">
+                        <Utensils className="h-8 w-8 text-orange-500" />
                       </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="font-semibold text-lg">{order.restaurant?.name || `Order ${order.order_number}`}</p>
+                        <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                          <span className="flex items-center gap-1">
+                            <Clock className="h-3 w-3" />
+                            {new Date(order.created_at).toLocaleDateString('en-ZA')}
+                          </span>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <p className="font-semibold text-lg">{formatCurrency(order.total)}</p>
+                        {getStatusBadge(order.status)}
+                      </div>
+                      <ChevronRight className="h-5 w-5 text-muted-foreground" />
                     </div>
-                    <div className="text-right">
-                      <p className="font-semibold text-lg">{formatCurrency(order.total)}</p>
-                      {getStatusBadge(order.status)}
-                    </div>
-                    <ChevronRight className="h-5 w-5 text-muted-foreground" />
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-12 text-muted-foreground">
+                  <Package className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                  <p>No orders yet</p>
+                </div>
+              )}
             </CardContent>
           </Card>
         </TabsContent>
@@ -355,41 +416,50 @@ export function CustomerDashboard() {
               <CardDescription>Hotels, venues, experiences, and rides</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
-                {upcomingBookings.map((booking) => (
-                  <div
-                    key={booking.id}
-                    className="flex items-center gap-4 p-4 rounded-lg border hover:bg-muted/50 cursor-pointer"
-                  >
-                    <div className="h-16 w-16 rounded-lg bg-muted flex items-center justify-center">
-                      {getTypeIcon(booking.type)}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2">
-                        <p className="font-semibold text-lg">{booking.name}</p>
-                        <Badge variant="outline" className="capitalize">{booking.type}</Badge>
+              {upcomingBookings.length > 0 ? (
+                <div className="space-y-4">
+                  {upcomingBookings.map((booking) => (
+                    <div
+                      key={booking.id}
+                      className="flex items-center gap-4 p-4 rounded-lg border hover:bg-muted/50 cursor-pointer"
+                    >
+                      <div className="h-16 w-16 rounded-lg bg-muted flex items-center justify-center">
+                        {getTypeIcon(booking.type)}
                       </div>
-                      <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                        <span className="flex items-center gap-1">
-                          <Calendar className="h-3 w-3" />
-                          {booking.date.toLocaleDateString('en-ZA', {
-                            weekday: 'long',
-                            year: 'numeric',
-                            month: 'long',
-                            day: 'numeric',
-                          })}
-                        </span>
-                        <span className="flex items-center gap-1">
-                          <MapPin className="h-3 w-3" />
-                          {booking.location}
-                        </span>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2">
+                          <p className="font-semibold text-lg">{booking.name}</p>
+                          <Badge variant="outline" className="capitalize">{booking.type}</Badge>
+                        </div>
+                        <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                          <span className="flex items-center gap-1">
+                            <Calendar className="h-3 w-3" />
+                            {booking.date.toLocaleDateString('en-ZA', {
+                              weekday: 'long',
+                              year: 'numeric',
+                              month: 'long',
+                              day: 'numeric',
+                            })}
+                          </span>
+                          {booking.location && (
+                            <span className="flex items-center gap-1">
+                              <MapPin className="h-3 w-3" />
+                              {booking.location}
+                            </span>
+                          )}
+                        </div>
                       </div>
+                      {getStatusBadge(booking.status)}
+                      <ChevronRight className="h-5 w-5 text-muted-foreground" />
                     </div>
-                    {getStatusBadge(booking.status)}
-                    <ChevronRight className="h-5 w-5 text-muted-foreground" />
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-12 text-muted-foreground">
+                  <Calendar className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                  <p>No bookings yet</p>
+                </div>
+              )}
             </CardContent>
           </Card>
         </TabsContent>
@@ -405,7 +475,7 @@ export function CustomerDashboard() {
                 <div className="flex items-center justify-between p-4 rounded-lg bg-gradient-to-r from-amber-500/10 to-orange-500/10">
                   <div>
                     <p className="text-sm text-muted-foreground">Current Tier</p>
-                    <p className="text-2xl font-bold text-amber-600">{loyaltyStats.tier}</p>
+                    <p className="text-2xl font-bold text-amber-600">{loyaltyTierName}</p>
                   </div>
                   <Star className="h-12 w-12 text-amber-500" />
                 </div>
@@ -413,20 +483,12 @@ export function CustomerDashboard() {
                 <div className="grid grid-cols-2 gap-4">
                   <div className="p-4 rounded-lg border">
                     <p className="text-sm text-muted-foreground">Available Points</p>
-                    <p className="text-2xl font-bold">{loyaltyStats.points.toLocaleString()}</p>
+                    <p className="text-2xl font-bold">{loyaltyPoints.toLocaleString()}</p>
                   </div>
                   <div className="p-4 rounded-lg border">
-                    <p className="text-sm text-muted-foreground">Total Spent</p>
-                    <p className="text-2xl font-bold">{formatCurrency(loyaltyStats.totalSpent)}</p>
+                    <p className="text-sm text-muted-foreground">Lifetime Orders</p>
+                    <p className="text-2xl font-bold">{loyalty?.lifetime_orders || 0}</p>
                   </div>
-                </div>
-
-                <div className="space-y-2">
-                  <div className="flex justify-between text-sm">
-                    <span>Progress to {loyaltyStats.nextTier}</span>
-                    <span>{loyaltyStats.pointsToNext} points to go</span>
-                  </div>
-                  <Progress value={((3000 - loyaltyStats.pointsToNext) / 3000) * 100} />
                 </div>
               </CardContent>
             </Card>
@@ -453,8 +515,8 @@ export function CustomerDashboard() {
                     </div>
                     <Button
                       size="sm"
-                      variant={loyaltyStats.points >= reward.points ? 'default' : 'outline'}
-                      disabled={loyaltyStats.points < reward.points}
+                      variant={loyaltyPoints >= reward.points ? 'default' : 'outline'}
+                      disabled={loyaltyPoints < reward.points}
                     >
                       {reward.points} pts
                     </Button>
@@ -486,7 +548,7 @@ export function CustomerDashboard() {
             <span className="font-medium">Saved Addresses</span>
           </CardContent>
         </Card>
-        <Card className="cursor-pointer hover:shadow-md">
+        <Card className="cursor-pointer hover:shadow-md" onClick={() => navigate('/help')}>
           <CardContent className="p-4 flex items-center gap-3">
             <Shield className="h-5 w-5 text-purple-500" />
             <span className="font-medium">Help & Support</span>
