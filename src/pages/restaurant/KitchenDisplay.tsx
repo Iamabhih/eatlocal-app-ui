@@ -259,7 +259,7 @@ const KitchenDisplay = () => {
                   {/* Order Type */}
                   <div className="px-4 py-2 border-b border-gray-800 flex items-center justify-between">
                     <Badge variant="outline" className="text-gray-300 border-gray-700">
-                      {(order.fulfillment_type || 'delivery').toUpperCase()}
+                      {((order as any).fulfillment_type || 'delivery').toUpperCase()}
                     </Badge>
                     <span className="text-gray-500 text-xs">
                       {new Date(order.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
