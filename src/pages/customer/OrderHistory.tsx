@@ -13,22 +13,28 @@ import { format } from "date-fns";
 import { useCart } from "@/hooks/useCart";
 import { useToast } from "@/hooks/use-toast";
 
+interface OrderItem {
+  quantity: number;
+  unit_price: number;
+  menu_item_id: string;
+  menu_item: {
+    name: string;
+    id: string;
+  };
+}
+
 interface Order {
   id: string;
   order_number: string;
   status: string;
   total: number;
   created_at: string;
+  restaurant_id: string;
   restaurant: {
     name: string;
     image_url: string;
   };
-  order_items: {
-    quantity: number;
-    menu_item: {
-      name: string;
-    };
-  }[];
+  order_items: OrderItem[];
 }
 
 const statusColors: Record<string, string> = {
