@@ -1,17 +1,17 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { LoadScript, GoogleMap, Marker, DirectionsRenderer } from '@react-google-maps/api';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { JourneyModeSelector } from '@/components/rides/JourneyModeSelector';
 import { useRides } from '@/hooks/useRides';
-import { MapPin, Navigation, AlertCircle } from 'lucide-react';
+import { MapPin, Navigation } from 'lucide-react';
 import { toast } from 'sonner';
 import { logger } from '@/lib/logger';
-import { Alert, AlertDescription } from '@/components/ui/alert';
 
-const MAPS_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
+const MAPS_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY || '';
 const hasMapsKey = !!MAPS_KEY;
 
 const libraries: ("places")[] = ["places"];
