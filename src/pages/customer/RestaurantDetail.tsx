@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Star, Clock, DollarSign, Plus, Minus, ShoppingCart } from "lucide-react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -8,6 +9,8 @@ import { useRestaurant } from "@/hooks/useRestaurants";
 import { useRestaurantMenu } from "@/hooks/useMenuItems";
 import { useCart } from "@/hooks/useCart";
 import { ReviewsSection } from "@/components/customer/ReviewsSection";
+import { MenuItemCustomization } from "@/components/customer/MenuItemCustomization";
+import { useRecentlyViewed } from "@/hooks/useSmartSearch";
 
 const RestaurantDetail = () => {
   const { id } = useParams<{ id: string }>();
