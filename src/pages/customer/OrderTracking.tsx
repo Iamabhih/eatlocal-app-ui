@@ -34,6 +34,8 @@ interface Restaurant {
   street_address: string;
   city: string;
   state: string;
+  latitude: number | null;
+  longitude: number | null;
 }
 
 interface DeliveryLocation {
