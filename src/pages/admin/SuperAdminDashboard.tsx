@@ -1454,10 +1454,6 @@ export default function SuperAdminDashboard() {
                   </Card>
                 </TabsContent>
               </Tabs>
-            </main>
-          </ScrollArea>
-        </div>
-      </div>
-    </SidebarProvider>
+    </div>
   );
 }

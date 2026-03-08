@@ -967,9 +967,6 @@ export default function AdminPlatformConfig() {
                 </div>
               </TabsContent>
             </Tabs>
-          </main>
-        </div>
-      </div>
-    </SidebarProvider>
+    </div>
   );
 }
