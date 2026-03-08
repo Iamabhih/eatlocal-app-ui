@@ -142,40 +142,7 @@ export default function AdminPlatformConfig() {
   );
 
   return (
-    <SidebarProvider>
-      <div className="min-h-screen flex w-full">
-        <AdminSidebar isSuperadmin={isSuperadmin} />
-
-        <div className="flex-1">
-          <header className="h-16 border-b flex items-center justify-between px-6 bg-gradient-to-r from-primary/5 to-accent/5">
-            <div className="flex items-center gap-4">
-              <SidebarTrigger />
-              <div className="flex items-center gap-3">
-                <Settings className="h-6 w-6 text-primary" />
-                <h1 className="text-2xl font-bold">Platform Configuration</h1>
-              </div>
-              <Badge variant="default" className="bg-primary">
-                SuperAdmin Only
-              </Badge>
-            </div>
-            <div className="flex items-center gap-2">
-              {hasChanges && (
-                <Badge variant="outline" className="text-yellow-600 border-yellow-600">
-                  Unsaved Changes
-                </Badge>
-              )}
-              <Button variant="outline" onClick={handleReset} disabled={isUpdating}>
-                <RotateCcw className="h-4 w-4 mr-2" />
-                Reset to Defaults
-              </Button>
-              <Button onClick={handleSave} disabled={isUpdating || !hasChanges}>
-                <Save className="h-4 w-4 mr-2" />
-                {isUpdating ? 'Saving...' : 'Save Changes'}
-              </Button>
-            </div>
-          </header>
-
-          <main className="p-6">
+    <div>
             {/* Warning Banner */}
             <Card className="border-yellow-500/50 bg-yellow-50 dark:bg-yellow-900/10 mb-6">
               <CardContent className="flex items-center gap-4 py-4">
