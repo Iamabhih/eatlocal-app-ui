@@ -433,9 +433,6 @@ export default function AdminAnalytics() {
                 </TabsContent>
               </Tabs>
             )}
-          </main>
-        </div>
-      </div>
-    </SidebarProvider>
+    </div>
   );
 }

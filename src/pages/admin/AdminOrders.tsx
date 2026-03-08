@@ -831,6 +831,6 @@ export default function AdminOrders() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </SidebarProvider>
+    </>
   );
 }

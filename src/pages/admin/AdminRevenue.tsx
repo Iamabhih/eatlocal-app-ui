@@ -289,9 +289,6 @@ export default function AdminRevenue() {
                 </div>
               </>
             )}
-          </main>
-        </div>
-      </div>
-    </SidebarProvider>
+    </div>
   );
 }

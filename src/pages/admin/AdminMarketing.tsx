@@ -651,10 +651,6 @@ export default function AdminMarketing() {
                   </CardContent>
                 </Card>
               </TabsContent>
-            </Tabs>
-          </main>
-        </div>
-      </div>
-    </SidebarProvider>
+    </div>
   );
 }

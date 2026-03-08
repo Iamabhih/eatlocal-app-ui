@@ -113,9 +113,6 @@ export default function AdminRestaurants() {
                 )}
               </CardContent>
             </Card>
-          </main>
-        </div>
-      </div>
-    </SidebarProvider>
+    </div>
   );
 }

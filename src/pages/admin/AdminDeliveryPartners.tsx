@@ -597,6 +597,6 @@ export default function AdminDeliveryPartners() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </SidebarProvider>
+    </>
   );
 }
