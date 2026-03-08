@@ -61,7 +61,6 @@ const BookRide = lazy(() => import("./pages/rider/BookRide"));
 const MyRides = lazy(() => import("./pages/rider/MyRides"));
 const RideTracking = lazy(() => import("./pages/rider/RideTracking"));
 
-const DriverPendingOrders = lazy(() => import("./pages/driver/DriverPendingOrders"));
 
 // Lazy-loaded: Legal & Support Pages
 const Terms = lazy(() => import("./pages/legal/Terms"));
