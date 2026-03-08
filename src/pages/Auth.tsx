@@ -7,6 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
+import { lovable } from '@/integrations/lovable/index';
 import { Utensils, Truck, User, ArrowLeft, Sparkles, Mail, Lock, Phone, UserCircle } from 'lucide-react';
 
 type UserRole = 'customer' | 'restaurant' | 'delivery_partner';
