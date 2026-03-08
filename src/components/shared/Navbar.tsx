@@ -358,40 +358,41 @@ const Navbar = ({ type = "customer" }: NavbarProps) => {
             </div>
 
             {/* Mobile Nav Links */}
-            <div className="flex flex-col gap-2">
+            <div className="flex flex-col gap-1">
+              <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider px-3 pt-2">Services</p>
               <Link to="/restaurants" onClick={() => setMobileMenuOpen(false)}>
                 <Button variant="ghost" className="w-full justify-start rounded-xl">
-                  <Utensils className="h-4 w-4 mr-2 text-orange-500" />
+                  <Utensils className="h-4 w-4 mr-2 text-primary" />
                   Food Delivery
                 </Button>
               </Link>
               <Link to="/hotels" onClick={() => setMobileMenuOpen(false)}>
                 <Button variant="ghost" className="w-full justify-start rounded-xl">
-                  <Hotel className="h-4 w-4 mr-2 text-blue-500" />
+                  <Hotel className="h-4 w-4 mr-2 text-primary" />
                   Hotels & Stays
                 </Button>
               </Link>
               <Link to="/venues" onClick={() => setMobileMenuOpen(false)}>
                 <Button variant="ghost" className="w-full justify-start rounded-xl">
-                  <Building2 className="h-4 w-4 mr-2 text-purple-500" />
+                  <Building2 className="h-4 w-4 mr-2 text-primary" />
                   Venues
                 </Button>
               </Link>
               <Link to="/experiences" onClick={() => setMobileMenuOpen(false)}>
                 <Button variant="ghost" className="w-full justify-start rounded-xl">
-                  <Sparkles className="h-4 w-4 mr-2 text-pink-500" />
+                  <Sparkles className="h-4 w-4 mr-2 text-primary" />
                   Experiences
                 </Button>
               </Link>
               <Link to="/rides/book" onClick={() => setMobileMenuOpen(false)}>
                 <Button variant="ghost" className="w-full justify-start rounded-xl">
-                  <Car className="h-4 w-4 mr-2 text-green-500" />
+                  <Car className="h-4 w-4 mr-2 text-primary" />
                   Rides
                 </Button>
               </Link>
               <Link to="/map" onClick={() => setMobileMenuOpen(false)}>
                 <Button variant="ghost" className="w-full justify-start rounded-xl">
-                  <Map className="h-4 w-4 mr-2 text-teal-500" />
+                  <Map className="h-4 w-4 mr-2 text-primary" />
                   Explore Map
                 </Button>
               </Link>
