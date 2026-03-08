@@ -80,10 +80,10 @@ const OrderTracking = () => {
       if (orderError) throw orderError;
       setOrder(orderData);
 
-      // Fetch restaurant
+      // Fetch restaurant with coordinates
       const { data: restaurantData, error: restaurantError} = await supabase
         .from('restaurants')
-        .select('name, phone, street_address, city, state')
+        .select('name, phone, street_address, city, state, latitude, longitude')
         .eq('id', orderData.restaurant_id)
         .single();
 
