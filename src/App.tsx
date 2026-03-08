@@ -753,6 +753,7 @@ const App = () => (
           <AuthProvider>
             <RestaurantChangeModal />
             <PanicButton variant="floating" size="md" />
+            <ChatbotWidget />
             <main id="main-content">
               <AppContent />
             </main>
