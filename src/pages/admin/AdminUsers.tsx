@@ -1,6 +1,4 @@
 import { useState } from 'react';
-import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
-import { AdminSidebar } from '@/components/admin/AdminSidebar';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
@@ -165,14 +163,8 @@ export default function AdminUsers() {
   };
 
   return (
-    <SidebarProvider>
-      <div className="min-h-screen flex w-full">
-        <AdminSidebar />
-        <div className="flex-1 flex flex-col">
-          <header className="h-12 flex items-center border-b px-4">
-            <SidebarTrigger />
-          </header>
-          <main className="flex-1 p-6 bg-muted/30">
+    <>
+      <div>
             <h1 className="text-3xl font-bold mb-6">User Management</h1>
 
             {/* Stats Cards */}
@@ -397,9 +389,7 @@ export default function AdminUsers() {
                 )}
               </CardContent>
             </Card>
-          </main>
-        </div>
-      </div>
+    </div>
 
       {/* User Details Dialog */}
       <Dialog open={showUserDetails} onOpenChange={setShowUserDetails}>
@@ -496,6 +486,6 @@ export default function AdminUsers() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </SidebarProvider>
+    </>
   );
 }
