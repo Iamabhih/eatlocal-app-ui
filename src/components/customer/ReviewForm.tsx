@@ -23,6 +23,10 @@ export function ReviewForm({ restaurantId, orderId, restaurantName, onSuccess, o
   const [hoverRating, setHoverRating] = useState(0);
   const [reviewText, setReviewText] = useState('');
   const [isAnonymous, setIsAnonymous] = useState(false);
+  const [photoPreviews, setPhotoPreviews] = useState<string[]>([]);
+  const [photoFiles, setPhotoFiles] = useState<File[]>([]);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const { upload, isUploading } = useImageUpload();
 
   const createReview = useCreateReview();
 
