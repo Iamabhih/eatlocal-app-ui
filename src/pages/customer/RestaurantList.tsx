@@ -185,6 +185,16 @@ const RestaurantList = () => {
     return sorted;
   }, [filteredRestaurants, sortBy, sortDirection]);
 
+  // Pagination
+  const totalPages = Math.ceil(sortedRestaurants.length / ITEMS_PER_PAGE);
+  const paginatedRestaurants = useMemo(() => {
+    const start = (currentPage - 1) * ITEMS_PER_PAGE;
+    return sortedRestaurants.slice(start, start + ITEMS_PER_PAGE);
+  }, [sortedRestaurants, currentPage]);
+
+  // Reset page when filters change
+  useMemo(() => { setCurrentPage(1); }, [searchQuery, selectedCategory, filters, showFavoritesOnly, sortBy, sortDirection]);
+
   const activeFiltersCount = useMemo(() => {
     let count = 0;
     if (filters.openNow) count++;
