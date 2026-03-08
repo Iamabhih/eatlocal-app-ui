@@ -90,12 +90,20 @@ const RestaurantDashboard = lazy(() => import("./pages/restaurant/RestaurantDash
 const RestaurantOrders = lazy(() => import("./pages/restaurant/RestaurantOrders"));
 const RestaurantMenu = lazy(() => import("./pages/restaurant/RestaurantMenu"));
 const KitchenDisplay = lazy(() => import("./pages/restaurant/KitchenDisplay"));
+const RestaurantSettings = lazy(() => import("./pages/restaurant/RestaurantSettings"));
+const RestaurantPromotions = lazy(() => import("./pages/restaurant/RestaurantPromotions"));
 
 // Lazy-loaded: Delivery Partner Portal
 const DeliveryPortalLayout = lazy(() => import("./components/delivery/DeliveryPortalLayout"));
 const DeliveryDashboard = lazy(() => import("./pages/delivery/DeliveryDashboard"));
 const DeliveryOrders = lazy(() => import("./pages/delivery/DeliveryOrders"));
 const DeliveryEarnings = lazy(() => import("./pages/delivery/DeliveryEarnings"));
+const DeliveryProfile = lazy(() => import("./pages/delivery/DeliveryProfile"));
+const DeliveryMap = lazy(() => import("./pages/delivery/DeliveryMap"));
+
+// Lazy-loaded: Driver Portal
+const DriverPendingOrders = lazy(() => import("./pages/driver/DriverPendingOrders"));
+const DriverRegistration = lazy(() => import("./pages/driver/DriverRegistration"));
 
 // Lazy-loaded: Admin Portal
 const AdminDashboard = lazy(() => import("./pages/admin/AdminDashboard"));
