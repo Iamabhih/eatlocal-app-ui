@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -13,16 +13,6 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 
 const MAPS_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
 const hasMapsKey = !!MAPS_KEY;
-
-// Only import Google Maps if key exists
-let LoadScript: any, GoogleMap: any, Marker: any, DirectionsRenderer: any;
-if (hasMapsKey) {
-  const maps = await import('@react-google-maps/api');
-  LoadScript = maps.LoadScript;
-  GoogleMap = maps.GoogleMap;
-  Marker = maps.Marker;
-  DirectionsRenderer = maps.DirectionsRenderer;
-}
 
 const libraries: ("places")[] = ["places"];
 
