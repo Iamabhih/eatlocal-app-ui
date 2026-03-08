@@ -14,3 +14,6 @@ verify_jwt = true
 
 [functions.send-push]
 verify_jwt = true
+
+[functions.seed-demo-data]
+verify_jwt = false
