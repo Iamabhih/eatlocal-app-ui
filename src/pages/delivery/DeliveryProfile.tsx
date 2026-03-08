@@ -1,34 +1,30 @@
-import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useAuth } from '@/contexts/AuthContext';
 import { useDeliveryPartnerStatus } from '@/hooks/useDeliveryPartnerStatus';
-import { User, Phone, Mail, Star, Package, TrendingUp } from 'lucide-react';
-import { toast } from 'sonner';
+import { Phone, Mail, Star, Package, TrendingUp } from 'lucide-react';
 
 export default function DeliveryProfile() {
-  const { user, profile } = useAuth();
+  const { user } = useAuth();
   const { status } = useDeliveryPartnerStatus();
+
+  const displayName = user?.user_metadata?.full_name || 'Delivery Partner';
 
   return (
     <div className="container mx-auto p-6 max-w-3xl space-y-6">
       <h1 className="text-2xl font-bold">My Profile</h1>
 
-      {/* Profile Card */}
       <Card>
         <CardHeader className="flex flex-row items-center gap-4">
           <Avatar className="h-20 w-20">
-            <AvatarImage src={profile?.avatar_url || undefined} />
+            <AvatarImage src={user?.user_metadata?.avatar_url || undefined} />
             <AvatarFallback className="text-xl">
-              {profile?.full_name?.charAt(0) || 'D'}
+              {displayName.charAt(0)}
             </AvatarFallback>
           </Avatar>
           <div className="flex-1">
-            <CardTitle className="text-xl">{profile?.full_name || 'Delivery Partner'}</CardTitle>
+            <CardTitle className="text-xl">{displayName}</CardTitle>
             <p className="text-muted-foreground">{user?.email}</p>
             <Badge variant={status?.is_online ? 'default' : 'secondary'} className="mt-2">
               {status?.is_online ? 'Online' : 'Offline'}
@@ -43,13 +39,12 @@ export default function DeliveryProfile() {
             </div>
             <div className="flex items-center gap-2">
               <Phone className="h-4 w-4 text-muted-foreground" />
-              <span className="text-sm">{profile?.phone || 'Not set'}</span>
+              <span className="text-sm">{user?.user_metadata?.phone || 'Not set'}</span>
             </div>
           </div>
         </CardContent>
       </Card>
 
-      {/* Stats */}
       <div className="grid grid-cols-3 gap-4">
         <Card>
           <CardContent className="p-4 text-center">

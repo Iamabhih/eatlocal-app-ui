@@ -4,43 +4,31 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Card } from '@/components/ui/card';
-import { useChatbot } from '@/hooks/useChatbot';
+import { useChatSession, useChatMessages, useSendMessage } from '@/hooks/useChatbot';
 import { useAuth } from '@/contexts/AuthContext';
 
 export function ChatbotWidget() {
   const [isOpen, setIsOpen] = useState(false);
   const [input, setInput] = useState('');
   const { user } = useAuth();
-  const {
-    currentSession,
-    messages,
-    createSession,
-    sendMessage,
-    isSending,
-  } = useChatbot();
-
-  const handleOpen = async () => {
-    setIsOpen(true);
-    if (!currentSession) {
-      await createSession.mutateAsync('support');
-    }
-  };
+  const { data: session } = useChatSession();
+  const { data: messages = [] } = useChatMessages(session?.id);
+  const sendMessage = useSendMessage();
 
   const handleSend = async () => {
-    if (!input.trim() || !currentSession) return;
+    if (!input.trim() || !session) return;
     const msg = input;
     setInput('');
-    await sendMessage.mutateAsync({ content: msg });
+    await sendMessage.mutateAsync({ sessionId: session.id, content: msg });
   };
 
   if (!user) return null;
 
   return (
     <>
-      {/* Floating button */}
       {!isOpen && (
         <button
-          onClick={handleOpen}
+          onClick={() => setIsOpen(true)}
           className="fixed bottom-6 right-6 z-50 h-14 w-14 rounded-full bg-primary text-primary-foreground shadow-lg flex items-center justify-center hover:opacity-90 transition-opacity"
           aria-label="Open chat"
         >
@@ -48,10 +36,8 @@ export function ChatbotWidget() {
         </button>
       )}
 
-      {/* Chat panel */}
       {isOpen && (
         <Card className="fixed bottom-6 right-6 z-50 w-80 sm:w-96 h-[480px] flex flex-col shadow-2xl">
-          {/* Header */}
           <div className="flex items-center justify-between px-4 py-3 border-b bg-primary text-primary-foreground rounded-t-lg">
             <span className="font-semibold">Support Chat</span>
             <button onClick={() => setIsOpen(false)} aria-label="Close chat">
@@ -59,7 +45,6 @@ export function ChatbotWidget() {
             </button>
           </div>
 
-          {/* Messages */}
           <ScrollArea className="flex-1 p-4">
             <div className="space-y-3">
               {messages.length === 0 && (
@@ -86,21 +71,20 @@ export function ChatbotWidget() {
             </div>
           </ScrollArea>
 
-          {/* Input */}
           <div className="p-3 border-t flex gap-2">
             <Input
               placeholder="Type a message..."
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleSend()}
-              disabled={isSending || !currentSession}
+              disabled={sendMessage.isPending || !session}
             />
             <Button
               size="icon"
               onClick={handleSend}
-              disabled={isSending || !input.trim()}
+              disabled={sendMessage.isPending || !input.trim()}
             >
-              {isSending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+              {sendMessage.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
             </Button>
           </div>
         </Card>
