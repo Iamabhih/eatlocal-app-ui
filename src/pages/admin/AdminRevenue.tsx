@@ -137,16 +137,8 @@ export default function AdminRevenue() {
     
     toast({ title: 'Report exported successfully' });
   };
-
   return (
-    <SidebarProvider>
-      <div className="min-h-screen flex w-full">
-        <AdminSidebar />
-        <div className="flex-1 flex flex-col">
-          <header className="h-12 flex items-center border-b px-4">
-            <SidebarTrigger />
-          </header>
-          <main className="flex-1 p-6 bg-muted/30">
+    <div>
             <h1 className="text-3xl font-bold mb-6">Platform Revenue</h1>
 
             {isLoading ? (
