@@ -1,11 +1,12 @@
-import { useState } from 'react';
-import { Star, Camera, X } from 'lucide-react';
+import { useState, useRef } from 'react';
+import { Star, Camera, X, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { useCreateReview } from '@/hooks/useRatingsReviews';
+import { useImageUpload } from '@/hooks/useImageUpload';
 
 interface ReviewFormProps {
   restaurantId: string;
