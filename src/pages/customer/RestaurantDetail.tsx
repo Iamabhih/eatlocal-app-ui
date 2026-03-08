@@ -18,6 +18,11 @@ const RestaurantDetail = () => {
   const { data: restaurant, isLoading: restaurantLoading } = useRestaurant(id!);
   const { data: menu = [], isLoading: menuLoading } = useRestaurantMenu(id!);
   const { addItem, removeItem, getItemQuantity, getCartTotal, getTotalItems } = useCart();
+  const { addRecent } = useRecentlyViewed();
+  const [customizeItem, setCustomizeItem] = useState<any>(null);
+
+  // Track recently viewed
+  if (id) addRecent(id);
 
   if (restaurantLoading || menuLoading) {
     return (
