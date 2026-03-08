@@ -266,14 +266,7 @@ export default function AdminOrders() {
   };
 
   return (
-    <SidebarProvider>
-      <div className="min-h-screen flex w-full">
-        <AdminSidebar />
-        <div className="flex-1 flex flex-col">
-          <header className="h-12 flex items-center border-b px-4">
-            <SidebarTrigger />
-          </header>
-          <main className="flex-1 p-6 bg-muted/30 overflow-auto">
+    <>
             <div className="flex items-center justify-between mb-6">
               <div>
                 <h1 className="text-3xl font-bold">Order Management</h1>
@@ -524,9 +517,6 @@ export default function AdminOrders() {
                 )}
               </CardContent>
             </Card>
-          </main>
-        </div>
-      </div>
 
       {/* Order Details Sheet */}
       <Sheet open={showOrderSheet} onOpenChange={setShowOrderSheet}>

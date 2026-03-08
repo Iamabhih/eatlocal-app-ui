@@ -206,8 +206,6 @@ export default function AdminDeliveryPartners() {
   });
   return (
     <>
-      <div>
-          <main className="flex-1 p-6 bg-muted/30">
             <h1 className="text-3xl font-bold mb-6">Delivery Partners</h1>
 
             {/* Summary Cards */}
@@ -463,9 +461,6 @@ export default function AdminDeliveryPartners() {
                 )}
               </CardContent>
             </Card>
-          </main>
-        </div>
-      </div>
 
       {/* Partner Details Dialog */}
       <Dialog open={showDetailsDialog} onOpenChange={setShowDetailsDialog}>
