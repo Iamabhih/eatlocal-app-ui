@@ -314,24 +314,7 @@ export default function SuperAdminDashboard() {
   };
 
   return (
-    <SidebarProvider>
-      <div className="min-h-screen flex w-full">
-        <AdminSidebar isSuperadmin={isSuperadmin} />
-
-        <div className="flex-1 overflow-hidden">
-          <header className="h-16 border-b flex items-center px-6 bg-gradient-to-r from-primary/5 to-accent/5">
-            <SidebarTrigger />
-            <div className="flex items-center gap-3 ml-4">
-              <ShieldCheck className="h-6 w-6 text-primary" />
-              <h1 className="text-2xl font-bold">Super Admin Control Panel</h1>
-            </div>
-            <Badge variant="default" className="ml-4 bg-primary">
-              Full System Access
-            </Badge>
-          </header>
-
-          <ScrollArea className="h-[calc(100vh-4rem)]">
-            <main className="p-6 space-y-6">
+    <div>
               {/* Warning Banner */}
               <Card className="border-yellow-500/50 bg-yellow-50 dark:bg-yellow-900/10">
                 <CardContent className="flex items-center gap-4 py-4">
