@@ -252,6 +252,34 @@ const RestaurantDetail = () => {
           totalReviews={restaurant.total_reviews || 0}
         />
       </div>
+      {/* Menu Item Customization Modal */}
+      {customizeItem && (
+        <MenuItemCustomization
+          open={!!customizeItem}
+          onOpenChange={(open) => !open && setCustomizeItem(null)}
+          menuItem={{
+            id: customizeItem.id,
+            name: customizeItem.name,
+            description: customizeItem.description,
+            price: Number(customizeItem.price),
+            image_url: customizeItem.image_url,
+          }}
+          onAddToCart={(customized) => {
+            for (let i = 0; i < customized.quantity; i++) {
+              addItem({
+                restaurantId: restaurant!.id,
+                restaurantName: restaurant!.name,
+                menuItemId: customized.menuItemId,
+                name: customized.name + (customized.selectedOptions.length > 0
+                  ? ` (${customized.selectedOptions.map(o => o.name).join(', ')})`
+                  : ''),
+                price: customized.price,
+                image_url: customizeItem.image_url,
+              });
+            }
+          }}
+        />
+      )}
     </div>
   );
 };
