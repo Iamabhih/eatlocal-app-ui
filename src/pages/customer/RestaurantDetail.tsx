@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Star, Clock, DollarSign, Plus, Minus, ShoppingCart } from "lucide-react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -8,6 +9,8 @@ import { useRestaurant } from "@/hooks/useRestaurants";
 import { useRestaurantMenu } from "@/hooks/useMenuItems";
 import { useCart } from "@/hooks/useCart";
 import { ReviewsSection } from "@/components/customer/ReviewsSection";
+import { MenuItemCustomization } from "@/components/customer/MenuItemCustomization";
+import { useRecentlyViewed } from "@/hooks/useSmartSearch";
 
 const RestaurantDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -15,6 +18,11 @@ const RestaurantDetail = () => {
   const { data: restaurant, isLoading: restaurantLoading } = useRestaurant(id!);
   const { data: menu = [], isLoading: menuLoading } = useRestaurantMenu(id!);
   const { addItem, removeItem, getItemQuantity, getCartTotal, getTotalItems } = useCart();
+  const { addRecent } = useRecentlyViewed();
+  const [customizeItem, setCustomizeItem] = useState<any>(null);
+
+  // Track recently viewed
+  if (id) addRecent(id);
 
   if (restaurantLoading || menuLoading) {
     return (
@@ -160,7 +168,7 @@ const RestaurantDetail = () => {
                                     )}
                                     <Button
                                       size="sm"
-                                      onClick={() => handleAddToCart(item)}
+                                      onClick={() => setCustomizeItem(item)}
                                       className="bg-primary hover:bg-primary/90"
                                     >
                                       <Plus className="h-4 w-4" />
@@ -244,6 +252,34 @@ const RestaurantDetail = () => {
           totalReviews={restaurant.total_reviews || 0}
         />
       </div>
+      {/* Menu Item Customization Modal */}
+      {customizeItem && (
+        <MenuItemCustomization
+          open={!!customizeItem}
+          onOpenChange={(open) => !open && setCustomizeItem(null)}
+          menuItem={{
+            id: customizeItem.id,
+            name: customizeItem.name,
+            description: customizeItem.description,
+            price: Number(customizeItem.price),
+            image_url: customizeItem.image_url,
+          }}
+          onAddToCart={(customized) => {
+            for (let i = 0; i < customized.quantity; i++) {
+              addItem({
+                restaurantId: restaurant!.id,
+                restaurantName: restaurant!.name,
+                menuItemId: customized.menuItemId,
+                name: customized.name + (customized.selectedOptions.length > 0
+                  ? ` (${customized.selectedOptions.map(o => o.name).join(', ')})`
+                  : ''),
+                price: customized.price,
+                image_url: customizeItem.image_url,
+              });
+            }
+          }}
+        />
+      )}
     </div>
   );
 };
